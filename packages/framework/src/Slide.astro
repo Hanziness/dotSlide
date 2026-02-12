@@ -1,0 +1,105 @@
+---
+
+
+
+
+
+
+
+export const identifier = 'slide' as const
+---
+
+<ds-slide class="bg-red shrink-0">
+  <div class="font-bold text-2xl">Here's a slide</div>
+
+  <slot />
+</ds-slide>
+
+<style>
+ds-slide {
+  position: relative;
+  width: var(--slide-width);
+  height: var(--slide-height);
+  scale: var(--slide-scale);
+  transform-origin: top left;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+
+  overflow: hidden;
+}
+
+ds-slide:not(.active) {
+  display: none;
+}
+</style>
+
+<script>
+import type { MapStore } from "nanostores"
+import type { Slideshow } from "./Slideshow.astro.0.mts"
+import { createSlideContext } from "./store/context/slide"
+import { type SlideshowContext, useSlideshowContext } from "./store/context/slideshow"
+
+class Slide extends HTMLElement {
+  // TODO This still runs BEFORE its parent does
+  connectedCallback() {
+
+  }
+}
+
+customElements.define('ds-slide', Slide)
+
+const slides = document.querySelectorAll<HTMLElement>(`ds-slide`)
+const slideshowRoot = slides[0].closest('ds-slideshow') as Slideshow
+
+/** Update the visibility of all slides */
+function updateActiveSlides(activeIdx: number) {
+  // TODO Only update those two slides that changed!
+
+  slides.forEach((slide, idx) => {
+    if (idx === activeIdx) {
+      slide.classList.remove('inactive')
+      slide.classList.add('active')
+    } else {
+      // Here we can prepare previous and next slides as well
+      slide.classList.remove('active')
+      slide.classList.add('inactive')
+    }
+  })
+}
+
+
+
+let slideshowContext: MapStore<SlideshowContext>
+
+function onSlideshowContextReady(context: MapStore<SlideshowContext>) {
+  context.subscribe((value, _oldValue, changedKey) => {
+    if (changedKey !== "activeSlide") return;
+    const newActiveSlide = value.activeSlide
+    updateActiveSlides(newActiveSlide)
+  })
+
+  updateActiveSlides(context.get().activeSlide)
+}
+
+try {
+  slideshowContext = useSlideshowContext(slides[0])
+  onSlideshowContextReady(slideshowContext)
+} catch (err) {
+  const readyEventId = `slideshow-${slideshowRoot.dataset.slideshowId}-ready`
+  console.warn(`Waiting for ${readyEventId}...`)
+  document.addEventListener(readyEventId, () => {
+    console.log("Slideshow finally loaded! Yay!")
+    slideshowContext = useSlideshowContext(slides[0])
+    onSlideshowContextReady(slideshowContext)
+  })
+}
+
+// Register index for each slide
+slides.forEach((slide, idx) => {
+  slide.setAttribute("data-slide-index", idx.toString())
+  createSlideContext(slide, {
+    index: idx
+  })
+})
+</script>

@@ -1,0 +1,19 @@
+---
+export type OverlayLocation = 'top' | 'center' | 'bottom';
+export type Alignment = 'left' | 'center' | 'right';
+
+interface Props {
+    location: OverlayLocation
+    alignment: Alignment
+    padding?: boolean
+}
+---
+
+<div class:list={[
+    'absolute flex flex-row gap-2',
+    { 'top-0': Astro.props.location === 'top', 'bottom-0': Astro.props.location === 'bottom', 'h-full items-center': Astro.props.location === 'center'},
+    { 'left-0': Astro.props.alignment === 'left', 'w-full justify-center': Astro.props.alignment === 'center', 'right-0': Astro.props.alignment === 'right' },
+    { 'p-4': Astro.props.padding }
+]}>
+    <slot />
+</div>

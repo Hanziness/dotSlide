@@ -1,0 +1,38 @@
+{
+  "name": "@dotslide/framework",
+  "version": "0.0.1",
+  "type": "module",
+  "exports": {
+    ".": "./index.ts",
+    "./controls": "./controls.ts"
+  },
+  "files": [
+    "src",
+    "index.ts",
+    "controls.ts"
+  ],
+  "keywords": [
+    "dotslide",
+    "astro-component"
+  ],
+  "scripts": {
+    "build:css": "unocss --minify",
+    "dev": "unocss --watch",
+    "dev:setup": "wait-on dist/styles.css"
+  },
+  "devDependencies": {
+    "@iconify-json/lucide": "^1.2.89",
+    "@unocss/cli": "^66.6.0",
+    "@unocss/preset-icons": "^66.6.0",
+    "astro": "^5.17.1",
+    "unocss": "^66.6.0",
+    "wait-on": "^9.0.3"
+  },
+  "peerDependencies": {
+    "astro": "^4.0.0 || ^5.0.0 || ^6.0.0"
+  },
+  "dependencies": {
+    "nanostores": "^1.1.0",
+    "zod": "^4.3.6"
+  }
+}

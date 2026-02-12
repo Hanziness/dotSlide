@@ -1,0 +1,25 @@
+---
+
+import { DebugCurrentSection, Root, Section, Slide, Slideshow, StyleHelper } from "@dotslide/framework";
+import { SlideControls } from "@dotslide/framework/controls"
+---
+
+<Root>
+	<StyleHelper />
+	<Slideshow width={1024} height={768}>
+		<Slide>Hi there</Slide>
+		<Section level={1} title="Hello there" />
+		<Section level={2} title="Subsection" />
+		<Slide>
+			Slide 2
+			<DebugCurrentSection />
+		</Slide>
+		<Section level={1} title="Part 2" />
+		<Slide>
+			
+			<div>Ho ho ho!</div>
+			<DebugCurrentSection />
+		</Slide>
+		<SlideControls />
+	</Slideshow>
+</Root>

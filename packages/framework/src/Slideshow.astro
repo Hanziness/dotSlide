@@ -1,0 +1,108 @@
+---
+
+import { generateId } from "./utils";
+
+interface Props {
+  /** Internal width of the slides, in pixels */
+  width: number;
+  /** Internal height of the slides, in pixels */
+  height: number;
+}
+
+export const identifier = 'slideshow' as const
+
+const slideshowId = generateId()
+---
+
+<script>
+import type { MapStore } from "nanostores";
+import { createSlideshowContext, type SlideshowContext } from "./store/context/slideshow";
+import { generateId } from "./utils";
+
+type Size = {
+  width: number
+  height: number
+}
+
+export class Slideshow extends HTMLElement {
+  /** Unique identifier of this Slideshow */
+  slideshowId: string
+  /** Display size of the Slideshow, in pixels */
+  slideshowSize: Size
+
+  constructor() {
+    super()
+
+    const slideWidth = this.getAttribute("data-slideshow-width")
+    const slideHeight = this.getAttribute("data-slideshow-height")
+
+    if (slideWidth === null || slideHeight === null) {
+        throw new Error("Slideshow width or height is undefined")
+      }
+
+    const width = Number.parseInt(slideWidth, 10)
+    const height = Number.parseInt(slideHeight, 10)
+
+    this.slideshowSize = {
+      width,
+      height
+    }
+
+    this.slideshowId = this.dataset.slideshowId ?? generateId()
+  }
+
+  connectedCallback() {
+    const slideshowId = this.dataset.slideshowId as string
+    const resizeObserver = new ResizeObserver((entries) => {
+      if (entries.length < 1) { return; }
+
+      const currentDimensions = this.getBoundingClientRect();
+      const scaleToFitParent = Math.min(currentDimensions.width / this.slideshowSize.width, currentDimensions.height / this.slideshowSize.height)
+      this.style.setProperty('--slide-scale', scaleToFitParent.toString());
+    })
+
+    const slides = this.querySelectorAll('ds-slide')
+
+    const slideshowContextRef = createSlideshowContext(this, {
+      id: slideshowId,
+      width: this.slideshowSize.width,
+      height: this.slideshowSize.height,
+      activeSlide: 0,
+      numSlides: slides.length
+    })
+
+    slideshowContextRef.subscribe((store) => {
+      console.debug(store)
+    })
+
+    this.style.setProperty('--slide-width', `${this.slideshowSize.width}px`);
+    this.style.setProperty('--slide-height', `${this.slideshowSize.height}px`);
+
+    resizeObserver.observe(this);
+    document.dispatchEvent(new CustomEvent(`slideshow-${this.slideshowId}-ready`))
+  }
+}
+
+customElements.define('ds-slideshow', Slideshow)
+</script>
+
+
+<style>
+ds-slideshow {
+  --fit-scale: 1;
+  --slide-width: attr(data-slideshow-width px);
+  --slide-height: attr(data-slideshow-height px);
+  --slide-scale: attr(data-slideshow-scale, 1);
+
+  scale: var(--fit-scale);
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  flex-direction: row;
+}
+</style>
+
+<ds-slideshow data-slideshow-id={slideshowId} data-slideshow-width={Astro.props.width} data-slideshow-height={Astro.props.height}>
+  <slot />
+</ds-slideshow>
