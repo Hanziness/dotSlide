@@ -1,0 +1,86 @@
+---
+// Future props to consider:
+// disabled?: boolean;           — temporarily disable keyboard navigation
+// keyMap?: Record<string, ...>; — custom key bindings
+// preventDefault?: boolean;     — control whether to prevent default browser behavior
+---
+
+<ds-keyboard-handler></ds-keyboard-handler>
+
+<script>
+import { useSlideshowContext } from "../store/context/slideshow";
+
+/** Navigation action triggered by a key press */
+type NavigationAction = "next" | "prev" | "first" | "last";
+
+/** Maps keyboard keys to navigation actions */
+const KEY_MAP: Record<string, NavigationAction> = {
+  ArrowRight: "next",
+  ArrowDown: "next",
+  PageDown: "next",
+  ArrowLeft: "prev",
+  ArrowUp: "prev",
+  PageUp: "prev",
+  Home: "first",
+  End: "last",
+};
+
+class KeyboardHandler extends HTMLElement {
+  private keydownHandler: ((e: KeyboardEvent) => void) | undefined;
+
+  connectedCallback() {
+    // Throws if not within a <Slideshow> — expected behavior
+    const ctx = useSlideshowContext(this);
+    const root = ctx.get().root;
+
+    this.keydownHandler = (e: KeyboardEvent) => {
+      // Only respond when this slideshow contains focus or nothing is focused
+      if (
+        !root.contains(document.activeElement) &&
+        document.activeElement !== document.body
+      ) {
+        return;
+      }
+
+      const action = KEY_MAP[e.key];
+      if (action === undefined) return;
+
+      e.preventDefault();
+
+      const { activeSlide, numSlides } = ctx.get();
+      let newIndex: number;
+
+      switch (action) {
+        case "next":
+          newIndex = activeSlide + 1;
+          break;
+        case "prev":
+          newIndex = activeSlide - 1;
+          break;
+        case "first":
+          newIndex = 0;
+          break;
+        case "last":
+          newIndex = numSlides - 1;
+          break;
+      }
+
+      ctx.setKey(
+        "activeSlide",
+        Math.max(0, Math.min(newIndex, numSlides - 1)),
+      );
+    };
+
+    document.addEventListener("keydown", this.keydownHandler);
+  }
+
+  disconnectedCallback() {
+    if (this.keydownHandler) {
+      document.removeEventListener("keydown", this.keydownHandler);
+      this.keydownHandler = undefined;
+    }
+  }
+}
+
+customElements.define("ds-keyboard-handler", KeyboardHandler);
+</script>
