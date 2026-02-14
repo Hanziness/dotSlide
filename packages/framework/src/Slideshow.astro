@@ -15,8 +15,7 @@ const slideshowId = generateId()
 ---
 
 <script>
-import type { MapStore } from "nanostores";
-import { createSlideshowContext, type SlideshowContext } from "./store/context/slideshow";
+import { createSlideshowContext } from "./store/context/slideshow";
 import { generateId } from "./utils";
 
 type Size = {
@@ -100,6 +99,8 @@ ds-slideshow {
 
   display: flex;
   flex-direction: row;
+  justify-content: center;
+  align-items: center;
 }
 </style>
 

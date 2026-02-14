@@ -10,18 +10,16 @@ export const identifier = 'slide' as const
 ---
 
 <ds-slide class="bg-red shrink-0">
-  <div class="font-bold text-2xl">Here's a slide</div>
-
-  <slot />
+  <div class="slide-container">
+    <slot />
+  </div>
 </ds-slide>
 
 <style>
 ds-slide {
   position: relative;
-  width: var(--slide-width);
-  height: var(--slide-height);
-  scale: var(--slide-scale);
-  transform-origin: top left;
+  width: calc(var(--slide-width) * var(--slide-scale));
+  height: calc(var(--slide-height) * var(--slide-scale));
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
@@ -31,6 +29,13 @@ ds-slide {
 
 ds-slide:not(.active) {
   display: none;
+}
+
+ds-slide > div.slide-container {
+  width: var(--slide-width);
+  height: var(--slide-height);
+  scale: var(--slide-scale);
+  transform-origin: 0 0;
 }
 </style>
 
