@@ -15,7 +15,7 @@ const slideshowId = generateId()
 ---
 
 <script>
-import { buildNavigationSequence } from "./store/context/navigation";
+import { buildNavigationSequence, type NavigationNode } from "./store/context/navigation";
 import { createSlideshowContext } from "./store/context/slideshow";
 import { generateId } from "./utils";
 
@@ -24,11 +24,29 @@ type Size = {
   height: number
 }
 
+function parseHash(hash: string): { slideIndex: number, stepIndex: number } | null {
+  const match = hash.match(/^#\/(\d+)(?:\/(\d+))?$/);
+  if (!match) return null;
+  return {
+    slideIndex: parseInt(match[1], 10) - 1, // 1 subtracted because it is treated as a 1-based index
+    stepIndex: match[2] ? parseInt(match[2], 10) : 1
+  };
+}
+
+function findNavigationIndex(sequence: NavigationNode[], target: { slideIndex: number, stepIndex: number }): number {
+  return sequence.findIndex(node => 
+    node.slideIndex === target.slideIndex && node.stepIndex === target.stepIndex
+  );
+}
+
 export class Slideshow extends HTMLElement {
   /** Unique identifier of this Slideshow */
   slideshowId: string
   /** Display size of the Slideshow, in pixels */
   slideshowSize: Size
+  
+  private _resizeObserver?: ResizeObserver
+  private _onHashChange?: () => void
 
   constructor() {
     super()
@@ -53,7 +71,7 @@ export class Slideshow extends HTMLElement {
 
   connectedCallback() {
     const slideshowId = this.dataset.slideshowId as string
-    const resizeObserver = new ResizeObserver((entries) => {
+    this._resizeObserver = new ResizeObserver((entries) => {
       if (entries.length < 1) { return; }
 
       const currentDimensions = this.getBoundingClientRect();
@@ -64,23 +82,56 @@ export class Slideshow extends HTMLElement {
     const slides = this.querySelectorAll('ds-slide')
     const navigationSequence = buildNavigationSequence(this);
 
+    let initialNavigationIndex = 0;
+    const hashState = parseHash(window.location.hash);
+    if (hashState) {
+        const idx = findNavigationIndex(navigationSequence, hashState);
+        if (idx !== -1) initialNavigationIndex = idx;
+    }
+
     const slideshowContextRef = createSlideshowContext(this, {
       id: slideshowId,
       width: this.slideshowSize.width,
       height: this.slideshowSize.height,
-      navigationIndex: 0,
+      navigationIndex: initialNavigationIndex,
       navigationSequence,
     })
 
     slideshowContextRef.subscribe((store) => {
       console.debug(store)
+      
+      const { activeSlide, activeStep } = store;
+      const hash = activeStep === 1 ? `#/${activeSlide + 1}` : `#/${activeSlide + 1}/${activeStep}`;
+      
+      if (window.location.hash !== hash) {
+          history.replaceState(null, "", hash);
+      }
     })
+
+    this._onHashChange = () => {
+        const newState = parseHash(window.location.hash);
+        if (newState) {
+             const seq = slideshowContextRef.get().navigationSequence;
+             const newIndex = findNavigationIndex(seq, newState);
+             if (newIndex !== -1) {
+                 slideshowContextRef.goTo(newIndex);
+             }
+        }
+    }
+    window.addEventListener("hashchange", this._onHashChange);
 
     this.style.setProperty('--slide-width', `${this.slideshowSize.width}px`);
     this.style.setProperty('--slide-height', `${this.slideshowSize.height}px`);
 
-    resizeObserver.observe(this);
+    this._resizeObserver.observe(this);
     document.dispatchEvent(new CustomEvent(`slideshow-${this.slideshowId}-ready`))
+  }
+  
+  disconnectedCallback() {
+      this._resizeObserver?.disconnect();
+      if (this._onHashChange) {
+          window.removeEventListener("hashchange", this._onHashChange);
+      }
   }
 }
 
