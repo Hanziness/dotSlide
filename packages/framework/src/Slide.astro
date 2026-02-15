@@ -33,98 +33,31 @@ ds-slide > div.slide-container {
 </style>
 
 <script>
-import type { Slideshow } from "./Slideshow.astro.0.mts"
 import { createSlideContext } from "./store/context/slide"
-import { type SlideshowStore, useSlideshowContext } from "./store/context/slideshow"
 import { logger } from "./utils"
 
 class Slide extends HTMLElement {
-  // TODO This still runs BEFORE its parent does
   connectedCallback() {
+    queueMicrotask(() => {
+      const slideshow = this.closest("ds-slideshow")
+      if (!slideshow) {
+        logger.warn("Slide is not rendered inside a ds-slideshow")
+        return
+      }
 
+      const slides = Array.from(slideshow.querySelectorAll<HTMLElement>("ds-slide"))
+      const slideIndex = slides.indexOf(this)
+
+      if (slideIndex === -1) {
+        logger.warn("Slide could not determine its index within the slideshow")
+        return
+      }
+
+      this.setAttribute("data-slide-index", slideIndex.toString())
+      createSlideContext(this, { index: slideIndex })
+    })
   }
 }
 
-customElements.define('ds-slide', Slide)
-
-const slides = document.querySelectorAll<HTMLElement>(`ds-slide`)
-const slideshowRoot = slides[0].closest('ds-slideshow') as Slideshow
-
-/** Update the visibility of all slides */
-function updateActiveSlides(activeIdx: number) {
-  // TODO Only update those two slides that changed!
-
-  slides.forEach((slide, idx) => {
-    if (idx === activeIdx) {
-      slide.classList.remove('inactive')
-      slide.classList.add('active')
-    } else {
-      // Here we can prepare previous and next slides as well
-      slide.classList.remove('active')
-      slide.classList.add('inactive')
-    }
-  })
-}
-
-/**
- * Toggle `.active` on `<ds-step>` children of a slide based on the
- * step visibility rule:
- *   visible = (from == null || activeStep >= from)
- *          && (to   == null || activeStep <= to)
- */
-function updateStepVisibility(slide: HTMLElement, activeStep: number) {
-  for (const step of slide.querySelectorAll<HTMLElement>("ds-step")) {
-    const from = step.dataset.stepFrom ? Number(step.dataset.stepFrom) : null;
-    const to = step.dataset.stepTo ? Number(step.dataset.stepTo) : null;
-
-    const visible =
-      (from === null || activeStep >= from) &&
-      (to === null || activeStep <= to);
-
-    step.classList.toggle("active", visible);
-  }
-}
-
-let slideshowContext: SlideshowStore
-
-function onSlideshowContextReady(context: SlideshowStore) {
-  context.subscribe((value, _oldValue, changedKey) => {
-    if (changedKey !== "navigationIndex") return;
-
-    const node = value.navigationSequence[value.navigationIndex];
-    if (!node) return;
-
-    updateActiveSlides(node.slideIndex);
-    updateStepVisibility(slides[node.slideIndex], node.stepIndex);
-  })
-
-  // Apply initial state
-  const value = context.get();
-  const node = value.navigationSequence[value.navigationIndex];
-  if (node) {
-    updateActiveSlides(node.slideIndex);
-    updateStepVisibility(slides[node.slideIndex], node.stepIndex);
-  }
-}
-
-try {
-  slideshowContext = useSlideshowContext(slides[0])
-  onSlideshowContextReady(slideshowContext)
-} catch (err) {
-  const readyEventId = `slideshow-${slideshowRoot.dataset.slideshowId}-ready`
-  logger.log(`Waiting for ${readyEventId}...`)
-  document.addEventListener(readyEventId, () => {
-    logger.log("Slideshow finally loaded! Yay!")
-    slideshowContext = useSlideshowContext(slides[0])
-    onSlideshowContextReady(slideshowContext)
-  })
-}
-
-// Register index for each slide
-slides.forEach((slide, idx) => {
-  slide.setAttribute("data-slide-index", idx.toString())
-  createSlideContext(slide, {
-    index: idx
-  })
-})
+customElements.define("ds-slide", Slide)
 </script>
