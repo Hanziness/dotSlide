@@ -93,7 +93,7 @@ export const createSlideshowContext = (
 export const useSlideshowContext = (child: HTMLElement): SlideshowStore => {
   const ctx = useContext<SlideshowContext>(child, "ds-slideshow");
 
-  logger.info("Using slideshow context");
+  logger.debug("Using slideshow context");
 
   if (ctx === undefined) {
     throw new Error(`No Slideshow context found for ${child.tagName}`, {
