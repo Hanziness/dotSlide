@@ -15,9 +15,10 @@ const slideshowId = generateId()
 ---
 
 <script>
-import { buildNavigationSequence, type NavigationNode } from "./store/context/navigation";
+import type { NavigationNode } from "./store/context/navigation";
 import { createSlideshowContext } from "./store/context/slideshow";
-import { generateId, logger } from "./utils";
+import { generateId } from "./utils";
+import { buildNavigationSequence, updateSlideVisibility, updateStepVisibility } from "./utils/navigation";
 
 type Size = {
   width: number
@@ -79,7 +80,7 @@ export class Slideshow extends HTMLElement {
       this.style.setProperty('--slide-scale', scaleToFitParent.toString());
     })
 
-    const slides = this.querySelectorAll('ds-slide')
+    const slides = [...this.querySelectorAll<HTMLElement>('ds-slide')];
     const navigationSequence = buildNavigationSequence(this);
 
     let initialNavigationIndex = 0;
@@ -97,10 +98,17 @@ export class Slideshow extends HTMLElement {
       navigationSequence,
     })
 
-    slideshowContextRef.subscribe((store) => {
-      logger.debug(store)
-      
+    // Update navigation on context changes
+    slideshowContextRef.subscribe((store, oldValue) => {
       const { activeSlide, activeStep } = store;
+      const currentSlide = slides[activeSlide];
+
+      // Update Slide and Step visibilities
+      updateSlideVisibility(slides, activeSlide, oldValue?.activeSlide);
+      if (currentSlide) {
+        updateStepVisibility(currentSlide, activeStep);
+      }
+
       const hash = activeStep === 1 ? `#/${activeSlide + 1}` : `#/${activeSlide + 1}/${activeStep}`;
       
       if (window.location.hash !== hash) {
@@ -108,13 +116,13 @@ export class Slideshow extends HTMLElement {
       }
     })
 
+    // Update state on hash changes
     this._onHashChange = () => {
         const newState = parseHash(window.location.hash);
         if (newState) {
-             const seq = slideshowContextRef.get().navigationSequence;
-             const newIndex = findNavigationIndex(seq, newState);
+             const newIndex = findNavigationIndex(navigationSequence, newState);
              if (newIndex !== -1) {
-                 slideshowContextRef.goTo(newIndex);
+                 slideshowContextRef.setKey("navigationIndex", newIndex);
              }
         }
     }
