@@ -33,10 +33,9 @@ ds-slide > div.slide-container {
 </style>
 
 <script>
-import type { MapStore } from "nanostores"
 import type { Slideshow } from "./Slideshow.astro.0.mts"
 import { createSlideContext } from "./store/context/slide"
-import { type SlideshowContext, useSlideshowContext } from "./store/context/slideshow"
+import { type SlideshowStore, useSlideshowContext } from "./store/context/slideshow"
 
 class Slide extends HTMLElement {
   // TODO This still runs BEFORE its parent does
@@ -66,18 +65,45 @@ function updateActiveSlides(activeIdx: number) {
   })
 }
 
+/**
+ * Toggle `.active` on `<ds-step>` children of a slide based on the
+ * step visibility rule:
+ *   visible = (from == null || activeStep >= from)
+ *          && (to   == null || activeStep <= to)
+ */
+function updateStepVisibility(slide: HTMLElement, activeStep: number) {
+  for (const step of slide.querySelectorAll<HTMLElement>("ds-step")) {
+    const from = step.dataset.stepFrom ? Number(step.dataset.stepFrom) : null;
+    const to = step.dataset.stepTo ? Number(step.dataset.stepTo) : null;
 
+    const visible =
+      (from === null || activeStep >= from) &&
+      (to === null || activeStep <= to);
 
-let slideshowContext: MapStore<SlideshowContext>
+    step.classList.toggle("active", visible);
+  }
+}
 
-function onSlideshowContextReady(context: MapStore<SlideshowContext>) {
+let slideshowContext: SlideshowStore
+
+function onSlideshowContextReady(context: SlideshowStore) {
   context.subscribe((value, _oldValue, changedKey) => {
-    if (changedKey !== "activeSlide") return;
-    const newActiveSlide = value.activeSlide
-    updateActiveSlides(newActiveSlide)
+    if (changedKey !== "navigationIndex") return;
+
+    const node = value.navigationSequence[value.navigationIndex];
+    if (!node) return;
+
+    updateActiveSlides(node.slideIndex);
+    updateStepVisibility(slides[node.slideIndex], node.stepIndex);
   })
 
-  updateActiveSlides(context.get().activeSlide)
+  // Apply initial state
+  const value = context.get();
+  const node = value.navigationSequence[value.navigationIndex];
+  if (node) {
+    updateActiveSlides(node.slideIndex);
+    updateStepVisibility(slides[node.slideIndex], node.stepIndex);
+  }
 }
 
 try {
