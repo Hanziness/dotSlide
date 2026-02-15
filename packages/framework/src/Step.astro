@@ -1,0 +1,33 @@
+---
+import { z } from "astro/zod";
+
+export const PropSchema = z
+  .object({
+    /** First step where this content is visible (inclusive, 1-based) */
+    from: z.number().int().min(1).optional(),
+    /** Last step where this content is visible (inclusive, 1-based) */
+    to: z.number().int().min(1).optional(),
+  })
+  .refine((data) => data.from !== undefined || data.to !== undefined, {
+    message: "At least one of 'from' or 'to' must be provided",
+  })
+  .refine((data) => data.from === undefined || data.to === undefined || data.from <= data.to, {
+    message: "'from' must be less than or equal to 'to'",
+  });
+
+type Props = z.output<typeof PropSchema>;
+
+const { from, to } = PropSchema.parse(Astro.props);
+---
+
+<ds-step data-step-from={from} data-step-to={to}><slot /></ds-step>
+
+<style>
+  ds-step {
+    display: contents;
+  }
+
+  ds-step:not(.active) {
+    display: none;
+  }
+</style>
