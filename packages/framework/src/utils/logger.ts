@@ -15,41 +15,26 @@ const contentStyle =
 
 const shouldLogDev = Boolean(import.meta.env.DEV);
 
-const printLog = (level: LogLevel, args: unknown[]) => {
-  const method = console[level] as typeof console.log;
+const noop = (..._args: unknown[]) => void 0;
+
+const bindLog = (level: LogLevel) => {
+  const method = console[level];
   if (typeof method !== "function") {
-    return;
+    return noop;
   }
 
-  method("%c[dotslide] %c", levelStyles[level], contentStyle, ...args);
+  return method.bind(
+    console,
+    "%c[dotslide] %c",
+    levelStyles[level],
+    contentStyle,
+  );
 };
 
 export const logger = {
-  debug: (...args: unknown[]) => {
-    if (!shouldLogDev) {
-      return;
-    }
-
-    printLog("debug", args);
-  },
-  info: (...args: unknown[]) => {
-    if (!shouldLogDev) {
-      return;
-    }
-
-    printLog("info", args);
-  },
-  log: (...args: unknown[]) => {
-    if (!shouldLogDev) {
-      return;
-    }
-
-    printLog("log", args);
-  },
-  warn: (...args: unknown[]) => {
-    printLog("warn", args);
-  },
-  error: (...args: unknown[]) => {
-    printLog("error", args);
-  },
+  debug: shouldLogDev ? bindLog("debug") : noop,
+  info: shouldLogDev ? bindLog("info") : noop,
+  log: shouldLogDev ? bindLog("log") : noop,
+  warn: bindLog("warn"),
+  error: bindLog("error"),
 };
