@@ -15,6 +15,7 @@ const slideshowId = generateId()
 ---
 
 <script>
+import { buildNavigationSequence } from "./store/context/navigation";
 import { createSlideshowContext } from "./store/context/slideshow";
 import { generateId } from "./utils";
 
@@ -61,13 +62,14 @@ export class Slideshow extends HTMLElement {
     })
 
     const slides = this.querySelectorAll('ds-slide')
+    const navigationSequence = buildNavigationSequence(this);
 
     const slideshowContextRef = createSlideshowContext(this, {
       id: slideshowId,
       width: this.slideshowSize.width,
       height: this.slideshowSize.height,
-      activeSlide: 0,
-      numSlides: slides.length
+      navigationIndex: 0,
+      navigationSequence,
     })
 
     slideshowContextRef.subscribe((store) => {
