@@ -1,6 +1,6 @@
 ---
 
-import { DebugCurrentSection, Root, Section, Slide, Slideshow, StyleHelper } from "@dotslide/framework";
+import { DebugCurrentSection, Root, Section, Slide, Slideshow, Step, StyleHelper } from "@dotslide/framework";
 import { KeyboardHandler, SlideControls } from "@dotslide/framework/controls"
 ---
 
@@ -13,6 +13,7 @@ import { KeyboardHandler, SlideControls } from "@dotslide/framework/controls"
 		<Slide>
 			Slide 2
 			<DebugCurrentSection />
+			<Step from={2}>This the second step of this slideshow!</Step>
 		</Slide>
 		<Section level={1} title="Part 2" />
 		<Slide>
