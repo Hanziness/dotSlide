@@ -1,6 +1,7 @@
 import type { SectionInfo } from "../store";
 import { sectionContext } from "../store";
 import { useSlideshowContext } from "../store/context/slideshow";
+import { logger } from "./logger";
 
 /**
  * Build the section hierarchy from DOM elements.
@@ -12,11 +13,9 @@ import { useSlideshowContext } from "../store/context/slideshow";
  * 3. Map each slide to its preceding section
  */
 export function buildSectionHierarchy(): void {
-  const slideshowRoot = document.querySelector<HTMLElement>(
-    "ds-slideshow",
-  );
+  const slideshowRoot = document.querySelector<HTMLElement>("ds-slideshow");
   if (!slideshowRoot) {
-    console.warn("Cannot build section hierarchy: slideshow root not found");
+    logger.warn("Cannot build section hierarchy: slideshow root not found");
     return;
   }
 
@@ -70,7 +69,7 @@ export function buildSectionHierarchy(): void {
     initialized: true,
   });
 
-  console.debug("Section hierarchy built:", sectionsBySlide);
+  logger.debug("Section hierarchy built:", sectionsBySlide);
 }
 
 /**
@@ -101,7 +100,7 @@ export function getCurrentSection(
   const slideshowContext = useSlideshowContext(slideshowRoot);
 
   if (!context.initialized) {
-    console.warn(
+    logger.warn(
       "Section hierarchy not initialized. Call buildSectionHierarchy() first.",
     );
     return null;
@@ -118,7 +117,7 @@ export function getCurrentSection(
     // HTMLElement - get index from data attribute
     const indexAttr = slideIndexOrElement.getAttribute("data-slide-index");
     if (indexAttr === null) {
-      console.warn("Slide element missing data-slide-index attribute");
+      logger.warn("Slide element missing data-slide-index attribute");
       return null;
     }
     slideIndex = Number.parseInt(indexAttr, 10);
@@ -133,7 +132,10 @@ export function getCurrentSection(
  * @param slideIndex - Slide index, or undefined for active slide
  * @returns String like "1.2.4" or empty string if no section
  */
-export function getSectionString(slideshowRoot: HTMLElement, slideIndex?: number): string {
+export function getSectionString(
+  slideshowRoot: HTMLElement,
+  slideIndex?: number,
+): string {
   const section = getCurrentSection(slideshowRoot, slideIndex);
   return section?.levels.join(".") ?? "";
 }

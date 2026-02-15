@@ -1,4 +1,5 @@
 import type { MapStore } from "nanostores";
+import { logger } from "../../utils";
 import { provideContext, useContext } from ".";
 import {
   createNavigationMethods,
@@ -60,7 +61,7 @@ export const createSlideshowContext = (
 ): SlideshowStore => {
   const { navigationSequence, navigationIndex } = initialValue;
 
-  console.info("Creating slideshow context");
+  logger.info("Creating slideshow context");
   const store = provideContext<SlideshowContext>(root, {
     ...initialValue,
     root,
@@ -92,7 +93,7 @@ export const createSlideshowContext = (
 export const useSlideshowContext = (child: HTMLElement): SlideshowStore => {
   const ctx = useContext<SlideshowContext>(child, "ds-slideshow");
 
-  console.info("Using slideshow context");
+  logger.info("Using slideshow context");
 
   if (ctx === undefined) {
     throw new Error(`No Slideshow context found for ${child.tagName}`, {

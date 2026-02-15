@@ -36,6 +36,7 @@ ds-slide > div.slide-container {
 import type { Slideshow } from "./Slideshow.astro.0.mts"
 import { createSlideContext } from "./store/context/slide"
 import { type SlideshowStore, useSlideshowContext } from "./store/context/slideshow"
+import { logger } from "./utils"
 
 class Slide extends HTMLElement {
   // TODO This still runs BEFORE its parent does
@@ -111,9 +112,9 @@ try {
   onSlideshowContextReady(slideshowContext)
 } catch (err) {
   const readyEventId = `slideshow-${slideshowRoot.dataset.slideshowId}-ready`
-  console.warn(`Waiting for ${readyEventId}...`)
+  logger.log(`Waiting for ${readyEventId}...`)
   document.addEventListener(readyEventId, () => {
-    console.log("Slideshow finally loaded! Yay!")
+    logger.log("Slideshow finally loaded! Yay!")
     slideshowContext = useSlideshowContext(slides[0])
     onSlideshowContextReady(slideshowContext)
   })

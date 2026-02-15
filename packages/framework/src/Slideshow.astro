@@ -17,7 +17,7 @@ const slideshowId = generateId()
 <script>
 import { buildNavigationSequence, type NavigationNode } from "./store/context/navigation";
 import { createSlideshowContext } from "./store/context/slideshow";
-import { generateId } from "./utils";
+import { generateId, logger } from "./utils";
 
 type Size = {
   width: number
@@ -98,7 +98,7 @@ export class Slideshow extends HTMLElement {
     })
 
     slideshowContextRef.subscribe((store) => {
-      console.debug(store)
+      logger.debug(store)
       
       const { activeSlide, activeStep } = store;
       const hash = activeStep === 1 ? `#/${activeSlide + 1}` : `#/${activeSlide + 1}/${activeStep}`;
