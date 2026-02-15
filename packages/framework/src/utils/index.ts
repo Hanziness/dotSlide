@@ -35,6 +35,7 @@ export function getDataTags<T extends Record<string, unknown>>(
   }, {});
 }
 
+export { logger } from "./logger";
 // Re-export section utilities for convenient access
 export {
   buildSectionHierarchy,
