@@ -1,5 +1,4 @@
 export { default as Section } from "./src/components/Section.astro";
-export { default as DebugCurrentSection } from "./src/dev/CurrentSection.astro";
 export { default as Root } from "./src/Root.astro";
 export { default as Slide } from "./src/Slide.astro";
 export { default as Slideshow } from "./src/Slideshow.astro";
