@@ -2,10 +2,10 @@
 
 <script>
     import { useSlideContext } from "../store/context/slide"
-    import { getCurrentSection } from "../utils";
 
+    
     document.querySelectorAll('[data-debug-section]').forEach((el) => {
         const ctx = useSlideContext(el as HTMLElement)
-        console.log(ctx?.get().index)
+        el.textContent = ctx?.get().index.toString() || "(?)"
     })
 </script>
