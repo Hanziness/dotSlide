@@ -6,10 +6,7 @@
 import { useSlideshowContext } from "../store/context/slideshow"
 
 document.querySelectorAll('button[slide-prev]').forEach((btn) => {
-  const slideshowContext = useSlideshowContext(btn as HTMLElement)
-  btn.addEventListener('click', () => {
-    const currentIdx = slideshowContext.get().activeSlide
-    slideshowContext.setKey('activeSlide', Math.max(0, currentIdx - 1))
-  })
+  const ctx = useSlideshowContext(btn as HTMLElement)
+  btn.addEventListener('click', () => ctx.prev())
 })
 </script>

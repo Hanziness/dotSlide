@@ -47,28 +47,7 @@ class KeyboardHandler extends HTMLElement {
 
       e.preventDefault();
 
-      const { activeSlide, numSlides } = ctx.get();
-      let newIndex: number;
-
-      switch (action) {
-        case "next":
-          newIndex = activeSlide + 1;
-          break;
-        case "prev":
-          newIndex = activeSlide - 1;
-          break;
-        case "first":
-          newIndex = 0;
-          break;
-        case "last":
-          newIndex = numSlides - 1;
-          break;
-      }
-
-      ctx.setKey(
-        "activeSlide",
-        Math.max(0, Math.min(newIndex, numSlides - 1)),
-      );
+      ctx[action]();
     };
 
     document.addEventListener("keydown", this.keydownHandler);

@@ -6,10 +6,7 @@
 import { useSlideshowContext } from "../store/context/slideshow"
 
 document.querySelectorAll('button[slide-next]').forEach((btn) => {
-  const slideshowContext = useSlideshowContext(btn as HTMLElement)
-  btn.addEventListener('click', () => {
-    const store = slideshowContext.get()
-    slideshowContext.setKey('activeSlide', Math.max(0, Math.min(store.activeSlide + 1, store.numSlides - 1)))
-  })
+  const ctx = useSlideshowContext(btn as HTMLElement)
+  btn.addEventListener('click', () => ctx.next())
 })
 </script>
