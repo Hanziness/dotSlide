@@ -80,7 +80,13 @@ export function updateSlideVisibility(
   activeIdx: number,
   prevIdx?: number,
 ): void {
-  if (prevIdx !== undefined && prevIdx !== activeIdx) {
+  const prevIsValid =
+    prevIdx !== undefined &&
+    prevIdx !== activeIdx &&
+    prevIdx >= 0 &&
+    prevIdx < slides.length;
+
+  if (prevIsValid) {
     const prevSlide = slides[prevIdx];
     const activeSlide = slides[activeIdx];
 
