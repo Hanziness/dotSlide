@@ -12,7 +12,7 @@ export function getComponentDataAttribute(prefix: string) {
 
 /** Returns a query selector for the given identifier (`[data-${identifier}]`) */
 export function getSelector(identifier: string) {
-  return `[data-${identifier}]`
+  return `[data-${identifier}]`;
 }
 
 /** Export an embeddable set of `data-` attributes for a particular component.
@@ -36,6 +36,11 @@ export function getDataTags<T extends Record<string, unknown>>(
 }
 
 export { logger } from "./logger";
+export {
+  type ResourceHandle,
+  type ResourceRegistrationDetail,
+  registerResource,
+} from "./resource";
 // Re-export section utilities for convenient access
 export {
   buildSectionHierarchy,
