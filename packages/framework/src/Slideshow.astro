@@ -17,8 +17,10 @@ const slideshowId = generateId()
 <script>
 import type { NavigationNode } from "./store/context/navigation";
 import { createSlideshowContext } from "./store/context/slideshow";
-import { generateId } from "./utils";
+import { generateId, logger } from "./utils";
+import { RESOURCE_READY, RESOURCE_REGISTER } from "./utils/events";
 import { buildNavigationSequence, updateSlideVisibility, updateStepVisibility } from "./utils/navigation";
+import type { ResourceRegistrationDetail } from "./utils/resource";
 
 type Size = {
   width: number
@@ -48,6 +50,8 @@ export class Slideshow extends HTMLElement {
   
   private _resizeObserver?: ResizeObserver
   private _onHashChange?: () => void
+  private _onResourceRegister?: (e: Event) => void
+  private _onResourceReady?: (e: Event) => void
 
   constructor() {
     super()
@@ -98,13 +102,64 @@ export class Slideshow extends HTMLElement {
       navigationSequence,
     })
 
+    // Resource readiness event listeners
+    this._onResourceRegister = (e: Event) => {
+      const { resourceId, slideIndex } = (e as CustomEvent<ResourceRegistrationDetail>).detail;
+      logger.debug(`Resource registered: ${resourceId} (slide ${slideIndex})`);
+
+      const current = slideshowContextRef.get();
+
+      // Revert to loading if we were already ready (late registration)
+      if (current.phase === "ready") {
+        slideshowContextRef.setKey("phase", "loading");
+      }
+
+      slideshowContextRef.setKey("pending", {
+        ...current.pending,
+        [resourceId]: { slideIndex },
+      });
+    };
+
+    this._onResourceReady = (e: Event) => {
+      const { resourceId } = (e as CustomEvent<ResourceRegistrationDetail>).detail;
+      logger.debug(`Resource ready: ${resourceId}`);
+
+      const { [resourceId]: _, ...remaining } = slideshowContextRef.get().pending;
+      slideshowContextRef.setKey("pending", remaining);
+
+      if (Object.keys(remaining).length === 0) {
+        this.classList.remove('loading')
+      }
+    };
+
+    this.addEventListener(RESOURCE_REGISTER, this._onResourceRegister);
+    this.addEventListener(RESOURCE_READY, this._onResourceReady);
+
+    // Close the registration window after synchronous connectedCallback cascade
+    queueMicrotask(() => {
+      const current = slideshowContextRef.get();
+      if (current.phase === "registering") {
+        slideshowContextRef.setKey("phase", "loading");
+        // TODO This will likely be handled by a separate loader component instead!
+        this.classList.add('loading')
+      }
+    });
+
     // Update navigation on context changes
     slideshowContextRef.subscribe((store, oldValue) => {
+      logger.debug(store)
+
+      // Gate visibility updates until the slideshow is ready
+      if (!store.ready) return;
+
       const { activeSlide, activeStep } = store;
       const currentSlide = slides[activeSlide];
 
+      // On first ready, oldValue may have ready=false — do a full pass
+      const prevSlide = oldValue?.ready ? oldValue.activeSlide : undefined;
+
       // Update Slide and Step visibilities
-      updateSlideVisibility(slides, activeSlide, oldValue?.activeSlide);
+      updateSlideVisibility(slides, activeSlide, prevSlide);
       if (currentSlide) {
         updateStepVisibility(currentSlide, activeStep);
       }
@@ -132,13 +187,18 @@ export class Slideshow extends HTMLElement {
     this.style.setProperty('--slide-height', `${this.slideshowSize.height}px`);
 
     this._resizeObserver.observe(this);
-    document.dispatchEvent(new CustomEvent(`slideshow-${this.slideshowId}-ready`))
   }
   
   disconnectedCallback() {
       this._resizeObserver?.disconnect();
       if (this._onHashChange) {
           window.removeEventListener("hashchange", this._onHashChange);
+      }
+      if (this._onResourceRegister) {
+          this.removeEventListener(RESOURCE_REGISTER, this._onResourceRegister);
+      }
+      if (this._onResourceReady) {
+          this.removeEventListener(RESOURCE_READY, this._onResourceReady);
       }
   }
 }
@@ -165,9 +225,17 @@ ds-slideshow {
   flex-direction: row;
   justify-content: center;
   align-items: center;
+
+  /* TODO Remove this - only for debugging */
+  transition: opacity 1s ease-in-out;
+}
+
+ds-slideshow.loading {
+  opacity: 20%;
 }
 </style>
 
 <ds-slideshow data-slideshow-id={slideshowId} data-slideshow-width={Astro.props.width} data-slideshow-height={Astro.props.height}>
+  <!-- TODO Add a loader overlay here -->
   <slot />
 </ds-slideshow>
