@@ -1,3 +1,4 @@
+export { default as Image } from "./src/components/Image.astro";
 export { default as Section } from "./src/components/Section.astro";
 export { default as Root } from "./src/Root.astro";
 export { default as Slide } from "./src/Slide.astro";

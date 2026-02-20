@@ -1,0 +1,66 @@
+---
+import { Image as AstroImage } from "astro:assets";
+import { z } from "astro/zod";
+
+const PropSchema = z.object({
+  src: z.string(),
+  alt: z.string(),
+  fit: z.enum(["contain", "cover", "fill"]).default("contain"),
+  width: z.number().optional(),
+  height: z.number().optional(),
+});
+
+type Props = z.input<typeof PropSchema>;
+
+const { src, alt, fit, width, height } = PropSchema.parse(Astro.props);
+
+const styles = [
+  `object-fit: ${fit}`,
+].filter(Boolean).join("; ");
+---
+
+<ds-image>
+  <AstroImage
+    src={src}
+    alt={alt}
+    width={width}
+    height={height}
+    style={styles}
+    loading="lazy"
+    decoding="async"
+    class="ds-image-inner"
+  />
+</ds-image>
+
+<script>
+  import { registerResource } from "../utils/resource";
+
+  export class DsImage extends HTMLElement {
+    connectedCallback() {
+      const img = this.querySelector("img");
+      if (!img) return;
+
+      const handle = registerResource(this);
+
+      if (img.complete) {
+        handle.ready();
+      } else {
+        img.addEventListener("load", () => handle.ready(), { once: true });
+        img.addEventListener("error", (e) => handle.error(e), { once: true });
+      }
+    }
+  }
+
+  customElements.define("ds-image", DsImage);
+</script>
+
+<style>
+  ds-image {
+    display: contents;
+  }
+
+  .ds-image-inner {
+    max-width: 100%;
+    display: block;
+  }
+</style>
