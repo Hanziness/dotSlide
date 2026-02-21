@@ -8,7 +8,7 @@ import { logger } from "./logger";
  */
 export type ResourceHandle = {
   ready: () => void;
-  error: (err: unknown) => void;
+  error: (err: Error) => void;
   id: string;
 };
 
@@ -18,6 +18,13 @@ export type ResourceHandle = {
 export type ResourceRegistrationDetail = ResourceInfo & {
   resourceId: string;
 };
+
+export type ResourceRegistrationResult = ResourceRegistrationDetail & ({
+  success: true
+} | {
+  success: false,
+  error: Error
+})
 
 /**
  * Registers a resource with the readiness system.
@@ -57,25 +64,36 @@ export function registerResource(
 
   let signaled = false;
 
-  const signal = () => {
+  const signal = (error?: Error) => {
     if (signaled) {
       return;
     }
     signaled = true;
+    const success = error === undefined
+    const result: ResourceRegistrationResult = success ? {
+      ...detail,
+      success: true
+    } : {
+      ...detail,
+      success: false,
+      error
+    }
+
+
     element.dispatchEvent(
-      new CustomEvent<ResourceRegistrationDetail>(RESOURCE_READY, {
+      new CustomEvent<ResourceRegistrationResult>(RESOURCE_READY, {
         bubbles: true,
-        detail,
+        detail: result,
       }),
     );
   };
 
   return {
     id: resourceId,
-    ready: signal,
-    error: (err: unknown) => {
+    ready: () => signal(),
+    error: (err: Error) => {
       logger.error(`Resource ${resourceId} failed:`, err);
-      signal();
+      signal(err);
     },
   };
 }

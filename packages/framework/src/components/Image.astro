@@ -41,7 +41,7 @@ const styles = [
         handle.ready();
       } else {
         img.addEventListener("load", () => handle.ready(), { once: true });
-        img.addEventListener("error", (e) => handle.error(e), { once: true });
+        img.addEventListener("error", (e) => handle.error({ ...e, name: "Image loading error"}), { once: true });
       }
     }
   }
