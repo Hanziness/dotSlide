@@ -7,7 +7,7 @@
   "tab_size": 2,
   "languages": {
     "Astro": {
-      "formatter": { "language_server": { "name": "Biome" } },
-    },
-  },
+      "formatter": { "language_server": { "name": "Biome" } }
+    }
+  }
 }
