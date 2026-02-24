@@ -1,5 +1,6 @@
 ---
 
+import Loader from "./overlay/Loader.astro";
 import { generateId } from "./utils";
 
 interface Props {
@@ -231,4 +232,5 @@ ds-slideshow.loading {
 
 <ds-slideshow data-slideshow-id={slideshowId} data-slideshow-width={Astro.props.width} data-slideshow-height={Astro.props.height}>
   <slot />
+  <Loader />
 </ds-slideshow>

@@ -1,0 +1,122 @@
+---
+const isDebug = process.env.NODE_ENV === 'development'
+---
+
+<script>
+import { useSlideshowContext } from "../store/context/slideshow"
+import { RESOURCE_READY } from "../utils/events";
+import type { ResourceRegistrationResult } from "../utils/resource";
+
+class Loader extends HTMLElement {
+    num_registered: number = 0;
+    num_success: number = 0;
+    num_failed: number = 0;
+    private store_unsubscribe: (() => void) | undefined = undefined;
+
+    private _updateProgressBar(progress?: number) {
+        const bar = this.querySelector('div.bar-inner') as HTMLDivElement
+        bar.style.width = `${(progress ?? (this.num_success / (this.num_registered || 1))) * 100}%`
+    }
+
+    private _onResourceReady(e: Event) {
+        const result = e as CustomEvent<ResourceRegistrationResult>
+        if (result.detail.success) {
+            this.num_success += 1;
+        } else {
+            this.num_failed += 1;
+        }
+
+        this._updateProgressBar()
+    }
+
+    connectedCallback() {
+        const slideshowCtx = useSlideshowContext(this)
+        this._updateProgressBar(0)
+        if (slideshowCtx.get().phase === "ready") {
+            // Slideshow already loaded
+            this._updateProgressBar(1)
+            setTimeout(() => {
+                this.setAttribute('state', 'finished')    
+            }, this.getAttribute('data-debug') === 'true' ? 0 : 300);
+
+            return
+        }
+
+        this.closest('ds-slideshow')?.addEventListener(RESOURCE_READY, this._onResourceReady);
+
+        this.store_unsubscribe = slideshowCtx.subscribe((store) => {
+            if (store.phase === 'loading') {
+                this.setAttribute('state', 'loading')
+                this._updateProgressBar()
+            } else if (store.phase === 'registering') {
+                // Update number of registered resources
+                this.num_registered = Math.max(this.num_registered, Object.keys(store.pending).length)
+            } else if (store.phase === 'ready') {
+                // Mark loader as finished, unsubscribe from store
+                this._updateProgressBar(1)
+                setTimeout(() => {
+                    this.setAttribute('state', 'finished')
+                    this.store_unsubscribe?.()
+                }, this.getAttribute('data-debug') === 'true' ? 0 : 700);
+            }
+        })
+    }
+
+    disconnectedCallback() {
+        this.closest('ds-slideshow')?.removeEventListener(RESOURCE_READY, this._onResourceReady)
+    }
+}
+
+customElements.define('ds-loader', Loader)
+</script>
+
+<ds-loader state="loading" data-debug={isDebug} class="w-full h-full absolute inset-0 bg-black text-white p-8 flex flex-col gap-4 items-center justify-center">
+    <div class="logo-text">dotSlide</div>
+    <div class="w-[80%] h-2 bg-white/20 rounded-full flex flex-row justify-start">
+        <div class="bar-inner h-full bg-white rounded-full" />
+    </div>
+</ds-loader>
+
+<style>
+ds-loader[state=loading] {
+    opacity: 100%;
+}
+
+ds-loader[state=finished] {
+    display: none;
+}
+
+ds-loader div.bar-inner {
+    transition: width 0.2s;
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 70%;
+    }
+
+    50% {
+        opacity: 100%;
+    }
+
+    100% {
+        opacity: 70%;
+    }
+}
+
+@keyframes empty {
+    0% {
+        scale: 1;
+    }
+    100% {
+        scale: 1;
+    }
+}
+
+.logo-text {
+    font-size: 3em;
+    font-weight: 900;
+    animation: pulse 2s ease-in-out infinite, empty 500ms linear infinite;
+}
+</style>
+
