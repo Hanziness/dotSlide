@@ -126,22 +126,16 @@ export class Slideshow extends HTMLElement {
 
       const { [resourceId]: _, ...remaining } = slideshowContextRef.get().pending;
       slideshowContextRef.setKey("pending", remaining);
-
-      if (Object.keys(remaining).length === 0) {
-        this.classList.remove('loading')
-      }
     };
 
     this.addEventListener(RESOURCE_REGISTER, this._onResourceRegister);
     this.addEventListener(RESOURCE_READY, this._onResourceReady);
 
     // Close the registration window after synchronous connectedCallback cascade
-    queueMicrotask(() => {
+    requestAnimationFrame(() => {
       const current = slideshowContextRef.get();
       if (current.phase === "registering") {
         slideshowContextRef.setKey("phase", "loading");
-        // TODO This will likely be handled by a separate loader component instead!
-        this.classList.add('loading')
       }
     });
 
@@ -236,6 +230,5 @@ ds-slideshow.loading {
 </style>
 
 <ds-slideshow data-slideshow-id={slideshowId} data-slideshow-width={Astro.props.width} data-slideshow-height={Astro.props.height}>
-  <!-- TODO Add a loader overlay here -->
   <slot />
 </ds-slideshow>
