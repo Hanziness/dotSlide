@@ -13,5 +13,4 @@ export {
   getSectionString,
 } from "./src/utils/section";
 
-// import "@unocss/reset/tailwind-v4.css";
-// import "./dist/styles.css";
+import "./src/index.css";

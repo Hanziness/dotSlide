@@ -1,20 +1,24 @@
-import { defineConfig, presetIcons, presetWind4 } from "unocss";
+import {
+  defineConfig,
+  presetIcons,
+  presetWind4,
+  transformerCompileClass,
+} from "unocss";
 
 export default defineConfig({
-  cli: {
-    entry: [
-      {
-        patterns: ["src/**/*.astro", "src/index.ts"],
-        outFile: "dist/styles.css",
+  presets: [
+    presetWind4({
+      preflights: {
+        reset: false,
       },
-    ],
-  },
-  content: {
-    filesystem: ["src/**/*.astro"],
-  },
-  presets: [presetWind4({
-    preflights: {
-      reset: false
-    }
-  }), presetIcons()],
+    }),
+    presetIcons(),
+  ],
+
+  transformers: [
+    transformerCompileClass({
+      layer: "dotslide",
+      classPrefix: "ds-",
+    }),
+  ],
 });
