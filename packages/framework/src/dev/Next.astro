@@ -2,30 +2,54 @@
 import { ChevronRight } from "@lucide/astro";
 ---
 
-<button slide-next>
-  <ChevronRight aria-hidden="true" />
-</button>
+<ds-next>
+  <button type="button">
+    <ChevronRight aria-hidden="true" />
+  </button>
+</ds-next>
 
 <style>
-  button[slide-next] {
-    border-radius: 9999px;
-    background-color: white;
+@layer dotslide {
+  ds-next {
+    display: contents;
+  }
+
+  ds-next > button {
+    border-radius: var(--ds-control-radius, 9999px);
+    background-color: var(--ds-control-bg, white);
     padding: 0.75rem;
-    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1),
-                0 4px 6px -4px rgb(0 0 0 / 0.1);
+    box-shadow: var(--ds-control-shadow, 0 10px 15px -3px rgb(0 0 0 / 0.1),
+                0 4px 6px -4px rgb(0 0 0 / 0.1));
     border: none;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
     justify-content: center;
   }
+}
 </style>
 
 <script>
-import { useSlideshowContext } from "../store/context/slideshow"
+import { useSlideshowContext } from "../store/context/slideshow";
 
-document.querySelectorAll('button[slide-next]').forEach((btn) => {
-  const ctx = useSlideshowContext(btn as HTMLElement)
-  btn.addEventListener('click', () => ctx.next())
-})
+class DsNext extends HTMLElement {
+  private _onClick?: () => void;
+
+  connectedCallback() {
+    const ctx = useSlideshowContext(this);
+    const btn = this.querySelector("button");
+    if (!btn) return;
+    this._onClick = () => ctx.next();
+    btn.addEventListener("click", this._onClick);
+  }
+
+  disconnectedCallback() {
+    const btn = this.querySelector("button");
+    if (btn && this._onClick) {
+      btn.removeEventListener("click", this._onClick);
+    }
+  }
+}
+
+customElements.define("ds-next", DsNext);
 </script>
