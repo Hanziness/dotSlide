@@ -1,12 +1,4 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "extends": ["//"],
-  "tasks": {
-    "build:css": {
-      "outputs": ["dist/styles.css"]
-    },
-    "dev": {
-      "outputs": ["dist/styles.css"]
-    }
-  }
+  "extends": ["//"]
 }

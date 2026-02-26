@@ -3,21 +3,11 @@
   "version": "0.0.1",
   "type": "module",
   "exports": {
-    ".": {
-      "development": "./index.ts",
-      "default": "./dist/index.ts"
-    },
-    "./controls": {
-      "development": "./controls.ts",
-      "default": "./dist/controls.ts"
-    },
-    "./dev": {
-      "development": "./dev.ts",
-      "default": "./dist/dev.ts"
-    }
+    ".": "./index.ts",
+    "./controls": "./controls.ts",
+    "./dev": "./dev.ts"
   },
   "files": [
-    "dist",
     "src",
     "index.ts",
     "controls.ts",
@@ -27,11 +17,7 @@
     "dotslide",
     "astro-component"
   ],
-  "scripts": {
-    "build:css": "node scripts/build.mjs && unocss \"dist/src/**/*.astro\" \"dist/src/**/*.ts\" --rewrite --minify -o dist/styles.css",
-    "dev": "unocss \"src/**/*.astro\" \"src/**/*.ts\" --watch -o dist/styles.css",
-    "dev:setup": "wait-on dist/styles.css"
-  },
+  "scripts": {},
   "devDependencies": {
     "@astrojs/ts-plugin": "^1.10.6",
     "@unocss/cli": "66.6.1",

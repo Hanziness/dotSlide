@@ -13,11 +13,7 @@
     "check-types": {
       "dependsOn": ["^check-types"]
     },
-    "dev:setup": {
-      "cache": false
-    },
     "dev": {
-      "dependsOn": ["^dev:setup"],
       "cache": false,
       "persistent": true
     }
