@@ -14,7 +14,7 @@ type Props = z.output<typeof PropSchema>
 PropSchema.parse(Astro.props)
 ---
 
-<div {...getDataTags(Astro.props, 'section', ['level', 'title'])} class="hidden" />
+<div {...getDataTags(Astro.props, 'section', ['level', 'title'])} style="display:none" />
 
 <script>
 import { sectionContext } from "../store";

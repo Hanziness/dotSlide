@@ -10,10 +10,54 @@ interface Props {
 ---
 
 <div class:list={[
-    'absolute flex flex-row gap-2',
-    { 'top-0': Astro.props.location === 'top', 'bottom-0': Astro.props.location === 'bottom', 'h-full items-center': Astro.props.location === 'center'},
-    { 'left-0': Astro.props.alignment === 'left', 'w-full justify-center': Astro.props.alignment === 'center', 'right-0': Astro.props.alignment === 'right' },
-    { 'p-4': Astro.props.padding }
+    'overlay',
+    { 'top': Astro.props.location === 'top', 'bottom': Astro.props.location === 'bottom', 'vcenter': Astro.props.location === 'center'},
+    { 'left': Astro.props.alignment === 'left', 'hcenter': Astro.props.alignment === 'center', 'right': Astro.props.alignment === 'right' },
+    { 'padded': Astro.props.padding }
 ]}>
     <slot />
 </div>
+
+<style>
+    div.overlay {
+        position: absolute;
+
+        display: flex;
+        flex-direction: row;
+        gap: .5em;
+    }
+
+    div.overlay.padded {
+        padding: 1em;
+    }
+
+    div.overlay.top {
+        top: 0;
+    }
+
+    div.overlay.vcenter {
+        height: 100%;
+        align-items: center;
+    }
+
+    div.overlay.bottom {
+        bottom: 0;
+    }
+
+    div.overlay.left {
+        left: 0;
+    }
+
+    div.overlay.hcenter {
+        width: 100%;
+        justify-content: center;
+    }
+
+    div.overlay.right {
+        right: 0;
+    }
+
+    div.overlay.padded {
+        padding: 1em;
+    }
+</style>

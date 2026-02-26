@@ -1,6 +1,25 @@
-<button slide-next class="rounded-full bg-white p-3 shadow-lg">
-   <div class="i-lucide:chevron-right" />
+---
+import { ChevronRight } from "@lucide/astro";
+---
+
+<button slide-next>
+  <ChevronRight aria-hidden="true" />
 </button>
+
+<style>
+  button[slide-next] {
+    border-radius: 9999px;
+    background-color: white;
+    padding: 0.75rem;
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1),
+                0 4px 6px -4px rgb(0 0 0 / 0.1);
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+</style>
 
 <script>
 import { useSlideshowContext } from "../store/context/slideshow"
