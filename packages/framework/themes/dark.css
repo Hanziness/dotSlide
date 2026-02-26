@@ -12,4 +12,13 @@
   --ds-loader-track: rgb(255 255 255 / 0.1);
   --ds-loader-bar: #e2e8f0;
   --ds-radius: 0;
+
+  /* control buttons (ds-next, ds-prev) */
+  --ds-control-bg: #1e293b;
+  --ds-control-radius: 9999px;
+  --ds-control-shadow:
+    0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.3);
+
+  /* overlay */
+  --ds-overlay-padding: 1em;
 }
