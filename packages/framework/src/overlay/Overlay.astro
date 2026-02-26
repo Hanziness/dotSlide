@@ -9,52 +9,50 @@ interface Props {
 }
 ---
 
-<div class:list={[
-    'overlay',
+<ds-overlay class:list={[
     { 'top': Astro.props.location === 'top', 'bottom': Astro.props.location === 'bottom', 'vcenter': Astro.props.location === 'center'},
     { 'left': Astro.props.alignment === 'left', 'hcenter': Astro.props.alignment === 'center', 'right': Astro.props.alignment === 'right' },
     { 'padded': Astro.props.padding }
 ]}>
     <slot />
-</div>
+</ds-overlay>
 
 <style>
 @layer dotslide {
-    div.overlay {
+    ds-overlay {
         position: absolute;
-
         display: flex;
         flex-direction: row;
-        gap: .5em;
+        gap: 0.5em;
     }
 
-    div.overlay.padded {
-        padding: 1em;
+    ds-overlay.padded {
+        padding: var(--ds-overlay-padding, 1em);
     }
 
-    div.overlay.top {
+    ds-overlay.top {
         top: 0;
     }
 
-    div.overlay.vcenter {
+    ds-overlay.bottom {
+        bottom: 0;
+    }
+
+    ds-overlay.vcenter {
         height: 100%;
         align-items: center;
     }
 
-    div.overlay.bottom {
-        bottom: 0;
-    }
-
-    div.overlay.left {
+    ds-overlay.left {
         left: 0;
     }
 
-    div.overlay.hcenter {
+    ds-overlay.hcenter {
         width: 100%;
         justify-content: center;
     }
 
-    div.overlay.right {
+    ds-overlay.right {
         right: 0;
     }
 }
