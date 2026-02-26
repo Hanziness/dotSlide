@@ -1,2 +1,0 @@
-@import "@unocss/reset/tailwind.css" layer(preflights);
-@import "../dist/styles.css" layer(dotslide);

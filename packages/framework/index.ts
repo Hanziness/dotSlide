@@ -12,5 +12,3 @@ export {
   getCurrentSection,
   getSectionString,
 } from "./src/utils/section";
-
-import "./src/index.css";
