@@ -5,10 +5,12 @@
   "exports": {
     ".": "./index.ts",
     "./controls": "./controls.ts",
-    "./dev": "./dev.ts"
+    "./dev": "./dev.ts",
+    "./themes/*": "./themes/*"
   },
   "files": [
     "src",
+    "themes",
     "index.ts",
     "controls.ts",
     "dev.ts"

@@ -23,6 +23,7 @@ const { from, to } = PropSchema.parse(Astro.props);
 <ds-step data-step-from={from} data-step-to={to}><slot /></ds-step>
 
 <style>
+@layer dotslide {
   ds-step {
     display: contents;
   }
@@ -30,4 +31,5 @@ const { from, to } = PropSchema.parse(Astro.props);
   ds-step:not(.active) {
     display: none;
   }
+}
 </style>

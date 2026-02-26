@@ -78,73 +78,75 @@ customElements.define('ds-loader', Loader)
 </ds-loader>
 
 <style>
-ds-loader {
+@layer dotslide {
+  ds-loader {
     width: 100%;
     height: 100%;
     position: absolute;
     inset: 0;
-    background-color: black;
-    color: white;
+    background-color: var(--ds-loader-bg, black);
+    color: var(--ds-loader-fg, white);
     padding: 2rem;
     display: flex;
     flex-direction: column;
     gap: 1rem;
     align-items: center;
     justify-content: center;
-}
+  }
 
-ds-loader[state=loading] {
+  ds-loader[state=loading] {
     opacity: 100%;
-}
+  }
 
-ds-loader[state=finished] {
+  ds-loader[state=finished] {
     display: none;
-}
+  }
 
-ds-loader .progress-track {
+  ds-loader .progress-track {
     width: 80%;
     height: 0.5rem;
-    background-color: rgb(255 255 255 / 0.2);
-    border-radius: 9999px;
+    background-color: var(--ds-loader-track, rgb(255 255 255 / 0.2));
+    border-radius: var(--ds-radius, 9999px);
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
-}
+  }
 
-ds-loader .bar-inner {
+  ds-loader .bar-inner {
     height: 100%;
-    background-color: white;
-    border-radius: 9999px;
+    background-color: var(--ds-loader-bar, white);
+    border-radius: var(--ds-radius, 9999px);
     transition: width 0.2s;
-}
+  }
 
-@keyframes pulse {
+  @keyframes pulse {
     0% {
-        opacity: 70%;
+      opacity: 70%;
     }
 
     50% {
-        opacity: 100%;
+      opacity: 100%;
     }
 
     100% {
-        opacity: 70%;
+      opacity: 70%;
     }
-}
+  }
 
-@keyframes empty {
+  @keyframes empty {
     0% {
-        scale: 1;
+      scale: 1;
     }
     100% {
-        scale: 1;
+      scale: 1;
     }
-}
+  }
 
-.logo-text {
+  .logo-text {
     font-size: 3em;
     font-weight: 900;
     animation: pulse 2s ease-in-out infinite, empty 500ms linear infinite;
+  }
 }
 </style>
 
