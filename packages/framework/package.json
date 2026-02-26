@@ -20,12 +20,7 @@
   "scripts": {},
   "devDependencies": {
     "@astrojs/ts-plugin": "^1.10.6",
-    "@unocss/cli": "66.6.1",
-    "@unocss/preset-icons": "66.6.1",
-    "@unocss/transformer-compile-class": "66.6.1",
-    "astro": "^5.17.1",
-    "unocss": "^66.6.0",
-    "wait-on": "^9.0.3"
+    "astro": "^5.17.1"
   },
   "peerDependencies": {
     "astro": "^4.0.0 || ^5.0.0 || ^6.0.0"
