@@ -1,0 +1,60 @@
+---
+import { z } from "astro/zod";
+
+const PropSchema = z.object({ action: z.enum(["next", "prev"]) });
+type Props = z.output<typeof PropSchema>;
+const { action } = PropSchema.parse(Astro.props);
+---
+
+<ds-button data-action={action}>
+  <button type="button">
+    <slot />
+  </button>
+</ds-button>
+
+<style>
+@layer dotslide {
+  ds-button {
+    display: contents;
+  }
+
+  ds-button > button {
+    border-radius: var(--ds-control-radius, 9999px);
+    background-color: var(--ds-control-bg, white);
+    padding: 0.75rem;
+    box-shadow: var(--ds-control-shadow, 0 10px 15px -3px rgb(0 0 0 / 0.1),
+                0 4px 6px -4px rgb(0 0 0 / 0.1));
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+</style>
+
+<script>
+import { useSlideshowContext } from "../store/context/slideshow";
+
+class DsButton extends HTMLElement {
+  private _onClick?: () => void;
+
+  connectedCallback() {
+    const ctx = useSlideshowContext(this);
+    const btn = this.querySelector("button");
+    if (!btn) return;
+    const action = this.dataset.action as "next" | "prev";
+    this._onClick = () => ctx[action]();
+    btn.addEventListener("click", this._onClick);
+  }
+
+  disconnectedCallback() {
+    const btn = this.querySelector("button");
+    if (btn && this._onClick) {
+      btn.removeEventListener("click", this._onClick);
+    }
+  }
+}
+
+customElements.define("ds-button", DsButton);
+</script>

@@ -1,55 +1,8 @@
 ---
 import { ChevronLeft } from "@lucide/astro";
+import Button from "./Button.astro";
 ---
 
-<ds-prev>
-  <button type="button">
-    <ChevronLeft aria-hidden="true" />
-  </button>
-</ds-prev>
-
-<style>
-@layer dotslide {
-  ds-prev {
-    display: contents;
-  }
-
-  ds-prev > button {
-    border-radius: var(--ds-control-radius, 9999px);
-    background-color: var(--ds-control-bg, white);
-    padding: 0.75rem;
-    box-shadow: var(--ds-control-shadow, 0 10px 15px -3px rgb(0 0 0 / 0.1),
-                0 4px 6px -4px rgb(0 0 0 / 0.1));
-    border: none;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-  }
-}
-</style>
-
-<script>
-import { useSlideshowContext } from "../store/context/slideshow";
-
-class DsPrev extends HTMLElement {
-  private _onClick?: () => void;
-
-  connectedCallback() {
-    const ctx = useSlideshowContext(this);
-    const btn = this.querySelector("button");
-    if (!btn) return;
-    this._onClick = () => ctx.prev();
-    btn.addEventListener("click", this._onClick);
-  }
-
-  disconnectedCallback() {
-    const btn = this.querySelector("button");
-    if (btn && this._onClick) {
-      btn.removeEventListener("click", this._onClick);
-    }
-  }
-}
-
-customElements.define("ds-prev", DsPrev);
-</script>
+<Button action="prev">
+  <ChevronLeft aria-hidden="true" />
+</Button>
