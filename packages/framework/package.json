@@ -4,16 +4,14 @@
   "type": "module",
   "exports": {
     ".": "./index.ts",
-    "./controls": "./controls.ts",
-    "./dev": "./dev.ts",
+    "./widgets": "./widgets.ts",
     "./themes/*": "./themes/*"
   },
   "files": [
     "src",
     "themes",
     "index.ts",
-    "controls.ts",
-    "dev.ts"
+    "widgets.ts"
   ],
   "keywords": [
     "dotslide",

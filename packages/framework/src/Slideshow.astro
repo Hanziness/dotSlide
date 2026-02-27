@@ -3,17 +3,24 @@
 import Loader from "./overlay/Loader.astro";
 import { generateId } from "./utils";
 import "../index.css";
+import KeyboardHandler from "./controls/KeyboardHandler.astro";
+import SlideControls from "./controls/SlideControls.astro";
 
 interface Props {
   /** Internal width of the slides, in pixels */
   width: number;
   /** Internal height of the slides, in pixels */
   height: number;
+  /** Show on-screen navigation controls (default: true) */
+  controls?: boolean;
+  /** Enable keyboard navigation (default: true) */
+  keyboard?: boolean;
 }
 
 export const identifier = 'slideshow' as const
 
 const slideshowId = generateId()
+const { controls = true, keyboard = true } = Astro.props;
 ---
 
 <script>
@@ -238,5 +245,7 @@ customElements.define('ds-slideshow', Slideshow)
 
 <ds-slideshow data-slideshow-id={slideshowId} data-slideshow-width={Astro.props.width} data-slideshow-height={Astro.props.height}>
   <slot />
+  {controls && <SlideControls />}
+  {keyboard && <KeyboardHandler />}
   <Loader />
 </ds-slideshow>
