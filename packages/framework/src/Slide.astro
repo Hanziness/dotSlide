@@ -3,7 +3,7 @@ export const identifier = 'slide' as const
 ---
 
 <ds-slide>
-  <div class="slide-container">
+  <div class:list={["slide-container", Astro.props.class]}>
     <slot />
   </div>
 </ds-slide>
@@ -15,8 +15,6 @@ export const identifier = 'slide' as const
     background-color: var(--ds-slide-bg, white);
     width: calc(var(--slide-width) * var(--slide-scale));
     height: calc(var(--slide-height) * var(--slide-scale));
-    display: flex;
-    flex-direction: column;
     flex-shrink: 0;
     overflow: hidden;
   }
