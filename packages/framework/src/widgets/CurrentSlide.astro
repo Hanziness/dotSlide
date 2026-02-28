@@ -1,0 +1,57 @@
+---
+import { z } from "astro/zod";
+
+const PropSchema = z.object({
+  within: z.number().int().min(1).max(6).optional(),
+});
+
+type Props = z.output<typeof PropSchema>;
+const props = PropSchema.parse(Astro.props);
+---
+
+<ds-current-slide data-within={props.within} />
+
+<script>
+  import { sectionContext } from "../store";
+  import { useSlideContext } from "../store/context/slide";
+  import { getSlidePositionInSection } from "../utils/section";
+
+  class CurrentSlide extends HTMLElement {
+    private _unsubscribe?: () => void;
+
+    connectedCallback() {
+      const slideCtx = useSlideContext(this);
+      if (!slideCtx) return;
+      const slideIndex = slideCtx.get().index;
+      const withinAttr = this.getAttribute("data-within");
+      const within = withinAttr ? parseInt(withinAttr, 10) : undefined;
+
+      if (within === undefined) {
+        // Global slide number — no section dependency needed
+        this.textContent = String(slideIndex + 1);
+        return;
+      }
+
+      // Within-section numbering — needs section context
+      this._unsubscribe = sectionContext.subscribe((ctx) => {
+        if (!ctx.initialized) return;
+        this._unsubscribe?.();
+
+        const pos = getSlidePositionInSection(slideIndex, within);
+        this.textContent = pos ? String(pos.position) : "?";
+      });
+    }
+
+    disconnectedCallback() {
+      this._unsubscribe?.();
+    }
+  }
+
+  customElements.define("ds-current-slide", CurrentSlide);
+</script>
+
+<style>
+  ds-current-slide {
+    display: inline;
+  }
+</style>
