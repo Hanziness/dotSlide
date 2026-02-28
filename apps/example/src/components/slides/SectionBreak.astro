@@ -1,0 +1,25 @@
+---
+
+import { Section, Slide } from "@dotslide/framework";
+import { CurrentSection } from "@dotslide/framework/widgets";
+
+interface Props {
+  level: number;
+  title: string;
+  subtitle?: string;
+}
+
+const { level, title, subtitle } = Astro.props;
+---
+
+<Section level={level} title={title} />
+<Slide>
+  <div class="section-break">
+    <div class="section-number">
+      <CurrentSection level={level} display="numeric" separator="." />
+    </div>
+    <div class="divider" />
+    <h2>{title}</h2>
+    {subtitle && <div class="subtitle">{subtitle}</div>}
+  </div>
+</Slide>

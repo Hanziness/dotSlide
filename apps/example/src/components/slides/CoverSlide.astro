@@ -1,0 +1,21 @@
+---
+
+import { Slide } from "@dotslide/framework";
+
+interface Props {
+  title: string;
+  subtitle?: string;
+  author?: string;
+}
+
+const { title, subtitle, author } = Astro.props;
+---
+
+<Slide>
+  <div class="cover-slide">
+    <h1>{title}</h1>
+    {subtitle && <div class="subtitle">{subtitle}</div>}
+    <div class="accent-line" />
+    {author && <div class="author">{author}</div>}
+  </div>
+</Slide>

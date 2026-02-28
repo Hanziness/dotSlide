@@ -1,0 +1,26 @@
+---
+
+import { Slide } from "@dotslide/framework";
+import { CurrentSlide, Progress, TotalSlides } from "@dotslide/framework/widgets";
+
+interface Props {
+  quote: string;
+  attribution?: string;
+}
+
+const { quote, attribution } = Astro.props;
+---
+
+<Slide>
+  <div class="quote-slide">
+    <div class="quote-mark">&ldquo;</div>
+    <blockquote>{quote}</blockquote>
+    {attribution && <div class="attribution">&mdash; {attribution}</div>}
+  </div>
+  <div class="slide-overlay bottom-left">
+    <Progress display="bar" />
+  </div>
+  <div class="slide-overlay bottom-right">
+    <CurrentSlide /> / <TotalSlides />
+  </div>
+</Slide>

@@ -1,0 +1,35 @@
+---
+
+import { Slide } from "@dotslide/framework";
+import { CurrentSlide, Progress, TotalSlides } from "@dotslide/framework/widgets";
+
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<Slide>
+  <div class="slide-body">
+    <div class="slide-title-bar">
+      <h2>{title}</h2>
+    </div>
+    <div class="slide-content">
+      <div class="two-column">
+        <div>
+          <slot name="left" />
+        </div>
+        <div>
+          <slot name="right" />
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-overlay bottom-left">
+    <Progress display="bar" />
+  </div>
+  <div class="slide-overlay bottom-right">
+    <CurrentSlide /> / <TotalSlides />
+  </div>
+</Slide>

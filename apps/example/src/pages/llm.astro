@@ -1,0 +1,486 @@
+---
+
+import "../styles/llm.css";
+import "@dotslide/framework/themes/default.css";
+
+import { Root, Slideshow, Step, StyleHelper } from "@dotslide/framework";
+import ContentSlide from "../components/slides/ContentSlide.astro";
+import CoverSlide from "../components/slides/CoverSlide.astro";
+import QuoteSlide from "../components/slides/QuoteSlide.astro";
+import SectionBreak from "../components/slides/SectionBreak.astro";
+import TwoColumn from "../components/slides/TwoColumn.astro";
+---
+
+<Root>
+  <StyleHelper />
+  <Slideshow width={1024} height={768}>
+
+    <!-- ═══════════════ Title Slide ═══════════════ -->
+
+    <CoverSlide
+      title="Introduction to Large Language Models"
+      subtitle="From Neural Networks to Practical AI"
+      author="Imre Gera"
+    />
+
+    <!-- ═══════════════ Section 1: From Neural Networks to LLMs ═══════════════ -->
+
+    <SectionBreak
+      level={1}
+      title="From Neural Networks to Large Language Models"
+    />
+
+    <!-- Slide 1.1: The Perceptron -->
+    <TwoColumn title="The Perceptron">
+      <div slot="left">
+        <pre class="mermaid">
+{`flowchart LR
+  x1["x₁"] --> S["Σ + b"]
+  x2["x₂"] --> S
+  xn["xₙ"] --> S
+  S --> act["σ(z)"]
+  act --> y["y"]`}
+        </pre>
+      </div>
+      <div slot="right">
+        <p>{'$y = \\sigma(\\mathbf{w}^\\top \\mathbf{x} + b)$'}</p>
+        <p>Sigmoid activation:</p>
+        <p>{'$\\sigma(z) = \\frac{1}{1 + e^{-z}}$'}</p>
+        <p>A single artificial neuron — the building block of neural networks.</p>
+        <p class="source">Rosenblatt, 1958</p>
+      </div>
+    </TwoColumn>
+
+    <!-- Slide 1.2: Neural Networks -->
+    <TwoColumn title="Multi-Layer Neural Networks">
+      <div slot="left">
+        <pre class="mermaid">
+{`flowchart LR
+  I1["Input₁"] --> H1["Hidden₁"]
+  I2["Input₂"] --> H1
+  I3["Input₃"] --> H1
+  I1 --> H2["Hidden₂"]
+  I2 --> H2
+  I3 --> H2
+  H1 --> O["Output"]
+  H2 --> O`}
+        </pre>
+      </div>
+      <div slot="right">
+        <ul>
+          <li>Layers of interconnected perceptrons</li>
+          <li><strong>Universal Approximation Theorem</strong> (1989): one hidden layer can approximate any continuous function</li>
+          <li>Non-linear transformations enable learning complex patterns</li>
+        </ul>
+        <p class="source">Cybenko, 1989; Hornik et al., 1989</p>
+      </div>
+    </TwoColumn>
+
+    <!-- Slide 1.3: Training with Backpropagation -->
+    <ContentSlide title="Learning: Backpropagation &amp; Gradient Descent">
+      <p>Loss function measures prediction error: {'$\\mathcal{L}(\\hat{y}, y)$'}</p>
+      <p>Chain rule propagates gradients backward:</p>
+      <p>{'$$\\frac{\\partial \\mathcal{L}}{\\partial w_{ij}} = \\frac{\\partial \\mathcal{L}}{\\partial a_j} \\cdot \\frac{\\partial a_j}{\\partial w_{ij}}$$'}</p>
+      <p>Weight update via gradient descent:</p>
+      <p>{'$$\\mathbf{w} \\leftarrow \\mathbf{w} - \\alpha \\nabla \\mathcal{L}(\\mathbf{w})$$'}</p>
+      <p>{'$\\alpha$'} = learning rate (step size)</p>
+      <p class="source">Rumelhart, Hinton &amp; Williams, 1986</p>
+    </ContentSlide>
+
+    <!-- Slide 1.4: RNNs -->
+    <TwoColumn title="Processing Sequences: Recurrent Neural Networks">
+      <div slot="left">
+        <pre class="mermaid">
+{`flowchart LR
+  xt["x(t)"] --> ht["h(t)"]
+  ht --> yt["y(t)"]
+  ht --> ht1["h(t+1)"]
+  xt1["x(t+1)"] --> ht1
+  ht1 --> yt1["y(t+1)"]`}
+        </pre>
+      </div>
+      <div slot="right">
+        <p>Hidden state carries memory:</p>
+        <p>{'$\\mathbf{h}_t = \\tanh(W_h \\mathbf{h}_{t-1} + W_x \\mathbf{x}_t + \\mathbf{b})$'}</p>
+        <ul>
+          <li>Problem: vanishing gradients over long sequences</li>
+          <li>LSTMs and GRUs partially addressed this, but remained sequential (slow to train)</li>
+        </ul>
+        <p class="source">Hochreiter &amp; Schmidhuber, 1997</p>
+      </div>
+    </TwoColumn>
+
+    <!-- Slide 1.5: The Transformer -->
+    <ContentSlide title="Attention Is All You Need">
+      <p>Self-attention mechanism:</p>
+      <p>{'$$\\text{Attention}(Q, K, V) = \\text{softmax}\\!\\left(\\frac{QK^\\top}{\\sqrt{d_k}}\\right) V$$'}</p>
+      <ul>
+        <li>Every token attends to every other token <strong>in parallel</strong></li>
+        <li>No recurrence needed — enables massive parallelization</li>
+        <li>Positional encoding adds sequence order information</li>
+        <li>Multi-head attention: multiple attention patterns learned simultaneously</li>
+      </ul>
+      <p class="source">Vaswani et al., 2017</p>
+    </ContentSlide>
+
+    <!-- Slide 1.6: Transformer Architecture -->
+    <ContentSlide title="Inside the Transformer">
+      <pre class="mermaid">
+{`flowchart TB
+  IE["Input Embedding"] --> PE["+ Positional Encoding"]
+  PE --> SA["Self-Attention"]
+  SA --> AN1["Add & Norm"]
+  AN1 --> FFN["Feed-Forward Network"]
+  FFN --> AN2["Add & Norm"]
+  AN2 --> NX["Repeat N times"]`}
+      </pre>
+      <p>Encoder-decoder (original) vs. <strong>decoder-only</strong> (GPT family) architectures</p>
+    </ContentSlide>
+
+    <!-- Slide 1.7: Scaling Up -->
+    <ContentSlide title="Scaling Up: Large Language Models">
+      <Step from={1}>
+        <p><strong>Parameter counts:</strong> GPT-2 (1.5B) → GPT-3 (175B) → GPT-4 (~1.8T estimated)</p>
+      </Step>
+      <Step from={2}>
+        <p><strong>Scaling laws:</strong> performance improves predictably with compute, data, and parameters (Kaplan et al., 2020)</p>
+      </Step>
+      <Step from={3}>
+        <p><strong>Emergent abilities:</strong> capabilities that appear only at scale — chain-of-thought reasoning, few-shot learning</p>
+      </Step>
+      <Step from={4}>
+        <p><strong>Pipeline:</strong> pre-training on internet-scale text → fine-tuning → RLHF alignment</p>
+      </Step>
+      <p class="source">Brown et al., 2020; Kaplan et al., 2020</p>
+    </ContentSlide>
+
+    <!-- ═══════════════ Section 2: From Chat to Agents ═══════════════ -->
+
+    <SectionBreak level={1} title="From Chat to Agents" />
+
+    <!-- Slide 2.1: Chat Paradigm -->
+    <ContentSlide title="The Chat Interface">
+      <ul>
+        <li><strong>System / User / Assistant</strong> message roles define the conversation</li>
+        <li>Prompt → Completion: the model predicts the next token</li>
+        <li><strong>Context window:</strong> limited memory — conversation must fit in a fixed-size window</li>
+        <li>Temperature controls randomness; system prompts set behavior boundaries</li>
+      </ul>
+    </ContentSlide>
+
+    <!-- Slide 2.2: Tool Use -->
+    <TwoColumn title="Extending Capabilities: Tool Use">
+      <div slot="left">
+        <pre class="mermaid">
+{`flowchart TD
+  UP["User Prompt"] --> LLM
+  LLM --> D{"Call tool?"}
+  D -->|Yes| T["Tool Executes"]
+  T --> R["Result"]
+  R --> LLM
+  D -->|No| Resp["Response"]`}
+        </pre>
+      </div>
+      <div slot="right">
+        <ul>
+          <li>LLMs can invoke external tools: web search, code execution, APIs</li>
+          <li><strong>Function calling:</strong> model outputs structured JSON to trigger actions</li>
+          <li>Transforms a text generator into a capable assistant</li>
+        </ul>
+      </div>
+    </TwoColumn>
+
+    <!-- Slide 2.3: ReAct Pattern -->
+    <TwoColumn title="Reasoning + Acting: The ReAct Pattern">
+      <div slot="left">
+        <pre class="mermaid">
+{`flowchart TD
+  O["Observe"] --> T["Think"]
+  T --> A["Act"]
+  A --> O`}
+        </pre>
+      </div>
+      <div slot="right">
+        <ul>
+          <li><strong>Chain-of-thought:</strong> "Let me think step by step..."</li>
+          <li>Interleaving reasoning with tool calls</li>
+          <li>Self-correction through observation of results</li>
+        </ul>
+        <p class="source">Yao et al., 2023</p>
+      </div>
+    </TwoColumn>
+
+    <!-- Slide 2.4: Multi-Agent Systems -->
+    <ContentSlide title="The Agent Ecosystem">
+      <Step from={1}>
+        <p><strong>Specialized agents:</strong> planner, coder, reviewer, researcher</p>
+      </Step>
+      <Step from={2}>
+        <p><strong>Orchestration layers</strong> manage agent coordination and shared memory</p>
+      </Step>
+      <Step from={3}>
+        <p><strong>Real-world applications:</strong> coding assistants, research automation, customer support</p>
+      </Step>
+      <Step from={4}>
+        <p><strong>The future:</strong> autonomous agents that plan, execute, and self-correct</p>
+      </Step>
+    </ContentSlide>
+
+    <!-- ═══════════════ Section 3: Risks ═══════════════ -->
+
+    <SectionBreak level={1} title="The Risks of Over-Reliance on AI" />
+
+    <!-- Sub-section 3.1: Cognitive Risks -->
+    <SectionBreak level={2} title="Cognitive Risks" />
+
+    <!-- Slide 3.1.1: Calculator Effect -->
+    <ContentSlide title="The Calculator Effect">
+      <ul>
+        <li>Over-reliance on AI for tasks we should practice ourselves</li>
+        <li>Analogy: <strong>GPS navigation reduced spatial reasoning abilities</strong> (Ishikawa, 2019)</li>
+        <li>Risk: developers who rely on AI lose the ability to debug, reason about code, and architect systems</li>
+        <li>Critical thinking is a muscle — it atrophies without use</li>
+      </ul>
+    </ContentSlide>
+
+    <!-- Slide 3.1.2: Erosion of Critical Thinking -->
+    <QuoteSlide
+      quote="The real danger is not that computers will begin to think like men, but that men will begin to think like computers."
+      attribution="Sydney J. Harris"
+    />
+
+    <!-- Sub-section 3.2: Technical Risks -->
+    <SectionBreak level={2} title="Technical Risks" />
+
+    <!-- Slide 3.2.1: Hallucinations -->
+    <ContentSlide title="Hallucinations: Confident but Wrong">
+      <ul>
+        <li>LLMs generate plausible-sounding but <strong>factually incorrect</strong> output</li>
+        <li>They don't "know" facts — they predict likely token sequences</li>
+        <li>Examples: fabricated citations, incorrect code that looks correct, invented legal cases</li>
+        <li>Why: trained on pattern matching, not truth verification</li>
+      </ul>
+      <p class="source">Ji et al., 2023 — "Survey of Hallucination in NLG"</p>
+    </ContentSlide>
+
+    <!-- Slide 3.2.2: Prompt Injection -->
+    <TwoColumn title="Prompt Injection Attacks">
+      <div slot="left">
+        <pre class="mermaid">
+{`flowchart LR
+  SP["System Prompt"] --> UI["User Input"]
+  UI --> HI["Hidden Instructions"]
+  HI --> LLM["LLM"]
+  LLM --> UB["Unintended Behavior"]`}
+        </pre>
+      </div>
+      <div slot="right">
+        <ul>
+          <li><strong>Direct injection:</strong> user crafts input to override system instructions</li>
+          <li><strong>Indirect injection:</strong> malicious content in retrieved documents</li>
+          <li>No reliable defense exists today — fundamental architectural issue</li>
+        </ul>
+        <p class="source">Perez &amp; Ribeiro, 2022; Greshake et al., 2023</p>
+      </div>
+    </TwoColumn>
+
+    <!-- Sub-section 3.3: Systemic Risks -->
+    <SectionBreak level={2} title="Systemic Risks" />
+
+    <!-- Slide 3.3.1: Bias -->
+    <ContentSlide title="Bias In, Bias Out">
+      <ul>
+        <li>Training data reflects <strong>historical and societal biases</strong></li>
+        <li>Models can amplify stereotypes in hiring, lending, healthcare decisions</li>
+        <li>"Fairness" is context-dependent — no single technical fix</li>
+        <li>Mitigation: diverse training data, evaluation benchmarks, human oversight</li>
+      </ul>
+      <p class="source">Bender et al., 2021 — "On the Dangers of Stochastic Parrots"</p>
+    </ContentSlide>
+
+    <!-- Slide 3.3.2: Privacy -->
+    <ContentSlide title="Privacy &amp; Data Risks">
+      <Step from={1}>
+        <p><strong>Model memorization</strong> — LLMs can memorize and regurgitate training data (Carlini et al., 2021)</p>
+      </Step>
+      <Step from={2}>
+        <p>Conversation data may be used for <strong>further training</strong></p>
+      </Step>
+      <Step from={3}>
+        <p>Enterprise vs. consumer tiers have <strong>different data policies</strong></p>
+      </Step>
+      <Step from={4}>
+        <p>Regulatory landscape: <strong>GDPR, AI Act</strong>, emerging compliance frameworks</p>
+      </Step>
+    </ContentSlide>
+
+    <!-- ═══════════════ Section 4: Practical Tips ═══════════════ -->
+
+    <SectionBreak level={1} title="Practical Tips for Using LLMs" />
+
+    <!-- Slide 4.1: Writing Effective Prompts -->
+    <ContentSlide title="Writing Effective Prompts">
+      <Step from={1}>
+        <p><strong>Be specific</strong> — "Summarize this in 3 bullet points" {'>'} "Summarize this"</p>
+      </Step>
+      <Step from={2}>
+        <p><strong>Provide context</strong> — role, audience, format expectations</p>
+      </Step>
+      <Step from={3}>
+        <p><strong>Use examples</strong> — show the model what you want (few-shot prompting)</p>
+      </Step>
+      <Step from={4}>
+        <p><strong>Request structured output</strong> — "Respond as JSON with fields..."</p>
+      </Step>
+      <Step from={5}>
+        <p><strong>Iterate</strong> — refine prompts based on results</p>
+      </Step>
+    </ContentSlide>
+
+    <!-- Slide 4.2: Verify -->
+    <ContentSlide title="Always Verify">
+      <ul>
+        <li>Treat LLM output as a <strong>first draft</strong>, not a final answer</li>
+        <li>Cross-reference facts with authoritative sources</li>
+        <li>Be especially skeptical of: statistics, citations, medical/legal advice, recent events</li>
+        <li>Use the model to help you search — but verify what it finds</li>
+      </ul>
+    </ContentSlide>
+
+    <!-- Slide 4.3: Know Limitations -->
+    <TwoColumn title="Know What LLMs Can and Can't Do">
+      <div slot="left">
+        <p><strong>Good at:</strong></p>
+        <ul>
+          <li>Drafting and editing text</li>
+          <li>Explaining concepts</li>
+          <li>Brainstorming ideas</li>
+          <li>Translating languages</li>
+          <li>Code assistance</li>
+        </ul>
+      </div>
+      <div slot="right">
+        <p><strong>Bad at:</strong></p>
+        <ul>
+          <li>Reliable math computation</li>
+          <li>Real-time information</li>
+          <li>Consistent factual recall</li>
+          <li>Understanding unseen context</li>
+          <li>Replacing domain expertise</li>
+        </ul>
+      </div>
+    </TwoColumn>
+
+    <!-- Slide 4.4: Privacy Best Practices -->
+    <ContentSlide title="Protecting Your Data">
+      <ul>
+        <li><strong>Never share:</strong> passwords, API keys, personal health/financial data, proprietary code</li>
+        <li>Prefer enterprise-grade tools with data protection guarantees</li>
+        <li>Understand the provider's data retention and training policies</li>
+        <li>Consider on-premises or self-hosted models for sensitive workloads</li>
+      </ul>
+    </ContentSlide>
+
+    <!-- Slide 4.5: Key Takeaways -->
+    <ContentSlide title="Key Takeaways">
+      <Step from={1}>
+        <p>LLMs are powerful <strong>pattern matchers</strong>, not reasoning engines</p>
+      </Step>
+      <Step from={2}>
+        <p>They are tools — best used to <strong>augment, not replace</strong>, human judgment</p>
+      </Step>
+      <Step from={3}>
+        <p><strong>Always verify</strong>, especially for high-stakes decisions</p>
+      </Step>
+      <Step from={4}>
+        <p>Prompt quality <strong>directly impacts</strong> output quality</p>
+      </Step>
+      <Step from={5}>
+        <p><strong>Stay informed</strong> — the field evolves rapidly</p>
+      </Step>
+    </ContentSlide>
+
+    <!-- Slide 4.6: References -->
+    <ContentSlide title="References &amp; Further Reading">
+      <ul>
+        <li>Vaswani et al. (2017) — "Attention Is All You Need"</li>
+        <li>Brown et al. (2020) — "Language Models are Few-Shot Learners" (GPT-3)</li>
+        <li>Yao et al. (2023) — "ReAct: Synergizing Reasoning and Acting"</li>
+        <li>Bender et al. (2021) — "On the Dangers of Stochastic Parrots"</li>
+        <li>Perez &amp; Ribeiro (2022) — "Ignore This Title and HackAPrompt"</li>
+        <li>Carlini et al. (2021) — "Extracting Training Data from Large Language Models"</li>
+      </ul>
+    </ContentSlide>
+
+  </Slideshow>
+
+  <script>
+    import renderMathInElement from "katex/contrib/auto-render";
+    import mermaid from "mermaid";
+
+    const katexOptions = {
+      throwOnError: false,
+      delimiters: [
+        { left: "$$", right: "$$", display: true },
+        { left: "$", right: "$", display: false },
+        { left: "\\(", right: "\\)", display: false },
+        { left: "\\[", right: "\\]", display: true },
+      ],
+    };
+
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: "neutral",
+      securityLevel: "strict",
+    });
+
+    async function renderSlide(slide: HTMLElement) {
+      if (!slide.dataset.katexRendered) {
+        renderMathInElement(slide, katexOptions);
+        slide.dataset.katexRendered = "true";
+      }
+
+      const mermaidNodes = slide.querySelectorAll<HTMLElement>(
+        "pre.mermaid:not([data-processed])"
+      );
+      if (mermaidNodes.length > 0) {
+        await mermaid.run({ nodes: Array.from(mermaidNodes) });
+      }
+    }
+
+    function init() {
+      const activeSlide = document.querySelector<HTMLElement>(
+        "ds-slide.active"
+      );
+      if (activeSlide) renderSlide(activeSlide);
+
+      const slides = document.querySelectorAll<HTMLElement>("ds-slide");
+      const observer = new MutationObserver((mutations) => {
+        for (const mutation of mutations) {
+          if (
+            mutation.type === "attributes" &&
+            mutation.attributeName === "class"
+          ) {
+            const el = mutation.target as HTMLElement;
+            if (el.matches("ds-slide.active")) {
+              renderSlide(el);
+            }
+          }
+        }
+      });
+
+      for (const slide of slides) {
+        observer.observe(slide, {
+          attributes: true,
+          attributeFilter: ["class"],
+        });
+      }
+    }
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", init);
+    } else {
+      init();
+    }
+  </script>
+</Root>
