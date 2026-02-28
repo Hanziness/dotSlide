@@ -1,12 +1,99 @@
 ---
+import { z } from "astro/zod";
 
+const PropSchema = z.object({
+  within: z.number().int().min(1).max(6).optional(),
+  display: z.enum(["fraction", "percentage", "bar"]).default("fraction"),
+});
+
+type Props = z.output<typeof PropSchema>;
+const props = PropSchema.parse(Astro.props);
 ---
 
+<ds-progress data-within={props.within} data-display={props.display}>
+  {props.display !== "bar" && <span class="text" />}
+  {props.display === "bar" && (
+    <div class="track"><div class="fill"></div></div>
+  )}
+</ds-progress>
+
 <script>
-import { useSlideshowContext } from "../store/context/slideshow";
+  import { sectionContext } from "../store";
+  import { useSlideContext } from "../store/context/slide";
+  import { useSlideshowContext } from "../store/context/slideshow";
+  import { getSlidePositionInSection } from "../utils/section";
 
-// Use slide context to get current slide
-// const slideshowCtx = useSlideshowContext()
+  class Progress extends HTMLElement {
+    private _unsubscribe?: () => void;
 
+    connectedCallback() {
+      const slideCtx = useSlideContext(this);
+      if (!slideCtx) return;
+      const slideIndex = slideCtx.get().index;
 
+      this._unsubscribe = sectionContext.subscribe((ctx) => {
+        if (!ctx.initialized) return;
+        this._unsubscribe?.();
+
+        const withinAttr = this.getAttribute("data-within");
+        const within = withinAttr ? parseInt(withinAttr, 10) : undefined;
+        const display = this.getAttribute("data-display") ?? "fraction";
+
+        let position: number;
+        let total: number;
+
+        if (within !== undefined) {
+          const pos = getSlidePositionInSection(slideIndex, within);
+          if (!pos) return;
+          position = pos.position;
+          total = pos.total;
+        } else {
+          const slideshowCtx = useSlideshowContext(this);
+          position = slideIndex + 1;
+          total = slideshowCtx.get().numSlides;
+        }
+
+        if (display === "fraction") {
+          const textEl = this.querySelector(".text");
+          if (textEl) textEl.textContent = `${position}/${total}`;
+        } else if (display === "percentage") {
+          const textEl = this.querySelector(".text");
+          const pct = total > 0 ? Math.round((position / total) * 100) : 0;
+          if (textEl) textEl.textContent = `${pct}%`;
+        } else if (display === "bar") {
+          const fillEl =
+            this.querySelector<HTMLElement>(".fill");
+          const pct = total > 0 ? (position / total) * 100 : 0;
+          if (fillEl) fillEl.style.width = `${pct}%`;
+        }
+      });
+    }
+
+    disconnectedCallback() {
+      this._unsubscribe?.();
+    }
+  }
+
+  customElements.define("ds-progress", Progress);
 </script>
+
+<style>
+  ds-progress {
+    display: inline;
+  }
+
+  ds-progress .track {
+    display: inline-block;
+    width: 100%;
+    height: 0.4em;
+    background: color-mix(in srgb, currentColor 20%, transparent);
+    border-radius: 9999px;
+  }
+
+  ds-progress .fill {
+    height: 100%;
+    background: currentColor;
+    border-radius: inherit;
+    transition: width 0.2s;
+  }
+</style>

@@ -1,0 +1,59 @@
+---
+import { z } from "astro/zod";
+
+const PropSchema = z.object({
+  within: z.number().int().min(1).max(6).optional(),
+});
+
+type Props = z.output<typeof PropSchema>;
+const props = PropSchema.parse(Astro.props);
+---
+
+<ds-total-slides data-within={props.within} />
+
+<script>
+  import { sectionContext } from "../store";
+  import { useSlideContext } from "../store/context/slide";
+  import { useSlideshowContext } from "../store/context/slideshow";
+  import { getSlidePositionInSection } from "../utils/section";
+
+  class TotalSlides extends HTMLElement {
+    private _unsubscribe?: () => void;
+
+    connectedCallback() {
+      const slideCtx = useSlideContext(this);
+      if (!slideCtx) return;
+      const slideIndex = slideCtx.get().index;
+      const withinAttr = this.getAttribute("data-within");
+      const within = withinAttr ? parseInt(withinAttr, 10) : undefined;
+
+      if (within === undefined) {
+        // Global total — no section dependency needed
+        const slideshowCtx = useSlideshowContext(this);
+        this.textContent = String(slideshowCtx.get().numSlides);
+        return;
+      }
+
+      // Within-section total — needs section context
+      this._unsubscribe = sectionContext.subscribe((ctx) => {
+        if (!ctx.initialized) return;
+        this._unsubscribe?.();
+
+        const pos = getSlidePositionInSection(slideIndex, within);
+        this.textContent = pos ? String(pos.total) : "?";
+      });
+    }
+
+    disconnectedCallback() {
+      this._unsubscribe?.();
+    }
+  }
+
+  customElements.define("ds-total-slides", TotalSlides);
+</script>
+
+<style>
+  ds-total-slides {
+    display: inline;
+  }
+</style>
