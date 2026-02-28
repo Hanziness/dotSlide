@@ -1,0 +1,13 @@
+---
+import { Slide } from "@dotslide/framework";
+
+interface Props {
+    title: string
+    author: string
+}
+---
+
+<Slide class="flex flex-col items-center justify-center gap-4 bg-slate-100">
+    <h1 class="font-bold text-xl">{Astro.props.title}</h1>
+    <div>{Astro.props.author}</div>
+</Slide>

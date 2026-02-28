@@ -1,0 +1,15 @@
+@import "tailwindcss";
+@import '@fontsource-variable/vollkorn';
+
+@theme {
+    --font-vollkorn: 'Vollkorn Variable', serif;
+
+    --text-normal: 24pt;
+    --text-lg: 32pt;
+    --text-xl: 42pt;
+}
+
+ds-slideshow {
+    --ds-font-family: var(--font-vollkorn);
+    --ds-font-size-base: var(--text-normal);
+}

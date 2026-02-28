@@ -1,0 +1,18 @@
+---
+import { Section, Slide } from '@dotslide/framework'
+import { CurrentSection, CurrentSlide } from '@dotslide/framework/widgets'
+
+interface Props {
+    level: number
+    title: string
+}
+---
+
+<Section level={Astro.props.level} title={Astro.props.title}></Section>
+<Slide class:list={"bg-slate-100"}>
+    <div class="h-full px-16 flex flex-col items-center justify-center">
+        <div><CurrentSection level={Astro.props.level} display="numeric" separator='.' /></div>
+        <div class="w-full my-4 h-1 bg-black rounded-full" />
+        <h2 class="text-lg font-bold text-left">{Astro.props.title}</h2>
+    </div>
+</Slide>
