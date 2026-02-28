@@ -1,11 +1,71 @@
-<div data-debug-section=""></div>
+---
+import { z } from "astro/zod";
+
+const PropSchema = z.object({
+  display: z.enum(["numeric", "text"]).default("numeric"),
+  level: z.number().int().min(1).max(6).optional(),
+  separator: z.string().default("."),
+});
+
+type Props = z.output<typeof PropSchema>;
+const props = PropSchema.parse(Astro.props);
+---
+
+<ds-current-section
+  data-display={props.display}
+  data-level={props.level}
+  data-separator={props.separator}
+/>
 
 <script>
-    import { useSlideContext } from "../store/context/slide"
+  import { sectionContext } from "../store";
+  import { useSlideContext } from "../store/context/slide";
 
-    
-    document.querySelectorAll('[data-debug-section]').forEach((el) => {
-        const ctx = useSlideContext(el as HTMLElement)
-        el.textContent = ctx?.get().index.toString() || "(?)"
-    })
+  class CurrentSection extends HTMLElement {
+    private _unsubscribe?: () => void;
+
+    connectedCallback() {
+      const slideCtx = useSlideContext(this);
+      if (!slideCtx) return;
+
+      this._unsubscribe = sectionContext.subscribe((ctx) => {
+        if (!ctx.initialized) return;
+        this._unsubscribe?.();
+
+        const slideIndex = slideCtx.get().index;
+        const sectionInfo = ctx.sectionsBySlide[slideIndex];
+        if (!sectionInfo) return;
+
+        const display = this.getAttribute("data-display") ?? "numeric";
+        const levelAttr = this.getAttribute("data-level");
+        const level = levelAttr ? parseInt(levelAttr, 10) : undefined;
+        const separator = this.getAttribute("data-separator") ?? ".";
+
+        if (display === "numeric") {
+          this.textContent =
+            level !== undefined
+              ? String(sectionInfo.levels[level - 1] ?? "")
+              : sectionInfo.levels.join(separator);
+        } else {
+          // display === "text"
+          this.textContent =
+            level !== undefined
+              ? (sectionInfo.titles[level] ?? "")
+              : (sectionInfo.title ?? "");
+        }
+      });
+    }
+
+    disconnectedCallback() {
+      this._unsubscribe?.();
+    }
+  }
+
+  customElements.define("ds-current-section", CurrentSection);
 </script>
+
+<style>
+  ds-current-section {
+    display: inline;
+  }
+</style>
