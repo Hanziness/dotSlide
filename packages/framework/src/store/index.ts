@@ -6,6 +6,8 @@ export type SectionInfo = {
   levels: number[];
   /** Optional title of the section */
   title?: string;
+  /** Titles keyed by level number, e.g. { 1: "Part 1", 2: "Chapter A" } */
+  titles: Partial<Record<number, string>>;
 };
 
 /** Section context holding the mapping of slides to sections */

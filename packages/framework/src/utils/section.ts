@@ -28,7 +28,7 @@ export function buildSectionHierarchy(): void {
   const counters = [0, 0, 0, 0, 0, 0, 0];
 
   // Current section info
-  let currentSection: SectionInfo = { levels: [] };
+  let currentSection: SectionInfo = { levels: [], titles: {} };
 
   // Result mapping
   const sectionsBySlide: Record<number, SectionInfo> = {};
@@ -54,7 +54,7 @@ export function buildSectionHierarchy(): void {
       // Build section path (levels 1 through current level)
       const levels = counters.slice(1, level + 1);
 
-      currentSection = { levels, title };
+      currentSection = { levels, title, titles: {} };
     } else if (element.tagName.toLowerCase() === "ds-slide") {
       // This is a slide - assign current section
       sectionsBySlide[slideIndex] = { ...currentSection };
