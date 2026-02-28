@@ -46,4 +46,6 @@ export {
   buildSectionHierarchy,
   getCurrentSection,
   getSectionString,
+  getSlidePositionInSection,
+  type SlidePosition,
 } from "./section";

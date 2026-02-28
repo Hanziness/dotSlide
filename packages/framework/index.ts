@@ -11,4 +11,6 @@ export {
   buildSectionHierarchy,
   getCurrentSection,
   getSectionString,
+  getSlidePositionInSection,
+  type SlidePosition,
 } from "./src/utils/section";
