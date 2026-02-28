@@ -13,12 +13,12 @@ const { action } = PropSchema.parse(Astro.props);
 </ds-button>
 
 <style>
-@layer dotslide {
-  ds-button {
+@scope (ds-button) {
+  :root {
     display: contents;
   }
 
-  ds-button > button {
+  button {
     border-radius: var(--ds-control-radius, 9999px);
     background-color: var(--ds-control-bg, white);
     padding: 0.75rem;

@@ -18,42 +18,40 @@ interface Props {
 </ds-overlay>
 
 <style>
-@layer dotslide {
-    ds-overlay {
-        position: absolute;
-        display: flex;
-        flex-direction: row;
-        gap: 0.5em;
-    }
+ds-overlay {
+    position: absolute;
+    display: flex;
+    flex-direction: row;
+    gap: 0.5em;
+}
 
-    ds-overlay.padded {
-        padding: var(--ds-overlay-padding, 1em);
-    }
+ds-overlay.padded {
+    padding: var(--ds-overlay-padding, 1em);
+}
 
-    ds-overlay.top {
-        top: 0;
-    }
+ds-overlay.top {
+    top: 0;
+}
 
-    ds-overlay.bottom {
-        bottom: 0;
-    }
+ds-overlay.bottom {
+    bottom: 0;
+}
 
-    ds-overlay.vcenter {
-        height: 100%;
-        align-items: center;
-    }
+ds-overlay.vcenter {
+    height: 100%;
+    align-items: center;
+}
 
-    ds-overlay.left {
-        left: 0;
-    }
+ds-overlay.left {
+    left: 0;
+}
 
-    ds-overlay.hcenter {
-        width: 100%;
-        justify-content: center;
-    }
+ds-overlay.hcenter {
+    width: 100%;
+    justify-content: center;
+}
 
-    ds-overlay.right {
-        right: 0;
-    }
+ds-overlay.right {
+    right: 0;
 }
 </style>
