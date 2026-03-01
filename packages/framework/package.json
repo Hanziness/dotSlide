@@ -5,13 +5,15 @@
   "exports": {
     ".": "./index.ts",
     "./widgets": "./widgets.ts",
+    "./store": "./store.ts",
     "./themes/*": "./themes/*"
   },
   "files": [
     "src",
     "themes",
     "index.ts",
-    "widgets.ts"
+    "widgets.ts",
+    "store.ts"
   ],
   "keywords": [
     "dotslide",
