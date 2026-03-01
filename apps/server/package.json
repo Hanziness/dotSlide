@@ -1,0 +1,28 @@
+{
+  "name": "@dotslide/server",
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "dev": "bun run --hot src/index.ts",
+    "build": "bun build src/index.ts --outdir dist --target bun",
+    "start": "bun run src/index.ts",
+    "build:remote-client": "bun build ../../packages/remote/src/index.ts --outfile assets/remote-client.js --target browser",
+    "db:generate": "drizzle-kit generate",
+    "db:push": "drizzle-kit push"
+  },
+  "dependencies": {
+    "@dotslide/protocol": "workspace:*",
+    "@dotslide/remote": "workspace:*",
+    "@hono/zod-validator": "latest",
+    "better-auth": "latest",
+    "better-sqlite3": "latest",
+    "drizzle-orm": "latest",
+    "hono": "latest",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "latest",
+    "@types/bun": "latest",
+    "drizzle-kit": "latest"
+  }
+}

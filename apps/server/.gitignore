@@ -1,0 +1,7 @@
+node_modules/
+dist/
+drizzle/
+sqlite.db
+sqlite.db-journal
+assets/remote-client.js
+*.db
