@@ -1,0 +1,34 @@
+{
+  "name": "@dotslide/remote",
+  "version": "0.0.1",
+  "type": "module",
+  "description": "Browser client for connecting dotslide presentations to control server",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./dist/remote-client.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "bun run build.ts",
+    "dev": "bun run build.ts --watch",
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@dotslide/protocol": "workspace:*",
+    "@dotslide/framework": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "typescript": "5.9.2"
+  },
+  "keywords": [
+    "dotslide",
+    "remote-control",
+    "presentation"
+  ]
+}
