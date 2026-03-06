@@ -1,5 +1,4 @@
 import { Hono } from "hono";
-import { serveStatic } from "hono/bun";
 import { cors } from "hono/cors";
 import { auth } from "./auth";
 import { config } from "./config";
@@ -22,14 +21,6 @@ const routes = app.route("/api", apiRoutes);
 
 // ── WebSocket upgrade ──
 app.route("/ws", wsRoute);
-
-// ── Serve the remote client script (bundled framework/remote) ──
-app.get(
-  "/@dotslide/remote-client.js",
-  serveStatic({
-    path: "../../packages/remote/dist/remote-client.js",
-  }),
-);
 
 // ── Serve the built presentation (with client injection) ──
 servePresentationWithInjection(app, config.presentationDir);
