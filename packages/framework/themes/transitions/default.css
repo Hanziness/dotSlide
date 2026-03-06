@@ -1,0 +1,5 @@
+@layer dotslide {
+    :root {
+        --ds-transition-anticipate: cubic-bezier(0.8, -0.4, 0.5, 1);
+    }
+}
