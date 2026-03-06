@@ -1,8 +1,11 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { admin, anonymous, bearer } from "better-auth/plugins";
+import { admin } from "better-auth/plugins/admin";
+import { anonymous } from "better-auth/plugins/anonymous";
+import { bearer } from "better-auth/plugins/bearer";
 import { db } from "./db";
 import * as schema from "./db/schema";
+import { ac, presenter, viewer } from "./middleware/access";
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -16,7 +19,14 @@ export const auth = betterAuth({
   }),
   plugins: [
     anonymous(), // Viewers get instant sessions (no sign-up)
-    admin(), // Adds `role` field to user, enables role management
+    admin({
+      ac,
+      roles: {
+        presenter,
+        viewer
+      },
+      defaultRole: "viewer"
+    }), // Adds `role` field to user, enables role management
     bearer(), // Supports Authorization: Bearer for WS handshake
   ],
   session: {
@@ -31,3 +41,5 @@ export const auth = betterAuth({
     useSecureCookies: false,
   },
 });
+
+export * as access from './middleware/access'
