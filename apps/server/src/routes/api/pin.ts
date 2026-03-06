@@ -1,3 +1,4 @@
+import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 import { auth } from "../../auth";
@@ -8,15 +9,13 @@ const PinSchema = z.object({ pin: z.string() });
 
 export const pinRoutes = new Hono<AuthEnv>().post(
   "/claim-presenter",
-  async (c) => {
-    const body = await c.req.json();
-    const result = PinSchema.safeParse(body);
-
-    if (!result.success) {
+  zValidator("json", PinSchema, (res, c) => {
+    if (!res.success) {
       return c.json({ error: "Invalid request body" }, 400);
     }
-
-    const { pin } = result.data;
+  }),
+  async (c) => {
+    const { pin } = await c.req.valid('json');
 
     if (pin !== config.pin) {
       return c.json({ error: "Invalid PIN" }, 403);
@@ -32,10 +31,8 @@ export const pinRoutes = new Hono<AuthEnv>().post(
     }
 
     // Upgrade the anonymous user's role to "presenter"
-    // TODO: Better Auth admin plugin only supports "user" | "admin" by default.
-    // Configure custom roles or use a different role storage mechanism.
     await auth.api.setRole({
-      body: { userId: user.id, role: "admin" as const },
+      body: { userId: user.id, role: "presenter" as const },
       headers: c.req.raw.headers,
     });
 
