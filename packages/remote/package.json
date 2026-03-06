@@ -2,20 +2,20 @@
   "name": "@dotslide/remote",
   "version": "0.0.1",
   "type": "module",
-  "description": "Browser client for connecting dotslide presentations to control server",
+  "description": "Astro component for connecting dotslide presentations to control server",
   "exports": {
-    ".": {
-      "types": "./src/index.ts",
-      "default": "./dist/remote-client.js"
-    }
+    ".": "./src/index.ts"
   },
   "files": [
-    "dist",
     "src"
   ],
+  "keywords": [
+    "dotslide",
+    "astro-component",
+    "remote-control",
+    "presentation"
+  ],
   "scripts": {
-    "build": "bun run build.ts",
-    "dev": "bun run build.ts --watch",
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
@@ -23,12 +23,11 @@
     "@dotslide/framework": "workspace:*"
   },
   "devDependencies": {
-    "@types/bun": "latest",
+    "@astrojs/ts-plugin": "^1.10.6",
+    "astro": "^5.17.1",
     "typescript": "5.9.2"
   },
-  "keywords": [
-    "dotslide",
-    "remote-control",
-    "presentation"
-  ]
+  "peerDependencies": {
+    "astro": "^4.0.0 || ^5.0.0 || ^6.0.0"
+  }
 }

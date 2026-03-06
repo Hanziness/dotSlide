@@ -1,0 +1,240 @@
+---
+interface Props {
+  /** WebSocket server URL (e.g., "http://localhost:3000") */
+  serverUrl: string;
+  /** Automatically reconnect on disconnect (default: true) */
+  autoReconnect?: boolean;
+  /** Capture and upload slide thumbnails when assigned presenter role (default: true) */
+  captureSlides?: boolean;
+  /** Maximum reconnection delay in milliseconds (default: 30000) */
+  reconnectMaxDelay?: number;
+}
+
+const {
+  serverUrl,
+  autoReconnect = true,
+  captureSlides = true,
+  reconnectMaxDelay = 30_000,
+} = Astro.props;
+---
+
+<ds-remote
+  data-server-url={serverUrl}
+  data-auto-reconnect={autoReconnect.toString()}
+  data-capture-slides={captureSlides.toString()}
+  data-reconnect-max-delay={reconnectMaxDelay.toString()}
+>
+  <div class="pointer" />
+  <div class="connection-indicator" />
+</ds-remote>
+
+<script>
+import type { ServerMessage } from "@dotslide/protocol";
+import { captureAndUpload } from "./capture";
+import { SyncAdapter } from "./sync";
+
+/**
+ * Custom element that connects the presentation to a dotslide server.
+ *
+ * Manages WebSocket lifecycle, bidirectional slide sync, laser pointer
+ * rendering, and connection status indication.
+ */
+class DsRemote extends HTMLElement {
+  private ws: WebSocket | null = null;
+  private syncAdapter = new SyncAdapter();
+  private reconnectDelay = 1000;
+  private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+  private indicatorTimer: ReturnType<typeof setTimeout> | null = null;
+
+  private get serverUrl(): string {
+    return this.getAttribute("data-server-url") ?? "";
+  }
+
+  private get autoReconnect(): boolean {
+    return this.getAttribute("data-auto-reconnect") !== "false";
+  }
+
+  private get captureSlides(): boolean {
+    return this.getAttribute("data-capture-slides") !== "false";
+  }
+
+  private get reconnectMaxDelay(): number {
+    return Number.parseInt(
+      this.getAttribute("data-reconnect-max-delay") ?? "30000",
+      10,
+    );
+  }
+
+  connectedCallback() {
+    this.connect();
+  }
+
+  disconnectedCallback() {
+    if (this.reconnectTimer) clearTimeout(this.reconnectTimer);
+    if (this.indicatorTimer) clearTimeout(this.indicatorTimer);
+    this.ws?.close();
+    this.syncAdapter.detach();
+  }
+
+  private connect() {
+    const wsUrl = `${this.serverUrl.replace(/^http/, "ws")}/ws`;
+    const ws = new WebSocket(wsUrl);
+    this.ws = ws;
+
+    ws.addEventListener("open", () => {
+      console.debug("[dotslide] Connected to server");
+      this.reconnectDelay = 1000;
+      this.syncAdapter.attach(ws);
+      this.showConnectionIndicator();
+    });
+
+    ws.addEventListener("message", (event) => {
+      try {
+        const msg: ServerMessage = JSON.parse(event.data as string);
+        this.handleServerMessage(msg);
+      } catch {
+        console.warn("[dotslide] Invalid message from server");
+      }
+    });
+
+    ws.addEventListener("close", () => {
+      console.debug("[dotslide] Disconnected from server");
+      this.syncAdapter.detach();
+      if (this.autoReconnect) {
+        this.reconnectTimer = setTimeout(() => {
+          this.reconnectDelay = Math.min(
+            this.reconnectDelay * 2,
+            this.reconnectMaxDelay,
+          );
+          this.connect();
+        }, this.reconnectDelay);
+      }
+    });
+
+    ws.addEventListener("error", (e) => {
+      console.warn("[dotslide] WebSocket error", e);
+    });
+  }
+
+  private handleServerMessage(msg: ServerMessage) {
+    switch (msg.type) {
+      case "navigate":
+        this.syncAdapter.applyRemoteNavigation(msg.navigationIndex);
+        break;
+      case "sync":
+        this.syncAdapter.applyFullSync(msg);
+        break;
+      case "laser":
+        this.updateLaser(msg.x, msg.y, msg.visible);
+        break;
+      case "role":
+        console.debug(`[dotslide] Role assigned: ${msg.role}`);
+        if (msg.role === "presenter" && this.captureSlides) {
+          this.waitForReady().then(() => captureAndUpload(this.serverUrl));
+        }
+        break;
+      case "question":
+      case "question:upvote":
+        // Q&A is handled by the controller UI, not the presentation
+        break;
+      case "error":
+        console.warn(`[dotslide] Server error: ${msg.message}`);
+        break;
+    }
+  }
+
+  /** Update the laser pointer position using the template .pointer element. */
+  private updateLaser(x: number, y: number, visible: boolean) {
+    const pointer = this.querySelector<HTMLElement>(".pointer");
+    if (!pointer) return;
+    pointer.style.left = `${x * 100}%`;
+    pointer.style.top = `${y * 100}%`;
+    pointer.style.opacity = visible ? "1" : "0";
+  }
+
+  /** Show the connection indicator for 3 seconds. */
+  private showConnectionIndicator() {
+    const indicator = this.querySelector<HTMLElement>(".connection-indicator");
+    if (!indicator) return;
+
+    if (this.indicatorTimer) clearTimeout(this.indicatorTimer);
+    indicator.setAttribute("data-visible", "true");
+
+    this.indicatorTimer = setTimeout(() => {
+      indicator.setAttribute("data-visible", "false");
+    }, 3000);
+  }
+
+  /**
+   * Wait for the slideshow to be ready (all resources loaded).
+   * Resolves immediately if already ready.
+   */
+  private waitForReady(): Promise<void> {
+    return new Promise((resolve) => {
+      // TODO Consider subscribing to the Slideshow context instead!
+      const check = () => {
+        const slideshow = document.querySelector<HTMLElement>("ds-slideshow");
+        if (slideshow?.getAttribute("data-ready") === "true") {
+          resolve();
+          return;
+        }
+        requestAnimationFrame(check);
+      };
+      check();
+    });
+  }
+}
+
+customElements.define("ds-remote", DsRemote);
+</script>
+
+<style>
+  ds-remote {
+    display: block;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  .pointer {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle,
+      #ff0000 0%,
+      #ff000080 60%,
+      transparent 100%
+    );
+    box-shadow: 0 0 8px 4px #ff000040;
+    transform: translate(-50%, -50%);
+    transition:
+      left 16ms linear,
+      top 16ms linear,
+      opacity 150ms ease;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  .connection-indicator {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #22c55e;
+    box-shadow: 0 0 8px 2px #22c55e60;
+    opacity: 0;
+    transition: opacity 300ms ease;
+    pointer-events: none;
+    z-index: 10000;
+  }
+
+  .connection-indicator[data-visible="true"] {
+    opacity: 1;
+  }
+</style>
