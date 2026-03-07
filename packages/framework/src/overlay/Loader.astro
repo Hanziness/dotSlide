@@ -13,12 +13,12 @@ class Loader extends HTMLElement {
     num_failed: number = 0;
     private store_unsubscribe: (() => void) | undefined = undefined;
 
-    private _updateProgressBar(progress?: number) {
+    private _updateProgressBar = (progress?: number) => {
         const bar = this.querySelector('div.bar-inner') as HTMLDivElement
         bar.style.width = `${(progress ?? (this.num_success / (this.num_registered || 1))) * 100}%`
     }
 
-    private _onResourceReady(e: Event) {
+    private _onResourceReady = (e: Event) => {
         const result = e as CustomEvent<ResourceRegistrationResult>
         if (result.detail.success) {
             this.num_success += 1;
@@ -64,6 +64,7 @@ class Loader extends HTMLElement {
 
     disconnectedCallback() {
         this.closest('ds-slideshow')?.removeEventListener(RESOURCE_READY, this._onResourceReady)
+        this.store_unsubscribe?.()
     }
 }
 
