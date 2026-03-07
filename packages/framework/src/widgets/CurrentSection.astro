@@ -5,9 +5,12 @@ const PropSchema = z.object({
   display: z.enum(["numeric", "text"]).default("numeric"),
   level: z.number().int().min(1).max(6).optional(),
   separator: z.string().default("."),
+
+  prefix: z.string().optional(),
+  suffix: z.string().optional()
 });
 
-type Props = z.output<typeof PropSchema>;
+type Props = z.input<typeof PropSchema>;
 const props = PropSchema.parse(Astro.props);
 ---
 
@@ -15,6 +18,8 @@ const props = PropSchema.parse(Astro.props);
   data-display={props.display}
   data-level={props.level}
   data-separator={props.separator}
+  data-prefix={props.prefix}
+  data-suffix={props.suffix}
 />
 
 <script>
@@ -40,18 +45,26 @@ const props = PropSchema.parse(Astro.props);
         const levelAttr = this.getAttribute("data-level");
         const level = levelAttr ? parseInt(levelAttr, 10) : undefined;
         const separator = this.getAttribute("data-separator") ?? ".";
+        const prefix = this.getAttribute("data-prefix") ?? "";
+        const suffix = this.getAttribute("data-suffix") ?? "";
 
         if (display === "numeric") {
           this.textContent =
-            level !== undefined
+            prefix +
+            (level !== undefined
               ? String(sectionInfo.levels[level - 1] ?? "")
-              : sectionInfo.levels.join(separator);
+              : sectionInfo.levels.join(separator)
+            ) +
+              suffix;
         } else {
           // display === "text"
           this.textContent =
-            level !== undefined
+            prefix +
+            (level !== undefined
               ? (sectionInfo.titles[level] ?? "")
-              : (sectionInfo.title ?? "");
+              : (sectionInfo.title ?? "")
+            ) +
+            suffix
         }
       });
     }
