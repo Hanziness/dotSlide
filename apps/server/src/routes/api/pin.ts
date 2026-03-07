@@ -15,7 +15,7 @@ export const pinRoutes = new Hono<AuthEnv>().post(
     }
   }),
   async (c) => {
-    const { pin } = await c.req.valid('json');
+    const { pin } = c.req.valid('json');
 
     if (pin !== config.pin) {
       return c.json({ error: "Invalid PIN" }, 403);
