@@ -8,7 +8,7 @@ import type { AuthEnv } from "../../middleware/env";
 const PinSchema = z.object({ pin: z.string() });
 
 export const pinRoutes = new Hono<AuthEnv>().post(
-  "/claim-presenter",
+  "/claim",
   zValidator("json", PinSchema, (res, c) => {
     if (!res.success) {
       return c.json({ error: "Invalid request body" }, 400);
