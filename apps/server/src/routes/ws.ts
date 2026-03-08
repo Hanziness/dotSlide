@@ -1,11 +1,9 @@
 import type { Role } from "@dotslide/protocol";
 import { Hono } from "hono";
-import { createBunWebSocket } from "hono/bun";
+import { upgradeWebSocket, websocket } from "hono/bun";
 import { auth } from "../auth";
 import { handleMessage } from "../ws/handlers";
 import { hub } from "../ws/hub";
-
-const { upgradeWebSocket, websocket } = createBunWebSocket();
 
 export { websocket };
 
