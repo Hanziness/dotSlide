@@ -1,8 +1,10 @@
 import { zValidator } from "@hono/zod-validator";
+import { eq } from "drizzle-orm";
 import { Hono } from "hono";
 import { z } from "zod";
-import { auth } from "../../auth";
 import { config } from "../../config";
+import { db } from "../../db";
+import { session as authSession } from "../../db/auth";
 import type { AuthEnv } from "../../middleware/env";
 
 const PinSchema = z.object({ pin: z.string() });
@@ -15,7 +17,7 @@ export const pinRoutes = new Hono<AuthEnv>().post(
     }
   }),
   async (c) => {
-    const { pin } = c.req.valid('json');
+    const { pin } = c.req.valid("json");
 
     if (pin !== config.pin) {
       return c.json({ error: "Invalid PIN" }, 403);
@@ -30,12 +32,11 @@ export const pinRoutes = new Hono<AuthEnv>().post(
       );
     }
 
-    // Upgrade the anonymous user's role to "presenter"
-    await auth.api.setRole({
-      body: { userId: user.id, role: "presenter" as const },
-      headers: c.req.raw.headers,
-    });
+    await db
+      .update(authSession)
+      .set({ presentationRole: "presenter" })
+      .where(eq(authSession.id, session.id));
 
-    return c.json({ role: "presenter" });
+    return c.json({ presentationRole: "presenter" });
   },
 );

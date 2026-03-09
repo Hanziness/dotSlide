@@ -1,7 +1,8 @@
 import type { Role } from "@dotslide/protocol";
 import { Hono } from "hono";
 import { upgradeWebSocket, websocket } from "hono/bun";
-import { auth } from "../auth";
+import { getPresentationRole } from "../middleware/auth";
+import { getFreshSession } from "../session";
 import { handleMessage } from "../ws/handlers";
 import { hub } from "../ws/hub";
 
@@ -11,21 +12,19 @@ export const wsRoute = new Hono().get(
   "/",
   upgradeWebSocket(async (c) => {
     // Authenticate from cookie or ?token= query param
-    let session = await auth.api.getSession({
-      headers: c.req.raw.headers,
-    });
+    let session = await getFreshSession(c.req.raw.headers);
 
     if (!session) {
       const token = new URL(c.req.url).searchParams.get("token");
       if (token) {
-        session = await auth.api.getSession({
-          headers: new Headers({ Authorization: `Bearer ${token}` }),
-        });
+        session = await getFreshSession(
+          new Headers({ Authorization: `Bearer ${token}` }),
+        );
       }
     }
 
     const userId = session?.user?.id ?? null;
-    const role: Role = (session?.user?.role as Role) ?? "viewer";
+    const role: Role = getPresentationRole(session?.session);
 
     return {
       onOpen(_event, ws) {

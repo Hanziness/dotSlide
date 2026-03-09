@@ -41,7 +41,7 @@ export const slideRoutes = new Hono<AuthEnv>()
     }
 
     const user = c.get("user");
-    if (!user || user.role !== "admin") {
+    if (!user || c.get("presentationRole") !== "presenter") {
       return c.json({ error: "Only the presenter can upload thumbnails" }, 403);
     }
 
