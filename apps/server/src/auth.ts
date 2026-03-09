@@ -1,13 +1,25 @@
-import { betterAuth } from "better-auth";
+import { type Auth, type BetterAuthOptions, betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { admin } from "better-auth/plugins/admin";
 import { anonymous } from "better-auth/plugins/anonymous";
 import { bearer } from "better-auth/plugins/bearer";
 import { db } from "./db";
-import * as schema from "./db/schema";
-import { ac, presenter, viewer } from "./middleware/access";
+import * as schema from "./db/auth";
 
-export const auth = betterAuth({
+type DotslideAuthOptions = BetterAuthOptions & {
+  plugins: [ReturnType<typeof anonymous>, ReturnType<typeof bearer>];
+  session: NonNullable<BetterAuthOptions["session"]> & {
+    additionalFields: {
+      presentationRole: {
+        type: ["viewer", "presenter"];
+        required: false;
+        defaultValue: "viewer";
+        input: false;
+      };
+    };
+  };
+};
+
+const authOptions: DotslideAuthOptions = {
   database: drizzleAdapter(db, {
     provider: "sqlite",
     schema: {
@@ -19,17 +31,17 @@ export const auth = betterAuth({
   }),
   plugins: [
     anonymous(), // Viewers get instant sessions (no sign-up)
-    admin({
-      ac,
-      roles: {
-        presenter,
-        viewer
-      },
-      defaultRole: "viewer"
-    }), // Adds `role` field to user, enables role management
     bearer(), // Supports Authorization: Bearer for WS handshake
   ],
   session: {
+    additionalFields: {
+      presentationRole: {
+        type: ["viewer", "presenter"],
+        required: false,
+        defaultValue: "viewer",
+        input: false,
+      },
+    },
     expiresIn: 60 * 60 * 24, // 24 hours
     cookieCache: {
       enabled: true,
@@ -40,6 +52,7 @@ export const auth = betterAuth({
     // Disable Secure flag for local HTTP usage
     useSecureCookies: false,
   },
-});
+  trustedOrigins: ["http://localhost:5173"],
+};
 
-export * as access from './middleware/access'
+export const auth: Auth<DotslideAuthOptions> = betterAuth(authOptions);

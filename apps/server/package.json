@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "bun run --hot src/index.ts",
-    "build": "bun build src/index.ts --outdir dist --target bun",
+    "build": "bun run build.ts",
     "start": "bun run src/index.ts",
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push"
@@ -24,11 +24,11 @@
   "exports": {
     ".": {
       "types": "./src/app.ts",
-      "default": "./src/app.ts"
+      "default": "./dist/app.js"
     },
     "./client": {
       "types": "./src/client.ts",
-      "default": "./src/client.ts"
+      "default": "./dist/client.js"
     }
   }
 }

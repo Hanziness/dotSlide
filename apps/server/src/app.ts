@@ -10,7 +10,7 @@ import { wsRoute } from "./routes/ws";
 const app = new Hono();
 
 // ── Global middleware ──
-app.use("/api/*", cors({ origin: "*", credentials: true }));
+app.use("/api/*", cors({ origin: "http://localhost:5173", credentials: true }));
 app.use("/*", authMiddleware);
 
 // ── Better Auth handler ──
