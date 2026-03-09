@@ -1,1 +1,11 @@
 @import 'tailwindcss';
+@import '@fontsource-variable/source-sans-3';
+
+@theme {
+    --font-sans: 'Source Sans 3 Variable', sans-serif;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+}

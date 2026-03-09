@@ -1,17 +1,21 @@
-import { access } from "@dotslide/server/client";
 import { createAuthClient } from "better-auth/client";
-import { admin, anonymous, bearer } from "better-auth/plugins";
+import { anonymousClient } from "better-auth/client/plugins";
+import { bearer } from "better-auth/plugins";
 
 export const authClient = createAuthClient({
+  baseURL: "http://localhost:9876",
   plugins: [
-    anonymous(), // Viewers get instant sessions (no sign-up)
-    admin({
-      ac: access.ac,
-      roles: {
-        presenter: access.presenter,
-        viewer: access.viewer,
-      },
-    }), // Adds `role` field to user, enables role management
+    anonymousClient(), // Viewers get instant sessions (no sign-up)
     bearer(), // Supports Authorization: Bearer for WS handshake
   ],
 });
+
+export async function refreshSession(): Promise<
+  Awaited<ReturnType<typeof authClient.getSession>>
+> {
+  return authClient.getSession({
+    query: {
+      disableCookieCache: true,
+    },
+  });
+}
