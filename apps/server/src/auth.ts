@@ -2,11 +2,17 @@ import { type Auth, type BetterAuthOptions, betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { anonymous } from "better-auth/plugins/anonymous";
 import { bearer } from "better-auth/plugins/bearer";
+import { oneTimeToken } from "better-auth/plugins/one-time-token";
+import { presenterOneTimeTokenTTLMinutes } from "./auth/presenter-token";
 import { db } from "./db";
 import * as schema from "./db/auth";
 
 type DotslideAuthOptions = BetterAuthOptions & {
-  plugins: [ReturnType<typeof anonymous>, ReturnType<typeof bearer>];
+  plugins: [
+    ReturnType<typeof anonymous>,
+    ReturnType<typeof bearer>,
+    ReturnType<typeof oneTimeToken>,
+  ];
   session: NonNullable<BetterAuthOptions["session"]> & {
     additionalFields: {
       presentationRole: {
@@ -32,6 +38,9 @@ const authOptions: DotslideAuthOptions = {
   plugins: [
     anonymous(), // Viewers get instant sessions (no sign-up)
     bearer(), // Supports Authorization: Bearer for WS handshake
+    oneTimeToken({
+      expiresIn: presenterOneTimeTokenTTLMinutes,
+    }),
   ],
   session: {
     additionalFields: {
