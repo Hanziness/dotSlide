@@ -19,8 +19,9 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
+    "@dotslide/framework": "workspace:*",
     "@dotslide/protocol": "workspace:*",
-    "@dotslide/framework": "workspace:*"
+    "nanostores": "^1.1.0"
   },
   "devDependencies": {
     "@astrojs/ts-plugin": "^1.10.6",

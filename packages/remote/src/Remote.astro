@@ -31,6 +31,7 @@ const {
 <script>
 import type { ServerMessage } from "@dotslide/protocol";
 import { captureAndUpload } from "./capture";
+import { connectionState } from "./connection-state";
 import { SyncAdapter } from "./sync";
 
 /**
@@ -74,6 +75,7 @@ class DsRemote extends HTMLElement {
     if (this.indicatorTimer) clearTimeout(this.indicatorTimer);
     this.ws?.close();
     this.syncAdapter.detach();
+    connectionState.set("standalone");
   }
 
   private connect() {
@@ -81,11 +83,21 @@ class DsRemote extends HTMLElement {
     const ws = new WebSocket(wsUrl);
     this.ws = ws;
 
+    // Track whether this is a reconnection attempt
+    const currentState = connectionState.get();
+    if (currentState === "reconnecting") {
+      // Keep reconnecting state — it was set by the close handler
+    } else {
+      connectionState.set("connecting");
+    }
+
     ws.addEventListener("open", () => {
       console.debug("[dotslide] Connected to server");
       this.reconnectDelay = 1000;
       this.syncAdapter.attach(ws);
       this.showConnectionIndicator();
+      // Default to viewer until the server assigns a role
+      connectionState.set("connected-viewer");
     });
 
     ws.addEventListener("message", (event) => {
@@ -101,6 +113,7 @@ class DsRemote extends HTMLElement {
       console.debug("[dotslide] Disconnected from server");
       this.syncAdapter.detach();
       if (this.autoReconnect) {
+        connectionState.set("reconnecting");
         this.reconnectTimer = setTimeout(() => {
           this.reconnectDelay = Math.min(
             this.reconnectDelay * 2,
@@ -108,6 +121,8 @@ class DsRemote extends HTMLElement {
           );
           this.connect();
         }, this.reconnectDelay);
+      } else {
+        connectionState.set("standalone");
       }
     });
 
@@ -129,6 +144,9 @@ class DsRemote extends HTMLElement {
         break;
       case "role":
         console.debug(`[dotslide] Role assigned: ${msg.role}`);
+        connectionState.set(
+          msg.role === "presenter" ? "connected-presenter" : "connected-viewer",
+        );
         if (msg.role === "presenter" && this.captureSlides) {
           this.waitForReady().then(() => captureAndUpload(this.serverUrl));
         }
