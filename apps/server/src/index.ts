@@ -15,4 +15,3 @@ const server = Bun.serve({
 
 console.log(`dotslide server running on http://localhost:${server.port}`);
 console.log(`Network: http://${getLocalIP()}:${server.port}`);
-console.log(`Presenter PIN: ${config.pin}`);
