@@ -60,6 +60,7 @@ const {
 
 <script>
 import type { ServerMessage } from "@dotslide/protocol";
+import { authClient } from "@dotslide/server/client"
 import { captureAndUpload } from "./capture";
 import { connectionState } from "./connection-state";
 import { SyncAdapter } from "./sync";
@@ -116,8 +117,19 @@ class DsRemote extends HTMLElement {
     connectionState.set("standalone");
   }
 
-  private connect() {
+  private async connect() {
     const wsUrl = `${this.serverUrl.replace(/^http/, "ws")}/ws`;
+    let session = await authClient.getSession()
+
+    if (!session.data) {
+      console.info("Signing in anonymously")
+      await authClient.signIn.anonymous()
+
+      // refresh session
+      session = await authClient.getSession()
+      console.info(session)
+    }
+
     const ws = new WebSocket(wsUrl);
     this.ws = ws;
 

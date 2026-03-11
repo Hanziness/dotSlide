@@ -21,6 +21,7 @@
   "dependencies": {
     "@dotslide/framework": "workspace:*",
     "@dotslide/protocol": "workspace:*",
+    "@dotslide/server": "workspace:*",
     "nanostores": "^1.1.0"
   },
   "devDependencies": {

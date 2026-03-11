@@ -49,6 +49,7 @@
       "version": "0.0.1",
       "dependencies": {
         "@dotslide/framework": "workspace:*",
+        "@dotslide/remote": "workspace:*",
         "@fontsource-variable/vollkorn": "^5.2.10",
         "@tailwindcss/vite": "^4.2.1",
         "astro": "^5.17.1",
@@ -114,6 +115,7 @@
       "dependencies": {
         "@dotslide/framework": "workspace:*",
         "@dotslide/protocol": "workspace:*",
+        "@dotslide/server": "workspace:*",
         "nanostores": "^1.1.0",
       },
       "devDependencies": {
