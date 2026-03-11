@@ -1,4 +1,5 @@
 import * as os from "node:os";
+import { websocket } from "hono/bun";
 import { app } from "./app";
 import { config } from "./config";
 
@@ -11,6 +12,7 @@ function getLocalIP(): string {
 const server = Bun.serve({
   port: config.port,
   fetch: app.fetch,
+  websocket,
 });
 
 console.log(`dotslide server running on http://localhost:${server.port}`);
