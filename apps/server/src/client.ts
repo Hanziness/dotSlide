@@ -6,3 +6,5 @@ export type Client = ReturnType<typeof hc<AppType>>;
 
 export const dsClient = (...args: Parameters<typeof hc>): Client =>
   hc<AppType>(...args);
+
+export { authClient } from "./client/auth-client"

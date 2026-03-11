@@ -1,7 +1,7 @@
 <script lang="ts">
+import { authClient } from "@dotslide/server/client";
 import { onMount } from "svelte";
 import { goto } from "$app/navigation";
-import { authClient } from "$lib/auth-client";
 
 type Props = {
   title: string;
