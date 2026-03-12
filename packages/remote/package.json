@@ -22,6 +22,7 @@
     "@dotslide/framework": "workspace:*",
     "@dotslide/protocol": "workspace:*",
     "@dotslide/server": "workspace:*",
+    "@zumer/snapdom": "^2.1.0",
     "nanostores": "^1.1.0"
   },
   "devDependencies": {
