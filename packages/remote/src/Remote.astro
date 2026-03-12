@@ -59,6 +59,7 @@ const {
 </ds-remote>
 
 <script>
+import { useSlideshowContext } from "@dotslide/framework/store";
 import type { ServerMessage } from "@dotslide/protocol";
 import { authClient } from "@dotslide/server/client"
 import { captureAndUpload } from "./capture";
@@ -104,6 +105,7 @@ class DsRemote extends HTMLElement {
 
   async connectedCallback() {
     await this.connect();
+    await captureAndUpload(this.serverUrl)
     this.setupInviteUI();
   }
 
@@ -181,6 +183,8 @@ class DsRemote extends HTMLElement {
   }
 
   private handleServerMessage(msg: ServerMessage) {
+    console.info(msg)
+
     switch (msg.type) {
       case "navigate":
         this.syncAdapter.applyRemoteNavigation(msg.navigationIndex);
@@ -208,6 +212,10 @@ class DsRemote extends HTMLElement {
         console.warn(`[dotslide] Server error: ${msg.message}`);
         break;
     }
+  }
+
+  sendSlides() {
+    const ctx = useSlideshowContext(this)
   }
 
   // ── Invite UI ──
