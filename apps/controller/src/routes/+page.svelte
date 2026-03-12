@@ -1,8 +1,8 @@
 <script lang="ts">
+    import { authClient } from "@dotslide/server/client";
     import { LogOutIcon } from "lucide-svelte";
     import { onMount } from "svelte";
     import { goto } from "$app/navigation";
-    import { authClient } from "$lib/auth-client";
     import { client } from "$lib/client";
     import Badge from "$lib/components/Badge.svelte";
     import Button from "$lib/components/Button.svelte";

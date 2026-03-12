@@ -1,8 +1,8 @@
 <script lang="ts">
+import { authClient, refreshSession } from "@dotslide/server/client";
 import { onMount } from "svelte";
 import { goto } from "$app/navigation";
 import { page } from "$app/stores";
-import { authClient, refreshSession } from "$lib/auth-client";
 import { client } from "$lib/client";
 
 type Status =
