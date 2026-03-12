@@ -102,8 +102,8 @@ class DsRemote extends HTMLElement {
     );
   }
 
-  connectedCallback() {
-    this.connect();
+  async connectedCallback() {
+    await this.connect();
     this.setupInviteUI();
   }
 
@@ -127,7 +127,6 @@ class DsRemote extends HTMLElement {
 
       // refresh session
       session = await authClient.getSession()
-      console.info(session)
     }
 
     const ws = new WebSocket(wsUrl);
