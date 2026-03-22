@@ -1,10 +1,10 @@
-import type { Hono } from "hono";
+import type { Env, Hono } from "hono";
 import { serveStatic } from "hono/bun";
 
 /**
  * Serve a built Astro presentation from a directory.
  */
-export function servePresentationWithInjection(app: Hono, dir: string) {
+export function servePresentationWithInjection<AuthEnv extends Env>(app: Hono<AuthEnv>, dir: string) {
   // Serve non-HTML assets directly
   app.use("/slideshow/*", serveStatic({ root: dir }));
 
