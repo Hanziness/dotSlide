@@ -61,7 +61,8 @@ const authOptions: DotslideAuthOptions = {
     // Disable Secure flag for local HTTP usage
     useSecureCookies: false,
   },
-  trustedOrigins: ["http://localhost:5173"],
+  trustedOrigins: ["http://localhost:5173", "http://localhost:4321", "http://localhost:4322"],
+  baseURL: "http://localhost:3000"
 };
 
 export const auth: Auth<DotslideAuthOptions> = betterAuth(authOptions);
