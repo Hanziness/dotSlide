@@ -1,6 +1,33 @@
 import { relations } from "drizzle-orm";
-import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import {
+  blob,
+  index,
+  integer,
+  sqliteTable,
+  text,
+} from "drizzle-orm/sqlite-core";
 import { user } from "./auth";
+
+export const presentation = sqliteTable("presentation", {
+  id: text("id").primaryKey(),
+  state: text("state", { mode: "json" }),
+  owner: text("owner").references(() => user.id),
+});
+
+export const presentationRelations = relations(presentation, ({ one }) => ({
+  owner: one(user)
+}))
+
+export const thumbnails = sqliteTable("thumbnails", {
+  id: text("id").primaryKey(),
+  presentation: text("presentation").references(() => presentation.id),
+  type: text("type").notNull(),
+  data: blob("data").notNull()
+})
+
+export const thumbnailsRelations = relations(thumbnails, ({ one }) => ({
+  presentation: one(presentation)
+}))
 
 export const question = sqliteTable(
   "question",
