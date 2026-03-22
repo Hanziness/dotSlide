@@ -1,13 +1,14 @@
 import { zValidator } from "@hono/zod-validator";
 import { eq } from "drizzle-orm";
 import { Hono } from "hono";
+import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
+import { SessionRole } from "../../auth/role";
 import { db } from "../../db";
-import { session as sessionTable } from "../../db/auth";
+import { presentation } from "../../db/dotslide";
 import type { AuthEnv } from "../../middleware/env";
 import { generateOneTimeToken, verifyOneTimeToken } from "../../one-time-token";
-
-const ClaimSchema = z.object({ token: z.string().min(1) });
+import { setSessionRole } from "../../session";
 
 export const presenterRoutes = new Hono<AuthEnv>()
   /**
@@ -36,15 +37,15 @@ export const presenterRoutes = new Hono<AuthEnv>()
       return c.json({ error: "Malformed origin header." }, 403);
     }
 
-    if (originHost !== host) {
-      return c.json(
-        {
-          error:
-            "Presenter invites can only be created from the presentation page.",
-        },
-        403,
-      );
-    }
+    // if (originHost !== host) {
+    //   return c.json(
+    //     {
+    //       error:
+    //         "Presenter invites can only be created from the presentation page.",
+    //     },
+    //     403,
+    //   );
+    // }
 
     // ── Require an authenticated session ──
     const session = c.get("session");
@@ -71,7 +72,7 @@ export const presenterRoutes = new Hono<AuthEnv>()
    */
   .post(
     "/claim",
-    zValidator("json", ClaimSchema, (res, c) => {
+    zValidator("json", z.object({ token: z.string().min(1) }), (res, c) => {
       if (!res.success) {
         return c.json({ error: "Invalid request body." }, 400);
       }
@@ -100,11 +101,94 @@ export const presenterRoutes = new Hono<AuthEnv>()
       }
 
       // ── Upgrade the consuming session to presenter ──
-      await db
-        .update(sessionTable)
-        .set({ presentationRole: "presenter" })
-        .where(eq(sessionTable.id, session.id));
+      await setSessionRole(session.id, SessionRole.Presenter);
 
       return c.json({ presentationRole: "presenter" as const });
+    },
+  )
+
+  .post("/create", async (c) => {
+    const session = c.get("session");
+    // TODO Find out why the client is not authenticated here 🤔
+    console.log(session)
+    console.log(c.get("presentationRole"))
+    if (!session) {
+      return c.json({ error: "Not authenticated. Sign in first.", session }, 401);
+    }
+
+    const res = await db
+      .insert(presentation)
+      .values({
+        id: uuidv4(),
+        owner: session.userId,
+        state: null,
+      })
+      .returning();
+
+    if (res.length !== 1) {
+      return c.json(
+        {
+          error: `Failed to register presentation, ${res.length} rows inserted`,
+        },
+        500,
+      );
+    }
+
+    return c.json(
+      {
+        id: res[0].id,
+      },
+      200,
+    );
+  })
+
+  .post(
+    "/update",
+    zValidator(
+      "json",
+      z.object({
+        presentation: z.string(),
+        state: z.json(),
+      }),
+    ),
+    async (c) => {
+      const session = c.get("session");
+      if (!session) {
+        return c.json({ error: "Not authenticated. Sign in first." }, 401);
+      }
+
+      const role = c.get("presentationRole");
+      if (role !== "presenter") {
+        return c.json({ error: "Insufficient permissions." }, 401);
+      }
+
+      const ownedPresentations = await db
+        .select()
+        .from(presentation)
+        .where(eq(presentation.owner, session.userId));
+      const input = c.req.valid("json");
+      if (ownedPresentations[0].id !== input.presentation) {
+        return c.json(
+          { error: "You do not have access to modify this presentation." },
+          401,
+        );
+      }
+
+      const res = await db
+        .update(presentation)
+        .set({ state: input.state })
+        .where(eq(presentation.id, ownedPresentations[0].id))
+        .returning();
+
+      if (res.length === 1) {
+        return c.status(200);
+      } else {
+        return c.json(
+          {
+            error: `Failed to update presentation state, affected ${res.length} rows.`,
+          },
+          500,
+        );
+      }
     },
   );
