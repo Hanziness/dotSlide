@@ -64,6 +64,7 @@ import type { ServerMessage } from "@dotslide/protocol";
 import { authClient } from "@dotslide/server/client"
 import { captureAndUpload } from "./capture";
 import { connectionState } from "./connection-state";
+import { client } from "./rpc-client";
 import { SyncAdapter } from "./sync";
 
 /**
@@ -79,6 +80,7 @@ class DsRemote extends HTMLElement {
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
   private indicatorTimer: ReturnType<typeof setTimeout> | null = null;
   private unsubscribeState: (() => void) | null = null;
+  private roomId: string | undefined
 
   private get serverUrl(): string {
     return this.getAttribute("data-server-url") ?? "";
@@ -124,12 +126,26 @@ class DsRemote extends HTMLElement {
     let session = await authClient.getSession()
 
     if (!session.data) {
-      console.info("Signing in anonymously")
       await authClient.signIn.anonymous()
 
       // refresh session
       session = await authClient.getSession()
+    } else {
+      console.info("Logged in: \n", session)
     }
+    console.log(session)
+
+    // Create a presentation room
+    const room = await client.api.presenter.create.$post({ })
+    if (room.status !== 200) {
+      console.warn('[Remote] 🛑 Error claiming presenter role: ', await room.json())
+      return
+    }
+
+    const roomRes = await room.json()
+    console.log('[Remote] ✅ Room created: ', roomRes.id) // TODO figure out typing here
+    this.roomId = roomRes.id
+  
 
     const ws = new WebSocket(wsUrl);
     this.ws = ws;
@@ -143,7 +159,7 @@ class DsRemote extends HTMLElement {
     }
 
     ws.addEventListener("open", () => {
-      console.debug("[dotslide] Connected to server");
+      console.debug("[Remote] Connected to server");
       this.reconnectDelay = 1000;
       this.syncAdapter.attach(ws);
       this.showConnectionIndicator();
