@@ -4,6 +4,8 @@ import { Root, Slide, Slideshow, StyleHelper } from "@dotslide/framework";
 import "../global.css";
 import "@dotslide/framework/themes/default.css";
 
+
+import { Remote } from "@dotslide/remote"
 import SectionWithSlide from "../components/SectionWithSlide.astro";
 // Custom slides
 import Title from "../components/slides/Title.astro";
@@ -18,5 +20,6 @@ import Title from "../components/slides/Title.astro";
 		<Slide>
 			Oh look, another slide!
 		</Slide>
+		<Remote serverUrl="http://localhost:9876" controllerUrl="http://localhost:5173" />
 	</Slideshow>
 </Root>
