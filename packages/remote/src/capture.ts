@@ -20,7 +20,7 @@ const THUMB_QUALITY = 0.7;
  *
  * @param serverUrl - Base URL of the dotslide server
  */
-export async function captureAndUpload(serverUrl: string): Promise<void> {
+export async function captureAndUpload(roomId: string): Promise<void> {
   const slideshow = document.querySelector<HTMLElement>("ds-slideshow");
   if (!slideshow) return;
 
@@ -41,7 +41,7 @@ export async function captureAndUpload(serverUrl: string): Promise<void> {
     try {
       const blob = await captureSlide(slide, width, height, scale);
       if (blob) {
-        await uploadThumbnail(serverUrl, i, blob);
+        await uploadThumbnail(roomId, i, blob);
       }
     } catch (err) {
       console.warn(`[dotslide/capture] Failed to capture slide ${i}:`, err);
@@ -62,12 +62,12 @@ async function captureSlide(
 }
 
 async function uploadThumbnail(
-  serverUrl: string,
-  slideIndex: number,
+  roomId: string,
+  index: number,
   blob: Blob,
 ): Promise<void> {
   
   const formData = new FormData();
-  formData.append("thumbnail", blob, `slide-${slideIndex}.webp`);
-  client.api.slides[":index"].thumbnail.$post({ param: { index: slideIndex.toString() }, form: { file: new File([blob], `slide-${slideIndex}.webp`) } })
+  formData.append("thumbnail", blob, `slide-${index}.webp`);
+  client.api.slides[":roomId"][":index"].thumbnail.$post({ param: { roomId, index: index.toString() }, form: { file: new File([blob], `slide-${index}.webp`) }  })
 }

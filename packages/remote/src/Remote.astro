@@ -19,7 +19,7 @@ interface Props {
 const {
   serverUrl,
   controllerUrl,
-  autoReconnect = true,
+  autoReconnect = false,
   captureSlides = true,
   reconnectMaxDelay = 30_000,
 } = Astro.props;
@@ -107,7 +107,13 @@ class DsRemote extends HTMLElement {
 
   async connectedCallback() {
     await this.connect();
-    await captureAndUpload(this.serverUrl)
+
+    if (!this.roomId) {
+      console.error("Remote didn't get a Room ID, quitting.")
+      return
+    }
+
+    await captureAndUpload(this.roomId)
     this.setupInviteUI();
   }
 
@@ -122,7 +128,6 @@ class DsRemote extends HTMLElement {
   }
 
   private async connect() {
-    const wsUrl = `${this.serverUrl.replace(/^http/, "ws")}/ws`;
     let session = await authClient.getSession()
 
     if (!session.data) {
@@ -146,7 +151,7 @@ class DsRemote extends HTMLElement {
     console.log('[Remote] ✅ Room created: ', roomRes.id) // TODO figure out typing here
     this.roomId = roomRes.id
   
-
+    const wsUrl = `${this.serverUrl.replace(/^http/, "ws")}/ws/${this.roomId}`;
     const ws = new WebSocket(wsUrl);
     this.ws = ws;
 
@@ -318,16 +323,18 @@ class DsRemote extends HTMLElement {
     statusEl: HTMLElement,
     copyButton: HTMLElement,
   ) {
+    if (!this.roomId) {
+      console.warn("No room ID is available for the invite")
+      return;
+    }
+
     linkInput.value = "";
     copyButton.style.display = "none";
     statusEl.textContent = "Generating link...";
     statusEl.className = "invite-status";
 
     try {
-      const response = await fetch(`${this.serverUrl}/api/presenter/invite`, {
-        method: "POST",
-        credentials: "include",
-      });
+      const response = await client.api.presenter[":roomId"].invite.$post({ param: { roomId: this.roomId } })
 
       if (!response.ok) {
         let message = "Failed to create invite link.";
