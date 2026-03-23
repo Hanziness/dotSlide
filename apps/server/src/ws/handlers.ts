@@ -1,8 +1,8 @@
-import { ClientMessage, permissions, type Role } from "@dotslide/protocol";
+import { ClientMessage } from "@dotslide/protocol";
 import type { WSConnection } from "./hub";
 import { hub } from "./hub";
 
-export function handleMessage(ws: WSConnection, raw: string, role: Role) {
+export function handleMessage(ws: WSConnection, raw: string, role: string | null) {
   let parsed: unknown;
   try {
     parsed = JSON.parse(raw);
@@ -25,14 +25,13 @@ export function handleMessage(ws: WSConnection, raw: string, role: Role) {
   const msg = result.data;
 
   // Permission check
-  if (!permissions[role].has(msg.type)) {
+  if (!role) {
     ws.send(
       JSON.stringify({
         type: "error",
         message: `Not permitted: ${msg.type}`,
-      }),
-    );
-    return;
+      })
+    )
   }
 
   switch (msg.type) {
