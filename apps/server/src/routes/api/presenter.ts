@@ -56,7 +56,6 @@ export const presenterRoutes = new Hono<AuthEnv>()
     // ── Generate a one-time token tied to the current session ──
     // Insert invitation entry into db, generate 5-minute JWT to allow elevating permissions for this room
     const expiresAt = new Date(Date.now() + 300 * 1000);
-    console.log(`Invite will expire at: ${expiresAt}`);
     const payload = await db
       .insert(invites)
       .values({
@@ -114,7 +113,6 @@ export const presenterRoutes = new Hono<AuthEnv>()
         return c.json({ error: "Invalid or expired presenter token." }, 403);
       }
 
-      console.info("Token received:\n", verified);
       const currentRole = await getUserPresentationRole(
         verified.presentation,
         session.userId,
@@ -164,7 +162,9 @@ export const presenterRoutes = new Hono<AuthEnv>()
         return c.json({ error: err }, 500);
       }
 
-      return c.text('OK', 200);
+      return c.json({
+        room: verified.presentation
+      }, 200);
     },
   )
 
