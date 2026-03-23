@@ -6,9 +6,10 @@ import { goto } from "$app/navigation";
 type Props = {
   title: string;
   submitLabel: string;
+  roomId: string;
 };
 
-const { title, submitLabel }: Props = $props();
+const { title, submitLabel, roomId }: Props = $props();
 
 let username = $state("");
 let error = $state<string | null>(null);
@@ -34,7 +35,7 @@ async function handleLogin() {
 
     await authClient.updateUser({ name: username });
 
-    await goto("/");
+    await goto(`/?p=${roomId}`);
   } finally {
     isSubmitting = false;
   }

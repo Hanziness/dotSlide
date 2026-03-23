@@ -49,11 +49,13 @@ onMount(async () => {
       return;
     }
 
+    const roomId = (await response.json()).room
+
     // Refresh session so downstream sees presenter role immediately
     await refreshSession();
 
     status = { state: "success" };
-    await goto("/", { replaceState: true });
+    await goto(`/?p=${roomId}`, { replaceState: true });
   } catch {
     status = {
       state: "error",

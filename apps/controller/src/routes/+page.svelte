@@ -7,8 +7,14 @@
     import Badge from "$lib/components/Badge.svelte";
     import Button from "$lib/components/Button.svelte";
 
+    const getRoomIdFromUrl = () => {
+        const params = new URLSearchParams(location.search)
+        return params.get("p")
+    }
+
     let session: Awaited<ReturnType<typeof authClient.getSession>> | undefined = $state()
-    const userRole = $derived(session?.data.session.presentationRole)
+    let roomId: string | null = $state(null)
+    let userRole: string | null = $state(null)
 
     onMount(async () => {
         session = await authClient.getSession()
@@ -21,21 +27,31 @@
             console.info("Already logged in:\n", session)
         }
 
+        roomId = getRoomIdFromUrl()
+
+        if (!roomId) {
+            throw new Error("No presentation ID supplied")
+        }
+
+        const userRoleQuery = await client.api.presenter[":roomId"].me.$get({ param: { roomId } })
+        if (userRoleQuery.ok) {
+            userRole = (await userRoleQuery.json()).currentRole
+            console.log("User role:", userRole)
+        }
+
         console.log(await (await client.api.slides.$get()).json())
     })
 
     const logout = async () => {
         await authClient.signOut()
-        goto('/auth/viewer')
+        goto(`/auth/viewer?p=${roomId}`)
     }
 </script>
 
 <div class="w-full h-full flex flex-col relative">
     <div class="w-full flex flex-row items-center justify-start gap-2 p-2 border-b border-slate-800">
         <div class="p-2">dotSlide</div>
-        {#if userRole === 'viewer'}
-            <Badge>Viewer</Badge>
-        {:else if userRole === 'presenter'}
+        {#if userRole === 'controller'}
             <Badge>Presenter</Badge>
         {/if}
         <div class="grow"></div>
