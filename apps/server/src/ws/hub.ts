@@ -1,12 +1,12 @@
 import type {
   NavigationSnapshot,
-  Role,
   ServerMessage,
 } from "@dotslide/protocol";
 
 type ConnectionInfo = {
   userId: string | null;
-  role: Role;
+  presentation: string;
+  role?: string;
 };
 
 export type Question = {
@@ -51,8 +51,8 @@ class Hub {
     this.connections.delete(ws);
   }
 
-  getRole(ws: WSConnection): Role {
-    return this.connections.get(ws)?.role ?? "viewer";
+  getRole(ws: WSConnection): string | undefined {
+    return this.connections.get(ws)?.role;
   }
 
   // ── Navigation state ──
@@ -94,7 +94,7 @@ class Hub {
   }
 
   /** Broadcast to connections with a specific role */
-  broadcastToRole(role: Role, message: ServerMessage) {
+  broadcastToRole(role: string, message: ServerMessage) {
     const data = JSON.stringify(message);
     for (const [ws, info] of this.connections.entries()) {
       if (info.role === role) ws.send(data);
