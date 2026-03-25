@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import type { AuthEnv } from "../../middleware/env";
+import { wsRoute } from "../ws";
 import { controllerRoutes } from "./controller";
 import { presenterRoutes } from "./presenter";
 import { slideRoutes } from "./slides";
@@ -8,3 +9,4 @@ export const apiRoutes = new Hono<AuthEnv>()
   .route("/control", controllerRoutes)
   .route("/presenter", presenterRoutes)
   .route("/slides", slideRoutes)
+  .route("/ws", wsRoute);

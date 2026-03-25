@@ -31,9 +31,6 @@ app.on(["GET", "POST"], "/api/auth/*", (c) => auth.handler(c.req.raw));
 // ── API routes (chained for RPC type inference) ──
 const routes = app.route("/api", apiRoutes);
 
-// ── WebSocket upgrade ──
-app.route("/ws", wsRoute);
-
 // ── Serve the built presentation (with client injection) ──
 servePresentationWithInjection(app, config.presentationDir);
 
