@@ -1,194 +1,84 @@
-import type {
-  NavigationSnapshot,
-  ServerMessage,
-} from "@dotslide/protocol";
+import type { ClientMessage, ServerMessage } from "@dotslide/protocol";
+import { eq } from "drizzle-orm";
+import { db } from "../db";
+import { presentation } from "../db/dotslide";
 
-type ConnectionInfo = {
-  userId: string | null;
-  presentation: string;
-  role?: string;
-};
+interface User {
+  userId: string;
+  room: string;
+  role: string | null;
+}
 
-export type Question = {
-  id: string;
-  text: string;
-  author: string;
-  timestamp: number;
-  upvotes: number;
-  upvotedBy: Set<string>;
-  dismissed: boolean;
-};
+class RoomManager {
+  /** Websocket rooms, maps to a set of connections */
+  private rooms: Map<string, Set<WebSocket>>;
+  /** User map, storing information for each connected user */
+  private users: Map<WebSocket, User>;
 
-type SlideMetadata = {
-  index: number;
-  title?: string;
-  hasThumbnail: boolean;
-};
+  // TODO Who creates `User` objects?
+  // WebSocket room manager: https://oneuptime.com/blog/post/2026-01-24-websocket-room-channel-management/view
 
-export type WSConnection = {
-  send(data: string): void;
-};
-
-class Hub {
-  private connections = new Map<WSConnection, ConnectionInfo>();
-  private state: NavigationSnapshot = {
-    navigationIndex: 0,
-    activeSlide: 0,
-    activeStep: 1,
-    numSlides: 0,
-  };
-  private thumbnails = new Map<number, Buffer>();
-  private questions = new Map<string, Question>();
-  private slideMetadata: SlideMetadata[] = [];
-
-  // ── Connection management ──
-
-  addConnection(ws: WSConnection, info: ConnectionInfo) {
-    this.connections.set(ws, info);
+  constructor() {
+    this.rooms = new Map();
+    this.users = new Map();
   }
 
-  removeConnection(ws: WSConnection) {
-    this.connections.delete(ws);
-  }
+  async join(ws: WebSocket, user: User) {
+    const room = user.room
+    if (!this.rooms.has(room)) {
+      // Check if room exists in the database
+      const res = await db
+        .select({ roomId: presentation.id })
+        .from(presentation)
+        .where(eq(presentation.id, room));
+      if (res.length !== 1) {
+        throw new Error(`Presentation "${room}" doesn't exist`);
+      }
 
-  getRole(ws: WSConnection): string | undefined {
-    return this.connections.get(ws)?.role;
-  }
-
-  // ── Navigation state ──
-
-  updateState(partial: Partial<NavigationSnapshot>) {
-    Object.assign(this.state, partial);
-  }
-
-  getState(): NavigationSnapshot {
-    return { ...this.state };
-  }
-
-  /** Send full state sync to a specific connection */
-  sendSync(ws: WSConnection) {
-    ws.send(
-      JSON.stringify({
-        type: "sync",
-        ...this.state,
-      }),
-    );
-  }
-
-  // ── Broadcasting ──
-
-  /** Broadcast a message to all connections */
-  broadcast(message: ServerMessage) {
-    const data = JSON.stringify(message);
-    for (const ws of this.connections.keys()) {
-      ws.send(data);
+      // Create room
+      this.rooms.set(room, new Set());
     }
+
+    // Add connection to room
+    this.rooms.get(room)?.add(ws);
+    this.users.set(ws, user);
   }
 
-  /** Broadcast to all connections except the sender */
-  broadcastExcept(sender: WSConnection, message: ServerMessage) {
-    const data = JSON.stringify(message);
-    for (const ws of this.connections.keys()) {
-      if (ws !== sender) ws.send(data);
-    }
-  }
-
-  /** Broadcast to connections with a specific role */
-  broadcastToRole(role: string, message: ServerMessage) {
-    const data = JSON.stringify(message);
-    for (const [ws, info] of this.connections.entries()) {
-      if (info.role === role) ws.send(data);
-    }
-  }
-
-  // ── Thumbnail management ──
-
-  setThumbnail(slideIndex: number, data: Buffer) {
-    this.thumbnails.set(slideIndex, data);
-    // Update metadata
-    const meta = this.slideMetadata.find((m) => m.index === slideIndex);
-    if (meta) {
-      meta.hasThumbnail = true;
-    }
-  }
-
-  getThumbnail(slideIndex: number): Buffer | undefined {
-    return this.thumbnails.get(slideIndex);
-  }
-
-  // ── Slide metadata ──
-
-  setSlideMetadata(metadata: SlideMetadata[]) {
-    this.slideMetadata = metadata;
-    this.state.numSlides = metadata.length;
-  }
-
-  getSlideMetadata(): SlideMetadata[] {
-    return this.slideMetadata.map((m) => ({
-      ...m,
-      hasThumbnail: this.thumbnails.has(m.index),
-    }));
-  }
-
-  // ── Question management ──
-
-  addQuestion(text: string, author: string): Question {
-    const id = crypto.randomUUID();
-    const question: Question = {
-      id,
-      text,
-      author,
-      timestamp: Date.now(),
-      upvotes: 0,
-      upvotedBy: new Set(),
-      dismissed: false,
-    };
-    this.questions.set(id, question);
-
-    // Broadcast to all connections
-    this.broadcast({
-      type: "question",
-      id: question.id,
-      text: question.text,
-      author: question.author,
-      timestamp: question.timestamp,
-      upvotes: question.upvotes,
+  async leave(ws: WebSocket) {
+    this.rooms.forEach((connections) => {
+      if (connections.has(ws)) {
+        connections.delete(ws);
+      }
     });
 
-    return question;
+    this.users.delete(ws);
   }
 
-  upvoteQuestion(
-    id: string,
-    userId: string,
-  ): { id: string; upvotes: number } | null {
-    const question = this.questions.get(id);
-    if (!question) return null;
+  /** Server method for broadcasting a message to all connected clients */
+  async send(room: string, msg: ServerMessage) {
+    this.rooms.get(room)?.forEach((connection) => {
+      connection.send(JSON.stringify(msg));
+    });
+  }
 
-    // Prevent double-voting
-    if (question.upvotedBy.has(userId)) {
-      return { id: question.id, upvotes: question.upvotes };
+  /** Handle incoming client messages */
+  private async receive(ws: WebSocket, msg: ClientMessage) {
+    const user = this.users.get(ws)
+
+    if (!user) {
+      throw new Error("No user registered for this connection")
     }
 
-    question.upvotedBy.add(userId);
-    question.upvotes++;
+    // Whether the user has permissions to control the presentation
+    const isElevated = user.role != null
 
-    // Broadcast update
-    this.broadcast({
-      type: "question:upvote",
-      id: question.id,
-      upvotes: question.upvotes,
-    });
-
-    return { id: question.id, upvotes: question.upvotes };
-  }
-
-  getQuestions(): Omit<Question, "upvotedBy">[] {
-    return Array.from(this.questions.values())
-      .filter((q) => !q.dismissed)
-      .sort((a, b) => b.upvotes - a.upvotes)
-      .map(({ upvotedBy: _, ...q }) => q);
+    switch (msg.type) {
+      case "navigate": {
+        return;
+      }
+    }
   }
 }
 
-export const hub = new Hub();
+/** Default `RoomManager` instance */
+export const roomManager = new RoomManager()
