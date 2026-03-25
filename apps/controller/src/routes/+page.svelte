@@ -15,6 +15,7 @@
     let session: Awaited<ReturnType<typeof authClient.getSession>> | undefined = $state()
     let roomId: string | null = $state(null)
     let userRole: string | null = $state(null)
+    let ws: WebSocket | null = $state(null)
 
     onMount(async () => {
         session = await authClient.getSession()
@@ -39,7 +40,13 @@
             console.log("User role:", userRole)
         }
 
-        console.log(await (await client.api.slides.$get()).json())
+        console.log(await (await client.api.control[":roomId"].metadata.$get({ param: { roomId } })).json())
+        console.log(client.api.ws[":roomId"].$url({ param: { roomId } }))
+        ws = new WebSocket(client.api.ws[":roomId"].$url({ param: { roomId } }))
+        ws.onmessage = (msg) => {
+            // Works 🥳
+            console.info(JSON.parse(msg.data))
+        }
     })
 
     const logout = async () => {
