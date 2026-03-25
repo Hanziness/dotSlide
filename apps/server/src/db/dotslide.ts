@@ -61,9 +61,10 @@ export const question = sqliteTable(
     id: text("id").primaryKey(),
     text: text("text").notNull(),
     authorId: text("authorId").references(() => user.id),
+    presentation: text("presentation").references(() => presentation.id),
     authorName: text("authorName").notNull().default("Anonymous"),
     timestamp: integer("timestamp", { mode: "timestamp" }).notNull(),
-    upvotes: integer("upvotes").notNull().default(0),
+    upvotes: text("upvotes", { mode: "json"}).notNull().$type<string[]>().default([]),
     dismissed: integer("dismissed", { mode: "boolean" })
       .notNull()
       .default(false),
@@ -73,4 +74,5 @@ export const question = sqliteTable(
 
 export const questionRelations = relations(question, ({ one }) => ({
   authorId: one(user),
+  presentation: one(presentation)
 }));
