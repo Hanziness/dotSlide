@@ -75,7 +75,7 @@ import { SyncAdapter } from "./sync";
  */
 class DsRemote extends HTMLElement {
   private ws: WebSocket | null = null;
-  private syncAdapter = new SyncAdapter();
+  private syncAdapter: SyncAdapter | null = null;
   private reconnectDelay = 1000;
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
   private indicatorTimer: ReturnType<typeof setTimeout> | null = null;
@@ -123,7 +123,7 @@ class DsRemote extends HTMLElement {
     this.unsubscribeState?.();
     this.unsubscribeState = null;
     this.ws?.close();
-    this.syncAdapter.detach();
+    this.syncAdapter?.detach();
     connectionState.set("standalone");
   }
 
@@ -150,6 +150,7 @@ class DsRemote extends HTMLElement {
     const roomRes = await room.json()
     console.log('[Remote] ✅ Room created: ', roomRes.id) // TODO figure out typing here
     this.roomId = roomRes.id
+    this.syncAdapter = new SyncAdapter(this.roomId)
   
     const wsUrl = `${this.serverUrl.replace(/^http/, "ws")}/ws/${this.roomId}`;
     const ws = new WebSocket(wsUrl);
@@ -166,7 +167,7 @@ class DsRemote extends HTMLElement {
     ws.addEventListener("open", () => {
       console.debug("[Remote] Connected to server");
       this.reconnectDelay = 1000;
-      this.syncAdapter.attach(ws);
+      this.syncAdapter?.attach(ws);
       this.showConnectionIndicator();
       // Default to viewer until the server assigns a role
       connectionState.set("connected-viewer");
@@ -183,7 +184,7 @@ class DsRemote extends HTMLElement {
 
     ws.addEventListener("close", () => {
       console.debug("[dotslide] Disconnected from server");
-      this.syncAdapter.detach();
+      this.syncAdapter?.detach();
       if (this.autoReconnect) {
         connectionState.set("reconnecting");
         this.reconnectTimer = setTimeout(() => {
@@ -208,10 +209,10 @@ class DsRemote extends HTMLElement {
 
     switch (msg.type) {
       case "navigate":
-        this.syncAdapter.applyRemoteNavigation(msg.navigationIndex);
+        this.syncAdapter?.applyRemoteNavigation(msg.navigationIndex);
         break;
       case "sync":
-        this.syncAdapter.applyFullSync(msg);
+        this.syncAdapter?.applyFullSync(msg);
         break;
       case "laser":
         this.updateLaser(msg.x, msg.y, msg.visible);
