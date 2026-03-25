@@ -15,3 +15,12 @@ export const authMiddleware = createMiddleware<{
   c.set("session", session?.session ?? null);
   await next();
 });
+
+/** @requires `authMiddleware` must run before this one */
+export const requireLoginMiddleware = createMiddleware(async (c, next) => {
+  const session = c.get("session")
+  if (!session) {
+    return c.json({ error: "You must be logged in to use this endpoint." }, 401)
+  }
+  await next()
+})
