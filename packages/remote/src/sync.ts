@@ -1,6 +1,8 @@
 import type { SlideshowStore } from "@dotslide/framework/store";
 import { useSlideshowContext } from "@dotslide/framework/store";
+import type { ClientMessage } from "@dotslide/protocol";
 import { connectionState } from "./connection-state";
+import { client } from "./rpc-client";
 
 /**
  * Bidirectional sync between SlideshowContext nanostores and
@@ -26,6 +28,11 @@ export class SyncAdapter {
   private store: SlideshowStore | null = null;
   private unsubscribe: (() => void) | null = null;
   private isRemoteUpdate = false;
+  private roomId: string;
+
+  constructor(roomId: string) {
+    this.roomId = roomId;
+  }
 
   attach(ws: WebSocket) {
     this.ws = ws;
@@ -45,6 +52,12 @@ export class SyncAdapter {
       if (changedKey !== "navigationIndex") return;
       if (this.isRemoteUpdate) return; // prevent echo
       if (connectionState.get() !== "connected-presenter") return;
+
+      client.api.control[":roomId"].metadata.$post({
+        param: { roomId: this.roomId },
+        json: _value,
+      });
+      console.log(_value);
 
       const { navigationIndex } = this.store?.get() ?? { navigationIndex: 0 };
       this.send({
@@ -82,7 +95,7 @@ export class SyncAdapter {
     this.isRemoteUpdate = false;
   }
 
-  private send(msg: unknown) {
+  private send(msg: ClientMessage) {
     if (this.ws?.readyState === WebSocket.OPEN) {
       this.ws.send(JSON.stringify(msg));
     }
