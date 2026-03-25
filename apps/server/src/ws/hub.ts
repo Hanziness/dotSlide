@@ -1,5 +1,6 @@
-import type { ClientMessage, ServerMessage } from "@dotslide/protocol";
+import type { ServerMessage } from "@dotslide/protocol";
 import { eq } from "drizzle-orm";
+import type { WSContext } from "hono/ws";
 import { db } from "../db";
 import { presentation } from "../db/dotslide";
 
@@ -9,11 +10,25 @@ interface User {
   role: string | null;
 }
 
+const ALLOWED_FILE_TYPES = ["image/png", "image/jpeg", "image/webp"];
+
+export interface RoomImmediateState {
+  laser: {
+    x: number;
+    y: number;
+    lastUpdate: Date;
+  };
+  /** Navigation index -> file mapping */
+  thumbnails: Map<number, Blob>
+}
+
 class RoomManager {
   /** Websocket rooms, maps to a set of connections */
-  private rooms: Map<string, Set<WebSocket>>;
+  private rooms: Map<string, Set<WSContext>>;
   /** User map, storing information for each connected user */
-  private users: Map<WebSocket, User>;
+  private users: Map<WSContext, User>;
+  /** Temporal (non-persistent) state for rooms */
+  private temporalState: Map<string, RoomImmediateState>;
 
   // TODO Who creates `User` objects?
   // WebSocket room manager: https://oneuptime.com/blog/post/2026-01-24-websocket-room-channel-management/view
@@ -21,10 +36,11 @@ class RoomManager {
   constructor() {
     this.rooms = new Map();
     this.users = new Map();
+    this.temporalState = new Map();
   }
 
-  async join(ws: WebSocket, user: User) {
-    const room = user.room
+  async join(ws: WSContext, user: User) {
+    const room = user.room;
     if (!this.rooms.has(room)) {
       // Check if room exists in the database
       const res = await db
@@ -37,6 +53,10 @@ class RoomManager {
 
       // Create room
       this.rooms.set(room, new Set());
+      this.temporalState.set(room, {
+        laser: { x: 0, y: 0, lastUpdate: new Date(0) },
+        thumbnails: new Map()
+      });
     }
 
     // Add connection to room
@@ -44,7 +64,7 @@ class RoomManager {
     this.users.set(ws, user);
   }
 
-  async leave(ws: WebSocket) {
+  async leave(ws: WSContext) {
     this.rooms.forEach((connections) => {
       if (connections.has(ws)) {
         connections.delete(ws);
@@ -55,30 +75,41 @@ class RoomManager {
   }
 
   /** Server method for broadcasting a message to all connected clients */
-  async send(room: string, msg: ServerMessage) {
+  send(room: string, msg: ServerMessage) {
     this.rooms.get(room)?.forEach((connection) => {
       connection.send(JSON.stringify(msg));
     });
   }
 
-  /** Handle incoming client messages */
-  private async receive(ws: WebSocket, msg: ClientMessage) {
-    const user = this.users.get(ws)
+  getUser(ws: WSContext): User | undefined {
+    return this.users.get(ws);
+  }
 
-    if (!user) {
-      throw new Error("No user registered for this connection")
+  getTemporalState(room: string): RoomImmediateState | undefined {
+    return this.temporalState.get(room);
+  }
+
+  updateTemporalState(room: string, newState: RoomImmediateState) {
+    if (!this.temporalState.get(room)) {
+      console.warn(`Room ${room} has no temporal state`);
+      return;
     }
 
-    // Whether the user has permissions to control the presentation
-    const isElevated = user.role != null
+    this.temporalState.set(room, newState);
+  }
 
-    switch (msg.type) {
-      case "navigate": {
-        return;
-      }
+  getThumbnail(room: string, index: number): Blob | undefined {
+    return this.getTemporalState(room)?.thumbnails?.get(index)
+  }
+
+  setThumbnail(room: string, index: number, file: Blob) {
+    if (!ALLOWED_FILE_TYPES.includes(file.type)) {
+      throw new Error(`Invalid file type. Received: ${file.type}`)
     }
+
+    this.temporalState.get(room)?.thumbnails.set(index, file)
   }
 }
 
 /** Default `RoomManager` instance */
-export const roomManager = new RoomManager()
+export const roomManager = new RoomManager();
