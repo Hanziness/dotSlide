@@ -1,3 +1,6 @@
+import { snapdom } from "@zumer/snapdom"
+import { client } from "./rpc-client";
+
 /**
  * Capture slide thumbnails from the presenter's browser.
  *
@@ -17,7 +20,7 @@ const THUMB_QUALITY = 0.7;
  *
  * @param serverUrl - Base URL of the dotslide server
  */
-export async function captureAndUpload(serverUrl: string): Promise<void> {
+export async function captureAndUpload(roomId: string): Promise<void> {
   const slideshow = document.querySelector<HTMLElement>("ds-slideshow");
   if (!slideshow) return;
 
@@ -38,7 +41,7 @@ export async function captureAndUpload(serverUrl: string): Promise<void> {
     try {
       const blob = await captureSlide(slide, width, height, scale);
       if (blob) {
-        await uploadThumbnail(serverUrl, i, blob);
+        await uploadThumbnail(roomId, i, blob);
       }
     } catch (err) {
       console.warn(`[dotslide/capture] Failed to capture slide ${i}:`, err);
@@ -51,51 +54,20 @@ export async function captureAndUpload(serverUrl: string): Promise<void> {
 
 async function captureSlide(
   slide: HTMLElement,
-  _width: number,
-  _height: number,
-  _scale: number,
-): Promise<Blob | null> {
-  // Implementation depends on html2canvas availability
-  // Option 1: html2canvas (if loaded)
-  if (
-    typeof (window as unknown as Record<string, unknown>).html2canvas ===
-    "function"
-  ) {
-    const html2canvas = (window as unknown as Record<string, unknown>)
-      .html2canvas as (
-      el: HTMLElement,
-      opts: Record<string, unknown>,
-    ) => Promise<HTMLCanvasElement>;
-
-    const canvas = await html2canvas(slide, {
-      scale: _scale,
-      useCORS: true,
-      logging: false,
-    });
-    return new Promise<Blob | null>((resolve) =>
-      canvas.toBlob(resolve, "image/webp", THUMB_QUALITY),
-    );
-  }
-
-  // Fallback: SVG foreignObject approach
-  // This has CORS and styling limitations but works without dependencies
-  console.warn(
-    "[dotslide/capture] html2canvas not available, skipping capture",
-  );
-  return null;
+  width?: number,
+  height?: number,
+  scale?: number,
+): Promise<Blob> {
+  return (await snapdom(slide, { width, height, scale })).toBlob()
 }
 
 async function uploadThumbnail(
-  serverUrl: string,
-  slideIndex: number,
+  roomId: string,
+  index: number,
   blob: Blob,
 ): Promise<void> {
+  
   const formData = new FormData();
-  formData.append("thumbnail", blob, `slide-${slideIndex}.webp`);
-
-  await fetch(`${serverUrl}/api/slides/${slideIndex}/thumbnail`, {
-    method: "POST",
-    body: formData,
-    credentials: "include",
-  });
+  formData.append("thumbnail", blob, `slide-${index}.webp`);
+  client.api.slides[":roomId"][":index"].thumbnail.$post({ param: { roomId, index: index.toString() }, form: { file: new File([blob], `slide-${index}.webp`) }  })
 }

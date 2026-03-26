@@ -1,4 +1,3 @@
-import { type Role as PresentationRole, Role } from "@dotslide/protocol";
 import { createMiddleware } from "hono/factory";
 import type { auth } from "../auth";
 import { getFreshSession } from "../session";
@@ -6,16 +5,7 @@ import { getFreshSession } from "../session";
 type AuthVariables = {
   user: typeof auth.$Infer.Session.user | null;
   session: typeof auth.$Infer.Session.session | null;
-  presentationRole: PresentationRole;
 };
-
-export function getPresentationRole(
-  session: typeof auth.$Infer.Session.session | null | undefined,
-): PresentationRole {
-  return session?.presentationRole === Role.Presenter
-    ? Role.Presenter
-    : Role.Viewer;
-}
 
 export const authMiddleware = createMiddleware<{
   Variables: AuthVariables;
@@ -23,6 +13,14 @@ export const authMiddleware = createMiddleware<{
   const session = await getFreshSession(c.req.raw.headers);
   c.set("user", session?.user ?? null);
   c.set("session", session?.session ?? null);
-  c.set("presentationRole", getPresentationRole(session?.session));
   await next();
 });
+
+/** @requires `authMiddleware` must run before this one */
+export const requireLoginMiddleware = createMiddleware(async (c, next) => {
+  const session = c.get("session")
+  if (!session) {
+    return c.json({ error: "You must be logged in to use this endpoint." }, 401)
+  }
+  await next()
+})

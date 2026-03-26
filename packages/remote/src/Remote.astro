@@ -1,7 +1,13 @@
 ---
 interface Props {
-  /** WebSocket server URL (e.g., "http://localhost:3000") */
+  /** WebSocket server URL (e.g., "http://localhost:9876") */
   serverUrl: string;
+  /**
+   * Controller app URL (e.g., "http://localhost:5173").
+   * When set, enables the presenter invite UI on the presentation page.
+   * Omit to disable invite link creation.
+   */
+  controllerUrl?: string;
   /** Automatically reconnect on disconnect (default: true) */
   autoReconnect?: boolean;
   /** Capture and upload slide thumbnails when assigned presenter role (default: true) */
@@ -12,7 +18,8 @@ interface Props {
 
 const {
   serverUrl,
-  autoReconnect = true,
+  controllerUrl,
+  autoReconnect = false,
   captureSlides = true,
   reconnectMaxDelay = 30_000,
 } = Astro.props;
@@ -20,34 +27,67 @@ const {
 
 <ds-remote
   data-server-url={serverUrl}
+  data-controller-url={controllerUrl}
   data-auto-reconnect={autoReconnect.toString()}
   data-capture-slides={captureSlides.toString()}
   data-reconnect-max-delay={reconnectMaxDelay.toString()}
 >
   <div class="pointer" />
   <div class="connection-indicator" />
+
+  {controllerUrl && (
+    <div class="invite-container" data-visible="false">
+      <button class="invite-button" type="button" aria-label="Create presenter invite link">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Share">
+          <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+          <polyline points="16 6 12 2 8 6" />
+          <line x1="12" y1="2" x2="12" y2="15" />
+        </svg>
+      </button>
+      <div class="invite-panel" data-visible="false">
+        <div class="invite-panel-content">
+          <p class="invite-label">Presenter invite link</p>
+          <div class="invite-link-row">
+            <input class="invite-link-input" type="text" readonly />
+            <button class="invite-copy-button" type="button" aria-label="Copy invite link">Copy</button>
+          </div>
+          <p class="invite-status" />
+        </div>
+      </div>
+    </div>
+  )}
 </ds-remote>
 
 <script>
+import { useSlideshowContext } from "@dotslide/framework/store";
 import type { ServerMessage } from "@dotslide/protocol";
+import { authClient } from "@dotslide/server/client"
 import { captureAndUpload } from "./capture";
+import { connectionState } from "./connection-state";
+import { client } from "./rpc-client";
 import { SyncAdapter } from "./sync";
 
 /**
  * Custom element that connects the presentation to a dotslide server.
  *
  * Manages WebSocket lifecycle, bidirectional slide sync, laser pointer
- * rendering, and connection status indication.
+ * rendering, connection status indication, and presenter invite UI.
  */
 class DsRemote extends HTMLElement {
   private ws: WebSocket | null = null;
-  private syncAdapter = new SyncAdapter();
+  private syncAdapter: SyncAdapter | null = null;
   private reconnectDelay = 1000;
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
   private indicatorTimer: ReturnType<typeof setTimeout> | null = null;
+  private unsubscribeState: (() => void) | null = null;
+  private roomId: string | undefined
 
   private get serverUrl(): string {
     return this.getAttribute("data-server-url") ?? "";
+  }
+
+  private get controllerUrl(): string | null {
+    return this.getAttribute("data-controller-url");
   }
 
   private get autoReconnect(): boolean {
@@ -65,27 +105,72 @@ class DsRemote extends HTMLElement {
     );
   }
 
-  connectedCallback() {
-    this.connect();
+  async connectedCallback() {
+    await this.connect();
+
+    if (!this.roomId) {
+      console.error("Remote didn't get a Room ID, quitting.")
+      return
+    }
+
+    await captureAndUpload(this.roomId)
+    this.setupInviteUI();
   }
 
   disconnectedCallback() {
     if (this.reconnectTimer) clearTimeout(this.reconnectTimer);
     if (this.indicatorTimer) clearTimeout(this.indicatorTimer);
+    this.unsubscribeState?.();
+    this.unsubscribeState = null;
     this.ws?.close();
-    this.syncAdapter.detach();
+    this.syncAdapter?.detach();
+    connectionState.set("standalone");
   }
 
-  private connect() {
-    const wsUrl = `${this.serverUrl.replace(/^http/, "ws")}/ws`;
+  private async connect() {
+    let session = await authClient.getSession()
+
+    if (!session.data) {
+      await authClient.signIn.anonymous()
+
+      // refresh session
+      session = await authClient.getSession()
+    } else {
+      console.info("Logged in: \n", session)
+    }
+    console.log(session)
+
+    // Create a presentation room
+    const room = await client.api.presenter.create.$post({ })
+    if (room.status !== 200) {
+      console.warn('[Remote] 🛑 Error claiming presenter role: ', await room.json())
+      return
+    }
+
+    const roomRes = await room.json()
+    console.log('[Remote] ✅ Room created: ', roomRes.id) // TODO figure out typing here
+    this.roomId = roomRes.id
+    this.syncAdapter = new SyncAdapter(this.roomId)
+  
+    const wsUrl = `${this.serverUrl.replace(/^http/, "ws")}/ws/${this.roomId}`;
     const ws = new WebSocket(wsUrl);
     this.ws = ws;
 
+    // Track whether this is a reconnection attempt
+    const currentState = connectionState.get();
+    if (currentState === "reconnecting") {
+      // Keep reconnecting state — it was set by the close handler
+    } else {
+      connectionState.set("connecting");
+    }
+
     ws.addEventListener("open", () => {
-      console.debug("[dotslide] Connected to server");
+      console.debug("[Remote] Connected to server");
       this.reconnectDelay = 1000;
-      this.syncAdapter.attach(ws);
+      this.syncAdapter?.attach(ws);
       this.showConnectionIndicator();
+      // Default to viewer until the server assigns a role
+      connectionState.set("connected-viewer");
     });
 
     ws.addEventListener("message", (event) => {
@@ -99,8 +184,9 @@ class DsRemote extends HTMLElement {
 
     ws.addEventListener("close", () => {
       console.debug("[dotslide] Disconnected from server");
-      this.syncAdapter.detach();
+      this.syncAdapter?.detach();
       if (this.autoReconnect) {
+        connectionState.set("reconnecting");
         this.reconnectTimer = setTimeout(() => {
           this.reconnectDelay = Math.min(
             this.reconnectDelay * 2,
@@ -108,6 +194,8 @@ class DsRemote extends HTMLElement {
           );
           this.connect();
         }, this.reconnectDelay);
+      } else {
+        connectionState.set("standalone");
       }
     });
 
@@ -117,18 +205,23 @@ class DsRemote extends HTMLElement {
   }
 
   private handleServerMessage(msg: ServerMessage) {
+    console.info(msg)
+
     switch (msg.type) {
       case "navigate":
-        this.syncAdapter.applyRemoteNavigation(msg.navigationIndex);
+        this.syncAdapter?.applyRemoteNavigation(msg.navigationIndex);
         break;
       case "sync":
-        this.syncAdapter.applyFullSync(msg);
+        this.syncAdapter?.applyFullSync(msg);
         break;
       case "laser":
         this.updateLaser(msg.x, msg.y, msg.visible);
         break;
       case "role":
         console.debug(`[dotslide] Role assigned: ${msg.role}`);
+        connectionState.set(
+          msg.role === "presenter" ? "connected-presenter" : "connected-viewer",
+        );
         if (msg.role === "presenter" && this.captureSlides) {
           this.waitForReady().then(() => captureAndUpload(this.serverUrl));
         }
@@ -140,6 +233,134 @@ class DsRemote extends HTMLElement {
       case "error":
         console.warn(`[dotslide] Server error: ${msg.message}`);
         break;
+    }
+  }
+
+  sendSlides() {
+    const ctx = useSlideshowContext(this)
+  }
+
+  // ── Invite UI ──
+
+  /**
+   * Set up the presenter invite UI if `controllerUrl` is configured.
+   *
+   * The invite button is shown when the presentation is connected to the
+   * server (any role) and hidden in standalone mode. Clicking it requests
+   * a one-time presenter token from the server and displays a copyable
+   * invite link.
+   */
+  private setupInviteUI() {
+    if (!this.controllerUrl) return;
+
+    const container = this.querySelector<HTMLElement>(".invite-container");
+    const button = this.querySelector<HTMLElement>(".invite-button");
+    const panel = this.querySelector<HTMLElement>(".invite-panel");
+    const linkInput = this.querySelector<HTMLInputElement>(".invite-link-input");
+    const copyButton = this.querySelector<HTMLElement>(".invite-copy-button");
+    const statusEl = this.querySelector<HTMLElement>(".invite-status");
+
+    if (!container || !button || !panel || !linkInput || !copyButton || !statusEl) return;
+
+    // Show/hide the invite container based on connection state
+    this.unsubscribeState = connectionState.subscribe((state) => {
+      const connected = state === "connected-viewer" || state === "connected-presenter";
+      container.setAttribute("data-visible", connected.toString());
+
+      // Close the panel when disconnecting
+      if (!connected) {
+        panel.setAttribute("data-visible", "false");
+      }
+    });
+
+    // Toggle panel on button click
+    button.addEventListener("click", () => {
+      const isOpen = panel.getAttribute("data-visible") === "true";
+      if (isOpen) {
+        panel.setAttribute("data-visible", "false");
+      } else {
+        panel.setAttribute("data-visible", "true");
+        this.generateInviteLink(linkInput, statusEl, copyButton);
+      }
+    });
+
+    // Close panel when clicking outside
+    document.addEventListener("click", (e) => {
+      if (!container.contains(e.target as Node)) {
+        panel.setAttribute("data-visible", "false");
+      }
+    });
+
+    // Copy to clipboard
+    copyButton.addEventListener("click", () => {
+      const link = linkInput.value;
+      if (!link) return;
+
+      navigator.clipboard.writeText(link).then(
+        () => {
+          statusEl.textContent = "Copied!";
+          statusEl.className = "invite-status invite-status-success";
+          setTimeout(() => {
+            statusEl.textContent = "";
+            statusEl.className = "invite-status";
+          }, 2000);
+        },
+        () => {
+          // Fallback: select the input text
+          linkInput.select();
+          statusEl.textContent = "Press Ctrl+C to copy";
+          statusEl.className = "invite-status";
+        },
+      );
+    });
+  }
+
+  /**
+   * Request a one-time presenter token from the server and display
+   * the full invite link in the panel.
+   */
+  private async generateInviteLink(
+    linkInput: HTMLInputElement,
+    statusEl: HTMLElement,
+    copyButton: HTMLElement,
+  ) {
+    if (!this.roomId) {
+      console.warn("No room ID is available for the invite")
+      return;
+    }
+
+    linkInput.value = "";
+    copyButton.style.display = "none";
+    statusEl.textContent = "Generating link...";
+    statusEl.className = "invite-status";
+
+    try {
+      const response = await client.api.presenter[":roomId"].invite.$post({ param: { roomId: this.roomId } })
+
+      if (!response.ok) {
+        let message = "Failed to create invite link.";
+        try {
+          const body = await response.json();
+          if ("error" in body && typeof body.error === "string") {
+            message = body.error;
+          }
+        } catch {
+          // use default message
+        }
+        statusEl.textContent = message;
+        statusEl.className = "invite-status invite-status-error";
+        return;
+      }
+
+      const { token } = (await response.json()) as { token: string };
+      const inviteUrl = `${this.controllerUrl}/auth/presenter?token=${encodeURIComponent(token)}`;
+      linkInput.value = inviteUrl;
+      copyButton.style.display = "";
+      statusEl.textContent = "Link expires in 5 minutes. Single use only.";
+      statusEl.className = "invite-status";
+    } catch {
+      statusEl.textContent = "Could not reach the server.";
+      statusEl.className = "invite-status invite-status-error";
     }
   }
 
@@ -236,5 +457,140 @@ customElements.define("ds-remote", DsRemote);
 
   .connection-indicator[data-visible="true"] {
     opacity: 1;
+  }
+
+  /* ── Invite UI ── */
+
+  .invite-container {
+    position: absolute;
+    bottom: 16px;
+    right: 16px;
+    z-index: 10000;
+    display: none;
+  }
+
+  .invite-container[data-visible="true"] {
+    display: block;
+  }
+
+  .invite-button {
+    pointer-events: auto;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: #1e293b;
+    color: #f8fafc;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow:
+      0 1px 3px rgba(0, 0, 0, 0.2),
+      0 1px 2px rgba(0, 0, 0, 0.12);
+    transition:
+      background 150ms ease,
+      transform 150ms ease,
+      opacity 200ms ease;
+    opacity: 0.6;
+  }
+
+  .invite-button:hover {
+    background: #334155;
+    opacity: 1;
+    transform: scale(1.05);
+  }
+
+  .invite-button:active {
+    transform: scale(0.95);
+  }
+
+  .invite-panel {
+    pointer-events: auto;
+    position: absolute;
+    bottom: 48px;
+    right: 0;
+    width: 340px;
+    background: #1e293b;
+    border-radius: 8px;
+    box-shadow:
+      0 4px 12px rgba(0, 0, 0, 0.3),
+      0 1px 4px rgba(0, 0, 0, 0.2);
+    display: none;
+  }
+
+  .invite-panel[data-visible="true"] {
+    display: block;
+  }
+
+  .invite-panel-content {
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .invite-label {
+    margin: 0;
+    font-size: 12px;
+    font-weight: 600;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .invite-link-row {
+    display: flex;
+    gap: 4px;
+  }
+
+  .invite-link-input {
+    flex: 1;
+    min-width: 0;
+    padding: 6px 8px;
+    font-size: 12px;
+    font-family: ui-monospace, monospace;
+    background: #0f172a;
+    color: #e2e8f0;
+    border: 1px solid #334155;
+    border-radius: 4px;
+    outline: none;
+  }
+
+  .invite-link-input:focus {
+    border-color: #3b82f6;
+  }
+
+  .invite-copy-button {
+    pointer-events: auto;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 500;
+    background: #3b82f6;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 150ms ease;
+  }
+
+  .invite-copy-button:hover {
+    background: #2563eb;
+  }
+
+  .invite-status {
+    margin: 0;
+    font-size: 11px;
+    color: #94a3b8;
+    min-height: 14px;
+  }
+
+  .invite-status-success {
+    color: #22c55e;
+  }
+
+  .invite-status-error {
+    color: #ef4444;
   }
 </style>

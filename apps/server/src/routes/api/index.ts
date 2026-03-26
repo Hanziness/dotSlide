@@ -1,9 +1,12 @@
 import { Hono } from "hono";
-import { pinRoutes } from "./pin";
-import { qaRoutes } from "./qa";
+import type { AuthEnv } from "../../middleware/env";
+import { wsRoute } from "../ws";
+import { controllerRoutes } from "./controller";
+import { presenterRoutes } from "./presenter";
 import { slideRoutes } from "./slides";
 
-export const apiRoutes = new Hono()
-  .route("/", pinRoutes)
+export const apiRoutes = new Hono<AuthEnv>()
+  .route("/control", controllerRoutes)
+  .route("/presenter", presenterRoutes)
   .route("/slides", slideRoutes)
-  .route("/qa", qaRoutes);
+  .route("/ws", wsRoute);

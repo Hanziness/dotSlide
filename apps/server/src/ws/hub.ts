@@ -1,194 +1,115 @@
-import type {
-  NavigationSnapshot,
-  Role,
-  ServerMessage,
-} from "@dotslide/protocol";
+import type { ServerMessage } from "@dotslide/protocol";
+import { eq } from "drizzle-orm";
+import type { WSContext } from "hono/ws";
+import { db } from "../db";
+import { presentation } from "../db/dotslide";
 
-type ConnectionInfo = {
-  userId: string | null;
-  role: Role;
-};
+interface User {
+  userId: string;
+  room: string;
+  role: string | null;
+}
 
-export type Question = {
-  id: string;
-  text: string;
-  author: string;
-  timestamp: number;
-  upvotes: number;
-  upvotedBy: Set<string>;
-  dismissed: boolean;
-};
+const ALLOWED_FILE_TYPES = ["image/png", "image/jpeg", "image/webp"];
 
-type SlideMetadata = {
-  index: number;
-  title?: string;
-  hasThumbnail: boolean;
-};
-
-export type WSConnection = {
-  send(data: string): void;
-};
-
-class Hub {
-  private connections = new Map<WSConnection, ConnectionInfo>();
-  private state: NavigationSnapshot = {
-    navigationIndex: 0,
-    activeSlide: 0,
-    activeStep: 1,
-    numSlides: 0,
+export interface RoomImmediateState {
+  laser: {
+    x: number;
+    y: number;
+    lastUpdate: Date;
   };
-  private thumbnails = new Map<number, Buffer>();
-  private questions = new Map<string, Question>();
-  private slideMetadata: SlideMetadata[] = [];
+  /** Navigation index -> file mapping */
+  thumbnails: Map<number, Blob>
+}
 
-  // ── Connection management ──
+class RoomManager {
+  /** Websocket rooms, maps to a set of connections */
+  private rooms: Map<string, Set<WSContext>>;
+  /** User map, storing information for each connected user */
+  private users: Map<WSContext, User>;
+  /** Temporal (non-persistent) state for rooms */
+  private temporalState: Map<string, RoomImmediateState>;
 
-  addConnection(ws: WSConnection, info: ConnectionInfo) {
-    this.connections.set(ws, info);
+  // TODO Who creates `User` objects?
+  // WebSocket room manager: https://oneuptime.com/blog/post/2026-01-24-websocket-room-channel-management/view
+
+  constructor() {
+    this.rooms = new Map();
+    this.users = new Map();
+    this.temporalState = new Map();
   }
 
-  removeConnection(ws: WSConnection) {
-    this.connections.delete(ws);
-  }
+  async join(ws: WSContext, user: User) {
+    const room = user.room;
+    if (!this.rooms.has(room)) {
+      // Check if room exists in the database
+      const res = await db
+        .select({ roomId: presentation.id })
+        .from(presentation)
+        .where(eq(presentation.id, room));
+      if (res.length !== 1) {
+        throw new Error(`Presentation "${room}" doesn't exist`);
+      }
 
-  getRole(ws: WSConnection): Role {
-    return this.connections.get(ws)?.role ?? "viewer";
-  }
-
-  // ── Navigation state ──
-
-  updateState(partial: Partial<NavigationSnapshot>) {
-    Object.assign(this.state, partial);
-  }
-
-  getState(): NavigationSnapshot {
-    return { ...this.state };
-  }
-
-  /** Send full state sync to a specific connection */
-  sendSync(ws: WSConnection) {
-    ws.send(
-      JSON.stringify({
-        type: "sync",
-        ...this.state,
-      }),
-    );
-  }
-
-  // ── Broadcasting ──
-
-  /** Broadcast a message to all connections */
-  broadcast(message: ServerMessage) {
-    const data = JSON.stringify(message);
-    for (const ws of this.connections.keys()) {
-      ws.send(data);
+      // Create room
+      this.rooms.set(room, new Set());
+      this.temporalState.set(room, {
+        laser: { x: 0, y: 0, lastUpdate: new Date(0) },
+        thumbnails: new Map()
+      });
     }
+
+    // Add connection to room
+    this.rooms.get(room)?.add(ws);
+    this.users.set(ws, user);
   }
 
-  /** Broadcast to all connections except the sender */
-  broadcastExcept(sender: WSConnection, message: ServerMessage) {
-    const data = JSON.stringify(message);
-    for (const ws of this.connections.keys()) {
-      if (ws !== sender) ws.send(data);
-    }
-  }
-
-  /** Broadcast to connections with a specific role */
-  broadcastToRole(role: Role, message: ServerMessage) {
-    const data = JSON.stringify(message);
-    for (const [ws, info] of this.connections.entries()) {
-      if (info.role === role) ws.send(data);
-    }
-  }
-
-  // ── Thumbnail management ──
-
-  setThumbnail(slideIndex: number, data: Buffer) {
-    this.thumbnails.set(slideIndex, data);
-    // Update metadata
-    const meta = this.slideMetadata.find((m) => m.index === slideIndex);
-    if (meta) {
-      meta.hasThumbnail = true;
-    }
-  }
-
-  getThumbnail(slideIndex: number): Buffer | undefined {
-    return this.thumbnails.get(slideIndex);
-  }
-
-  // ── Slide metadata ──
-
-  setSlideMetadata(metadata: SlideMetadata[]) {
-    this.slideMetadata = metadata;
-    this.state.numSlides = metadata.length;
-  }
-
-  getSlideMetadata(): SlideMetadata[] {
-    return this.slideMetadata.map((m) => ({
-      ...m,
-      hasThumbnail: this.thumbnails.has(m.index),
-    }));
-  }
-
-  // ── Question management ──
-
-  addQuestion(text: string, author: string): Question {
-    const id = crypto.randomUUID();
-    const question: Question = {
-      id,
-      text,
-      author,
-      timestamp: Date.now(),
-      upvotes: 0,
-      upvotedBy: new Set(),
-      dismissed: false,
-    };
-    this.questions.set(id, question);
-
-    // Broadcast to all connections
-    this.broadcast({
-      type: "question",
-      id: question.id,
-      text: question.text,
-      author: question.author,
-      timestamp: question.timestamp,
-      upvotes: question.upvotes,
+  async leave(ws: WSContext) {
+    this.rooms.forEach((connections) => {
+      if (connections.has(ws)) {
+        connections.delete(ws);
+      }
     });
 
-    return question;
+    this.users.delete(ws);
   }
 
-  upvoteQuestion(
-    id: string,
-    userId: string,
-  ): { id: string; upvotes: number } | null {
-    const question = this.questions.get(id);
-    if (!question) return null;
+  /** Server method for broadcasting a message to all connected clients */
+  send(room: string, msg: ServerMessage) {
+    this.rooms.get(room)?.forEach((connection) => {
+      connection.send(JSON.stringify(msg));
+    });
+  }
 
-    // Prevent double-voting
-    if (question.upvotedBy.has(userId)) {
-      return { id: question.id, upvotes: question.upvotes };
+  getUser(ws: WSContext): User | undefined {
+    return this.users.get(ws);
+  }
+
+  getTemporalState(room: string): RoomImmediateState | undefined {
+    return this.temporalState.get(room);
+  }
+
+  updateTemporalState(room: string, newState: RoomImmediateState) {
+    if (!this.temporalState.get(room)) {
+      console.warn(`Room ${room} has no temporal state`);
+      return;
     }
 
-    question.upvotedBy.add(userId);
-    question.upvotes++;
-
-    // Broadcast update
-    this.broadcast({
-      type: "question:upvote",
-      id: question.id,
-      upvotes: question.upvotes,
-    });
-
-    return { id: question.id, upvotes: question.upvotes };
+    this.temporalState.set(room, newState);
   }
 
-  getQuestions(): Omit<Question, "upvotedBy">[] {
-    return Array.from(this.questions.values())
-      .filter((q) => !q.dismissed)
-      .sort((a, b) => b.upvotes - a.upvotes)
-      .map(({ upvotedBy: _, ...q }) => q);
+  getThumbnail(room: string, index: number): Blob | undefined {
+    return this.getTemporalState(room)?.thumbnails?.get(index)
+  }
+
+  setThumbnail(room: string, index: number, file: Blob) {
+    if (!ALLOWED_FILE_TYPES.includes(file.type)) {
+      throw new Error(`Invalid file type. Received: ${file.type}`)
+    }
+
+    this.temporalState.get(room)?.thumbnails.set(index, file)
   }
 }
 
-export const hub = new Hub();
+/** Default `RoomManager` instance */
+export const roomManager = new RoomManager();

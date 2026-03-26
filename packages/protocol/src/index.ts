@@ -15,6 +15,4 @@ export {
   SyncRequest,
 } from "./messages";
 
-export { permissions, Role } from "./roles";
-
 export type { NavigationSnapshot } from "./state";

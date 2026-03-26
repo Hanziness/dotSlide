@@ -14,7 +14,7 @@ export const LaserBroadcast = z.object({
   /** Y position normalized to [0, 1] relative to slide height */
   y: z.number().min(0).max(1),
   /** Whether the laser pointer is visible */
-  visible: z.boolean(),
+  lastUpdate: z.date(),
 });
 
 export const SyncBroadcast = z.object({
@@ -75,7 +75,6 @@ export const LaserUpdate = z.object({
   type: z.literal("laser"),
   x: z.number().min(0).max(1),
   y: z.number().min(0).max(1),
-  visible: z.boolean(),
 });
 
 export const QuestionSubmit = z.object({

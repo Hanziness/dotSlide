@@ -1,9 +1,23 @@
 import type { SlideshowStore } from "@dotslide/framework/store";
 import { useSlideshowContext } from "@dotslide/framework/store";
+import type { ClientMessage } from "@dotslide/protocol";
+import { connectionState } from "./connection-state";
+import { client } from "./rpc-client";
 
 /**
  * Bidirectional sync between SlideshowContext nanostores and
  * a WebSocket connection to the dotslide server.
+ *
+ * **Outbound gating**: Local navigation changes are only forwarded
+ * to the server when the client is in `connected-presenter` state.
+ * This prevents viewer sessions from mutating shared server state.
+ * The server-side permission check in `ws/handlers.ts` remains the
+ * final authority — this client-side gate is a UX optimization that
+ * avoids sending messages that would be rejected anyway.
+ *
+ * **Inbound sync**: Remote navigation updates from the server are
+ * always applied, regardless of role, so that both viewers and
+ * presenters see the same slide.
  *
  * Uses a guard flag (`isRemoteUpdate`) to prevent echo loops:
  * when the server sends a navigation update, we apply it to the
@@ -14,6 +28,11 @@ export class SyncAdapter {
   private store: SlideshowStore | null = null;
   private unsubscribe: (() => void) | null = null;
   private isRemoteUpdate = false;
+  private roomId: string;
+
+  constructor(roomId: string) {
+    this.roomId = roomId;
+  }
 
   attach(ws: WebSocket) {
     this.ws = ws;
@@ -28,9 +47,17 @@ export class SyncAdapter {
     this.store = useSlideshowContext(slideshow);
 
     // Listen for local navigation changes and forward to server
+    // only when the client has presenter privileges
     this.unsubscribe = this.store.listen((_value, _oldValue, changedKey) => {
       if (changedKey !== "navigationIndex") return;
       if (this.isRemoteUpdate) return; // prevent echo
+      if (connectionState.get() !== "connected-presenter") return;
+
+      client.api.control[":roomId"].metadata.$post({
+        param: { roomId: this.roomId },
+        json: _value,
+      });
+      console.log(_value);
 
       const { navigationIndex } = this.store?.get() ?? { navigationIndex: 0 };
       this.send({
@@ -68,7 +95,7 @@ export class SyncAdapter {
     this.isRemoteUpdate = false;
   }
 
-  private send(msg: unknown) {
+  private send(msg: ClientMessage) {
     if (this.ws?.readyState === WebSocket.OPEN) {
       this.ws.send(JSON.stringify(msg));
     }

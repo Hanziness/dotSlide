@@ -1,6 +1,5 @@
 <script lang="ts">
-import { LogOutIcon } from "lucide-svelte";
-    import type { Snippet } from "svelte";
+import type { Snippet } from "svelte";
 
 interface ButtonProps {
     onclick?: () => void
