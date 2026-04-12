@@ -1,6 +1,7 @@
 ---
 
 import { Root, Slide, Slideshow, StyleHelper } from "@dotslide/framework";
+import { Item, Row } from "@dotslide/framework/layout"
 import "../global.css";
 import "@dotslide/framework/themes/default.css";
 
@@ -20,6 +21,13 @@ import Title from "../components/slides/Title.astro";
 		<Slide>
 			Oh look, another slide!
 		</Slide>
-		<Remote serverUrl="http://localhost:9876" controllerUrl="http://localhost:5173" />
+		<Slide>
+			<p>Here's a row:</p>
+			<Row>
+				<Item>One</Item>
+				<Item>Two</Item>
+			</Row>
+		</Slide>
+		<!-- <Remote serverUrl="http://localhost:9876" controllerUrl="http://localhost:5173" /> -->
 	</Slideshow>
 </Root>
