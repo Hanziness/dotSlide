@@ -1,0 +1,112 @@
+---
+import { z } from "astro/zod";
+
+const PropsSchema = z.object({
+  src: z.string().optional(),
+  class: z.string().optional(),
+  controls: z.boolean().optional().default(false),
+  loop: z.boolean().optional().default(false),
+  muted: z.boolean().optional().default(false),
+  playsInline: z.boolean().optional().default(true),
+  poster: z.string().optional(),
+  preload: z.enum(["auto", "metadata", "none"]).optional().default("auto"),
+});
+
+type Props = z.input<typeof PropsSchema>;
+
+const props = PropsSchema.parse(Astro.props);
+---
+
+<ds-video class={props.class} data-src={props.src} data-controls={props.controls} data-loop={props.loop} data-muted={props.muted} data-plays-inline={props.playsInline} data-poster={props.poster} data-preload={props.preload}>
+  <video
+    class:list={props.class ? [props.class] : []}
+    src={props.src}
+    controls={props.controls}
+    loop={props.loop}
+    muted={props.muted}
+    playsinline={props.playsInline}
+    poster={props.poster}
+    preload={props.preload}
+  >
+    <slot />
+  </video>
+</ds-video>
+
+<style>
+  ds-video {
+    display: inline-block;
+    width: 100%;
+    height: 100%;
+  }
+
+  ds-video video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+</style>
+
+<script>
+class DsVideo extends HTMLElement {
+  private video: HTMLVideoElement | null = null;
+  private observer: MutationObserver | null = null;
+  private slideElement: HTMLElement | null = null;
+
+  connectedCallback() {
+    this.video = this.querySelector("video");
+
+    if (!this.video) {
+      console.warn("ds-video: no video element found");
+      return;
+    }
+
+    this.slideElement = this.closest("ds-slide");
+
+    if (!this.slideElement) {
+      console.warn("ds-video: not inside a ds-slide element");
+      return;
+    }
+
+    // Sync initial state
+    this._syncPlayback();
+
+    // Watch for class changes on the slide
+    this.observer = new MutationObserver(() => {
+      this._syncPlayback();
+    });
+
+    this.observer.observe(this.slideElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+  }
+
+  disconnectedCallback() {
+    this.observer?.disconnect();
+  }
+
+  private _syncPlayback() {
+    if (!this.video || !this.slideElement) return;
+
+    const isActive = this.slideElement.classList.contains("active");
+
+    if (isActive) {
+      // Force muted and playsInline for autoplay
+      this.video.muted = true;
+      this.video.playsInline = true;
+
+      // Attempt to play
+      this.video.fastSeek(0)
+      this.video.play().catch(() => {
+        // Autoplay was prevented - ignore
+      });
+      
+    } else {
+      // Slide is not active - pause playback
+      this.video.pause();
+    }
+  }
+}
+
+customElements.define("ds-video", DsVideo);
+</script>
