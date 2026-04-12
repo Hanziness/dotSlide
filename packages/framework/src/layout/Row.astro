@@ -1,0 +1,37 @@
+---
+import { z } from 'astro/zod'
+import { AlignmentSchema } from "."
+
+const PropsSchema = z.object({
+  class: z.string().optional(),
+  gap: z.number().gte(0).optional().default(0.5),
+  halign: AlignmentSchema.optional().default('start'),
+  valign: AlignmentSchema.optional().default('center')
+})
+
+type Props = z.input<typeof PropsSchema>
+
+const props = PropsSchema.parse(Astro.props)
+---
+
+<ds-row class:list={[props.class]} data-gap={props.gap} data-halign={props.halign} data-valign={props.valign} style={{"--halign": props.halign, "--valign": props.valign, "--gap": `${props.gap}rem`}}>
+  <slot />
+</ds-row>
+
+<style>
+  ds-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: var(--halign, start);
+    align-items: var(--valign, center);
+    gap: var(--gap, .5rem);
+  }
+</style>
+
+<script>
+  class DsRow extends HTMLElement {
+
+  }
+
+  customElements.define('ds-row', DsRow)
+</script>

@@ -1,0 +1,22 @@
+---
+import { z } from "astro/zod";
+
+const PropSchema = z.object({
+  mode: z.enum(['unordered', 'ordered']).optional().default('unordered')
+})
+
+type Props = z.input<typeof PropSchema>
+
+const props = PropSchema.parse(Astro.props)
+
+const tagMap: Record<(typeof props)['mode'], string> = {
+  'ordered': 'ol',
+  'unordered': 'ul'
+} as const
+
+const ListTag = tagMap[props.mode]
+---
+
+<ListTag>
+  <slot />
+</ListTag>
