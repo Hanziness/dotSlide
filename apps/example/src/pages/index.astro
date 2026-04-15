@@ -1,6 +1,6 @@
 ---
 
-import { Counter, Root, Slide, Slideshow, StyleHelper } from "@dotslide/framework";
+import { Counter, Reference, Root, Slide, Slideshow, StyleHelper } from "@dotslide/framework";
 import { Flex, Item, List } from "@dotslide/framework/layout";
 import "../global.css";
 import "@dotslide/framework/themes/default.css";
@@ -24,7 +24,7 @@ import Title from "../components/slides/Title.astro";
 		</Slide>
 		<SectionWithSlide level={2} title="Introduction" />
 		<Slide>
-			<p>The second test counter: <Counter type="test" />, but this one is a different one: <Counter type="table" /></p>
+			<p>The second test counter: <Counter type="test" id="test-2" />, but this one is a different one: <Counter type="table" /></p>
 			<p>Here's a row:</p>
 			<Flex>
 				<Item>One</Item>
@@ -47,6 +47,9 @@ import Title from "../components/slides/Title.astro";
 				<div>One</div>
 				<div>Two</div>
 			</Flex>
+		</Slide>
+		<Slide>
+			<p>Let's see if <Reference id="test-2" /> exists.</p>
 		</Slide>
 		<!-- <Remote serverUrl="http://localhost:9876" controllerUrl="http://localhost:5173" /> -->
 	</Slideshow>
