@@ -152,7 +152,7 @@ class DsRemote extends HTMLElement {
     this.roomId = roomRes.id
     this.syncAdapter = new SyncAdapter(this.roomId)
   
-    const wsUrl = `${this.serverUrl.replace(/^http/, "ws")}/ws/${this.roomId}`;
+    const wsUrl = `${this.serverUrl.replace(/^http/, "ws")}/api/ws/${this.roomId}`;
     const ws = new WebSocket(wsUrl);
     this.ws = ws;
 
