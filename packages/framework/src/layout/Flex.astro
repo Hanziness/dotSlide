@@ -1,0 +1,64 @@
+---
+import { z } from "astro/zod";
+import { AlignmentSchema } from ".";
+
+const PropsSchema = z.object({
+  class: z.string().optional(),
+  gap: z.number().gte(0).optional().default(0.5),
+  halign: AlignmentSchema.optional().default("start"),
+  valign: AlignmentSchema.optional().default("center"),
+  mode: z.enum(["row", "column"]).optional().default("row"),
+  column: z.boolean().optional(),
+});
+
+type Props = z.input<typeof PropsSchema>;
+
+const rawProps = Astro.props;
+
+if ("mode" in rawProps && "column" in rawProps) {
+  throw new Error("Cannot specify both 'mode' and 'column'.");
+}
+
+const props = PropsSchema.parse(rawProps);
+const resolvedMode = props.column === true ? "column" : props.mode;
+---
+
+<ds-flex
+  class:list={[props.class]}
+  gap={props.gap}
+  halign={props.halign}
+  valign={props.valign}
+  mode={resolvedMode}
+>
+  <slot />
+</ds-flex>
+
+<style>
+  ds-flex {
+    display: flex;
+    flex-direction: var(--flex-direction, row);
+    justify-content: var(--halign, start);
+    align-items: var(--valign, center);
+    gap: var(--gap, .5rem);
+  }
+</style>
+
+<script>
+  class DsFlex extends HTMLElement {
+    static observedAttributes = ["gap", "halign", "valign", "mode"] as const;
+
+    attributeChangedCallback(name: typeof DsFlex.observedAttributes[number], _oldValue: string, newValue: string) {
+      if (name === "gap") {
+        this.style.setProperty("--gap", `${Number(newValue) ?? 0.5}rem`);
+      } else if (name === "halign") {
+        this.style.setProperty("--halign", newValue ?? "start");
+      } else if (name === "valign") {
+        this.style.setProperty("--valign", newValue);
+      } else if (name === "mode") {
+        this.style.setProperty("--flex-direction", newValue);
+      }
+    }
+  }
+
+  customElements.define("ds-flex", DsFlex)
+</script>

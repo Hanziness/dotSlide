@@ -1,12 +1,11 @@
 ---
 
 import { Counter, Root, Slide, Slideshow, StyleHelper } from "@dotslide/framework";
-import { Item, List, Row } from "@dotslide/framework/layout"
+import { Flex, Item, List } from "@dotslide/framework/layout";
 import "../global.css";
 import "@dotslide/framework/themes/default.css";
 
-
-import { Remote } from "@dotslide/remote"
+import { Remote } from "@dotslide/remote";
 import SectionWithSlide from "../components/SectionWithSlide.astro";
 // Custom slides
 import Title from "../components/slides/Title.astro";
@@ -27,10 +26,10 @@ import Title from "../components/slides/Title.astro";
 		<Slide>
 			<p>The second test counter: <Counter type="test" />, but this one is a different one: <Counter type="table" /></p>
 			<p>Here's a row:</p>
-			<Row>
+			<Flex>
 				<Item>One</Item>
 				<Item>Two</Item>
-			</Row>
+			</Flex>
 
 			<p>And these are two lists:</p>
 			<List.Root unordered>
@@ -42,6 +41,12 @@ import Title from "../components/slides/Title.astro";
 				<List.Item>Item 3</List.Item>
 				<List.Item>Item 4</List.Item>
 			</List>
+
+			<p class="mt-8">And this is a column:</p>
+			<Flex column>
+				<div>One</div>
+				<div>Two</div>
+			</Flex>
 		</Slide>
 		<!-- <Remote serverUrl="http://localhost:9876" controllerUrl="http://localhost:5173" /> -->
 	</Slideshow>
