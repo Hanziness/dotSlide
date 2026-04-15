@@ -1,0 +1,92 @@
+---
+import { z } from "astro/zod";
+
+const PropSchema = z.object({
+  id: z.string().min(1),
+  prefix: z.string().optional(),
+  suffix: z.string().optional()
+});
+
+type Props = z.output<typeof PropSchema>;
+
+const props = PropSchema.parse(Astro.props);
+---
+
+<ds-reference data-id={props.id} prefix={props.prefix} suffix={props.suffix}>
+  <span class="value" />
+</ds-reference>
+
+<script>
+  import { useSlideshowContext } from "./store/context/slideshow";
+
+  class DsReference extends HTMLElement {
+    static observedAttributes = ["prefix", "suffix"] as const;
+
+    private _unsubscribe?: () => void;
+    private _warnedMissingCounter = false;
+    private _prefix: string = "";
+    private _suffix: string = "";
+
+    connectedCallback() {
+      const id = this.getAttribute("data-id");
+
+      if (!id) {
+        console.warn("ds-reference: missing data-id attribute");
+        return;
+      }
+
+      const slideshowCtx = useSlideshowContext(this);
+      this._unsubscribe = slideshowCtx.subscribe(() => {
+        this._syncCounter(slideshowCtx, id);
+      });
+
+      this._syncCounter(slideshowCtx, id);
+    }
+
+    attributeChangedCallback(name: typeof DsReference.observedAttributes[number], _oldValue: string, newValue: string) {
+      if (name === "prefix") {
+        this._prefix = newValue
+      } else if (name === "suffix") {
+        this._suffix = newValue
+      }
+    }
+
+    disconnectedCallback() {
+      this._unsubscribe?.();
+    }
+
+    private _syncCounter(
+      slideshowCtx: ReturnType<typeof useSlideshowContext>,
+      id: string,
+    ) {
+      const counter = Object.values(slideshowCtx.get().counters)
+        .flat()
+        .find((entry) => entry.id === id);
+
+      if (counter) {
+        const valueElement = this.querySelector<HTMLElement>(".value");
+        if (valueElement) {
+          valueElement.textContent = `${this._prefix}${String(counter.value)}${this._suffix}`;
+        }
+        this._unsubscribe?.();
+        this._unsubscribe = undefined;
+        return;
+      }
+
+      if (!this._warnedMissingCounter && slideshowCtx.get().phase !== "registering") {
+        console.warn(
+          `ds-reference: counter not found for id="${id}"`,
+        );
+        this._warnedMissingCounter = true;
+      }
+    }
+  }
+
+  customElements.define("ds-reference", DsReference);
+</script>
+
+<style>
+  ds-reference {
+    display: inline;
+  }
+</style>
