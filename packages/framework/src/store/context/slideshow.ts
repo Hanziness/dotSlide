@@ -14,6 +14,14 @@ export type ResourceInfo = {
   slideIndex: number;
 };
 
+/** Information about a registered counter */
+export type CounterInfo = {
+  /** Current counter value (starts at 1) */
+  value: number;
+  /** Optional ID for referencing this counter */
+  id?: string;
+};
+
 /** Lifecycle phase of the slideshow's resource loading */
 export type SlideshowPhase = "registering" | "loading" | "ready";
 
@@ -30,6 +38,9 @@ export type SlideshowContext = {
   navigationIndex: number;
   /** Full navigation sequence (built once at init) */
   navigationSequence: NavigationNode[];
+
+  /** Map of counter types to their instances. Each instance gets a sequential value. */
+  counters: Record<string, CounterInfo[]>;
 
   // — Derived fields (auto-updated when navigationIndex changes) —
 
@@ -66,7 +77,8 @@ type DerivedFields =
   | "numSlides"
   | "phase"
   | "pending"
-  | "ready";
+  | "ready"
+  | "counters";
 
 /** Fields derived from navigation state */
 type NavigationDerivedFields = "activeSlide" | "activeStep" | "numSlides";
@@ -103,6 +115,8 @@ export const createSlideshowContext = (
     phase: "registering",
     pending: {},
     ready: false,
+    // Counter state — starts empty, counters register themselves
+    counters: {},
   });
 
   // Keep derived fields in sync when navigationIndex changes.
@@ -124,8 +138,8 @@ export const createSlideshowContext = (
     const { phase, pending } = store.get();
     const isReady =
       phase !== "registering" && Object.keys(pending).length === 0;
-    
-      if (store.get().ready !== isReady) {
+
+    if (store.get().ready !== isReady) {
       store.setKey("ready", isReady);
       if (isReady) {
         store.setKey("phase", "ready");

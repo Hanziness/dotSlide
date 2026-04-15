@@ -1,0 +1,78 @@
+---
+import { z } from "astro/zod";
+
+const PropSchema = z
+  .object({
+    mode: z.enum(["unordered", "ordered"]).optional(),
+    ordered: z.boolean().optional(),
+    unordered: z.boolean().optional(),
+    start: z.number().int().min(1).optional().default(1),
+  })
+  .refine(
+    (data) => {
+      const specified = [data.mode, data.ordered, data.unordered].filter(
+        Boolean,
+      );
+      return specified.length <= 1;
+    },
+    {
+      message:
+        "Cannot specify more than one of 'mode', 'ordered', or 'unordered'",
+    },
+  );
+
+type Props = z.input<typeof PropSchema>;
+
+let parsed: z.output<typeof PropSchema>;
+try {
+  parsed = PropSchema.parse(Astro.props);
+} catch (e) {
+  if (e instanceof z.ZodError) {
+    throw new Error(e.errors.map((e) => e.message).join(", "));
+  }
+  throw e;
+}
+
+// Normalize props to effective mode
+let effectiveMode: "ordered" | "unordered" = "unordered";
+if (parsed.ordered === true) {
+  effectiveMode = "ordered";
+} else if (parsed.unordered === true) {
+  effectiveMode = "unordered";
+} else if (parsed.mode) {
+  effectiveMode = parsed.mode;
+}
+
+const start = parsed.start ?? 1;
+---
+
+<ds-list
+  data-mode={effectiveMode}
+  data-start={effectiveMode === "ordered" ? start : undefined}
+  style={{
+    '--ds-list-start': effectiveMode === "ordered" ? start : undefined
+  }}
+>
+  <slot />
+</ds-list>
+
+<style>
+  ds-list {
+    display: block;
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+  }
+
+  ds-list[data-mode="ordered"] {
+    counter-reset: ds-list calc(var(--ds-list-start, 1) - 1);
+  }
+</style>
+
+<script>
+  class DsList extends HTMLElement {
+
+  }
+
+  customElements.define("ds-list", DsList);
+</script>

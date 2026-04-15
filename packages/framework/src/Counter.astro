@@ -1,0 +1,90 @@
+---
+import { z } from "astro/zod";
+
+const PropSchema = z.object({
+  /** Counter type (e.g., "figure", "table", "caption"). Controls which counter to increment. */
+  type: z.string().min(1),
+  /** Optional ID for referencing this counter elsewhere */
+  id: z.string().optional(),
+});
+
+type Props = z.output<typeof PropSchema>;
+
+const props = PropSchema.parse(Astro.props);
+---
+
+<ds-counter data-type={props.type} data-id={props.id}>
+  <span class="value" />
+</ds-counter>
+
+<script>
+  import { type CounterInfo, useSlideshowContext } from "./store/context/slideshow";
+
+  class DsCounter extends HTMLElement {
+    private valueElement: HTMLElement | null = null;
+
+    connectedCallback() {
+      this.valueElement = this.querySelector(".value");
+      const type = this.getAttribute("data-type");
+      const id = this.getAttribute("data-id") ?? undefined;
+
+      if (!type) {
+        console.warn("ds-counter: missing data-type attribute");
+        return;
+      }
+
+      // Get slideshow context and register counter
+      const slideshowCtx = useSlideshowContext(this);
+      if (!slideshowCtx) {
+        console.warn("ds-counter: no slideshow context found");
+        return;
+      }
+
+      // Register counter during registration phase
+      this._registerCounter(slideshowCtx, type, id);
+    }
+
+    disconnectedCallback() {
+      // No cleanup needed - counters are immutable once registered
+    }
+
+    private _registerCounter(
+      slideshowCtx: ReturnType<typeof useSlideshowContext>,
+      type: string,
+      id: string | undefined,
+    ) {
+      const ctx = slideshowCtx.get();
+
+      // Get existing instances for this counter type
+      const instances = ctx.counters[type] ?? [];
+
+      // Calculate new value (1-based)
+      const newValue = instances.length + 1;
+
+      // Create counter info
+      const counterInfo: CounterInfo = { value: newValue };
+      if (id) {
+        counterInfo.id = id;
+      }
+
+      // Store this instance in the array
+      slideshowCtx.setKey("counters", {
+        ...ctx.counters,
+        [type]: [...instances, counterInfo],
+      });
+
+      // Store the value and display it
+      if (this.valueElement) {
+        this.valueElement.textContent = String(newValue);
+      }
+    }
+  }
+
+  customElements.define("ds-counter", DsCounter);
+</script>
+
+<style>
+  ds-counter {
+    display: inline;
+  }
+</style>
