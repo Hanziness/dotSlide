@@ -1,0 +1,24 @@
+<li>
+  <slot />
+</li>
+
+<style is:global>
+  ds-list[data-mode="ordered"] > li::before {
+    counter-increment: ds-list;
+    content: counter(ds-list) ".";
+    display: inline-block;
+    width: 1.5em;
+    text-align: right;
+    margin-right: 0.5em;
+    color: var(--ds-list-marker-color, currentColor);
+  }
+
+  ds-list[data-mode="unordered"] > li::before {
+    content: "•";
+    display: inline-block;
+    width: 1.5em;
+    text-align: right;
+    margin-right: 0.5em;
+    color: var(--ds-list-marker-color, currentColor);
+  }
+</style>

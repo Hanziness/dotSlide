@@ -1,0 +1,15 @@
+---
+import { z } from "astro/zod"
+
+const PropSchema = z.object({
+  class: z.string().optional()
+})
+
+type Props = z.infer<typeof PropSchema>
+
+const props = PropSchema.parse(Astro.props)
+---
+
+<div class:list={[props.class]}>
+  <slot />
+</div>

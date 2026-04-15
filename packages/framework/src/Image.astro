@@ -3,14 +3,15 @@ import { Image as AstroImage } from "astro:assets";
 import type { ComponentProps } from "astro/types";
 import { z } from "astro/zod";
 
-const fitSchema = z.enum(["contain", "cover", "fill"]).default("contain")
+const fitSchema = z.enum(["contain", "cover", "fill"]).optional().default("contain")
 
-type Props = ComponentProps<typeof AstroImage> & {
-  caption?: string;
-  fit: z.output<typeof fitSchema>
-}
+const PropSchema = z.intersection(z.custom<ComponentProps<typeof AstroImage>>(), z.object({
+  caption: z.string().optional(),
+  fit: fitSchema
+}))
 
-const props = z.custom<Props>().parse(Astro.props)
+type Props = z.input<typeof PropSchema>
+const props = PropSchema.parse(Astro.props)
 
 const styles = [
   `object-fit: ${props.fit}`,
