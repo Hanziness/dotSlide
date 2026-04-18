@@ -1,35 +1,107 @@
-# Astro Starter Kit: Component Package
+# DotSlide
 
-This is a template for an Astro component library. Use this template for writing components to use in multiple projects or publish to NPM.
+DotSlide is a modern presentation framework for Astro.
+It helps you build fast, portable decks from semantic components instead of custom slide code by providing ready-made components.
 
-```sh
-bun create astro@latest -- --template component
+
+Focus on the contents, not how to prompt out the right layout and key bindings.
+
+## ✨ Why DotSlide
+
+- Minimal building blocks for real presentations.
+- Export to a static website using the power of Astro.
+- Built to grow into more ready-made features, like a controller app.
+
+## 🧩 What you get
+
+### 🎬 Core presentation
+
+- `Root` — wraps a presentation and provides the main slideshow context.
+- `Slideshow` — defines the slide deck canvas and shared presentation settings.
+- `Slide` — renders one slide of content.
+- `Section` — helps group slides into chapters and sections.
+- `Step` — reveals content within slides in stages.
+- `Counter` — tracks slide-adjacent values such as counts or labels. Use for figures, tables etc.
+- `Reference` — links to a counter in the deck.
+- `Image` — adds responsive images with presentation-friendly defaults.
+- `Video` — embeds video content in a slide.
+- `Overlay` — positions content on top of a slide.
+
+```astro
+---
+import { Root, Slideshow, Slide, Image } from "@dotslide/framework";
+---
+
+<Root>
+  <Slideshow>
+    <Slide>
+      <Image src="/cover.png" alt="Cover image" />
+    </Slide>
+  </Slideshow>
+</Root>
 ```
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/withastro/astro/tree/latest/examples/non-html-pages)
-[![Open with CodeSandbox](https://assets.codesandbox.io/github/button-edit-lime.svg)](https://codesandbox.io/p/sandbox/github/withastro/astro/tree/latest/examples/non-html-pages)
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/withastro/astro?devcontainer_path=.devcontainer/component/devcontainer.json)
+### 📐 Layout helpers
 
-## 🚀 Project Structure
+- `Flex` — lays out items in a row or column.
+- `Item` — places one item inside a flex layout.
+- `List.Root` — creates a styled list container.
+- `List.Item` — renders one item inside a list.
 
-Inside of your Astro project, you'll see the following folders and files:
+```astro
+---
+import { Flex, Item, List } from "@dotslide/framework/layout";
+---
 
-```text
-/
-├── index.ts
-├── src
-│   └── MyComponent.astro
-├── tsconfig.json
-├── package.json
+<Flex>
+  <Item>Left</Item>
+  <Item>Right</Item>
+</Flex>
+
+<List.Root unordered>
+  <List.Item>One</List.Item>
+  <List.Item>Two</List.Item>
+</List.Root>
 ```
 
-The `index.ts` file is the "entry point" for your package. Export your components in `index.ts` to make them importable from your package.
+### 📊 Live widgets
 
-## 🧞 Commands
+- `CurrentSection` — shows the section the deck is currently in.
+- `CurrentSlide` — shows the active slide number or label.
+- `Progress` — displays presentation progress.
+- `TotalSlides` — reports the number of slides in the deck.
 
-All commands are run from the root of the project, from a terminal:
+```astro
+---
+import { Progress, TotalSlides } from "@dotslide/framework/widgets";
+---
 
-| Command       | Action                                                                                                                                                                                                                           |
-| :------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `bun link`    | Registers this package locally. Run `bun link my-component-library` in an Astro project to install your components                                                                                                               |
-| `bun publish` | [Publishes](https://docs.npmjs.com/creating-and-publishing-unscoped-public-packages#publishing-unscoped-public-packages) this package to NPM. Requires you to be [logged in](https://docs.npmjs.com/cli/v8/commands/bun-adduser) |
+<Progress />
+<p><TotalSlides /> slides</p>
+```
+
+## 🚀 Usage
+
+Start by importing `@dotslide/framework` in an Astro project:
+
+```astro
+---
+import { Root, Slideshow, Slide } from "@dotslide/framework";
+import "@dotslide/framework/themes/default.css";
+---
+
+<Root>
+  <Slideshow>
+    <Slide>
+      <h1>Hello, dotSlide</h1>
+      <p>A simple deck built with semantic components.</p>
+    </Slide>
+  </Slideshow>
+</Root>
+```
+
+Or use the `example` app in this repo as a starting point.
+
+## 💬 Found it useful?
+
+If you like this project, consider [**☕ buying a coffee**](https://buymeacoffee.com/imreg).

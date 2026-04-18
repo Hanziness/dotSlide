@@ -1,6 +1,11 @@
 {
   "name": "@dotslide/remote",
   "version": "0.0.1",
+  "author": {
+    "name": "Imre Gera",
+    "url": "https://github.com/Hanziness"
+  },
+  "private": true,
   "type": "module",
   "description": "Astro component for connecting dotslide presentations to control server",
   "exports": {

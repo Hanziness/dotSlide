@@ -150,8 +150,6 @@ export class Slideshow extends HTMLElement {
 
     // Update navigation on context changes
     slideshowContextRef.subscribe((store, oldValue) => {
-      logger.debug(store)
-
       // Gate visibility updates until the slideshow is ready
       if (!store.ready) return;
 

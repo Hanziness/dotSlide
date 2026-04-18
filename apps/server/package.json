@@ -2,6 +2,10 @@
   "name": "@dotslide/server",
   "version": "0.0.1",
   "type": "module",
+  "author": {
+    "name": "Imre Gera",
+    "url": "https://github.com/Hanziness"
+  },
   "scripts": {
     "dev": "bun run --hot src/index.ts",
     "build": "bun run build.ts",
