@@ -1,8 +1,5 @@
-Presentation controller server built using Hono.
+# dotSlide Server
 
-# Responsibilities
+This is a server application that allows hosting your dotSlide presentations and creating a connection to the controller app through WebSockets.
 
-1. Allows hosting a presentation using a simple file server
-2. Hosts the presentation controller UI
-
-The server does all of this in a small packaged executable.
+_Work in progress_
