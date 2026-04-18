@@ -2,6 +2,10 @@
   "name": "@dotslide/example",
   "type": "module",
   "version": "0.0.1",
+  "author": {
+    "name": "Imre Gera",
+    "url": "https://github.com/Hanziness"
+  },
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",

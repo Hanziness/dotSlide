@@ -1,6 +1,10 @@
 {
   "name": "@dotslide/framework",
   "version": "0.0.1",
+  "author": {
+    "name": "Imre Gera",
+    "url": "https://github.com/Hanziness"
+  },
   "type": "module",
   "exports": {
     ".": "./index.ts",

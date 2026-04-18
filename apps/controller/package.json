@@ -2,6 +2,10 @@
   "name": "controller",
   "private": true,
   "version": "0.0.1",
+  "author": {
+    "name": "Imre Gera",
+    "url": "https://github.com/Hanziness"
+  },
   "type": "module",
   "scripts": {
     "dev": "vite dev",
@@ -29,6 +33,7 @@
     "@storybook/addon-vitest": "^10.2.15",
     "@storybook/sveltekit": "^10.2.15",
     "@sveltejs/adapter-auto": "^7.0.0",
+    "@sveltejs/adapter-static": "^3.0.10",
     "@sveltejs/kit": "^2.50.2",
     "@sveltejs/vite-plugin-svelte": "^6.2.4",
     "@tailwindcss/vite": "^4.1.18",
