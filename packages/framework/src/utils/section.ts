@@ -83,8 +83,6 @@ export function buildSectionHierarchy(): void {
     sectionsBySlide,
     initialized: true,
   });
-
-  logger.debug("Section hierarchy built:", sectionsBySlide);
 }
 
 /**
