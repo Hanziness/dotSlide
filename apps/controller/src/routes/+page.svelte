@@ -6,6 +6,7 @@
     import { client } from "$lib/client";
     import Badge from "$lib/components/Badge.svelte";
     import Button from "$lib/components/Button.svelte";
+    import Controls from "$lib/components/presenter/Controls.svelte";
 
     const getRoomIdFromUrl = () => {
         const params = new URLSearchParams(location.search)
@@ -62,6 +63,9 @@
             <Badge>Presenter</Badge>
         {/if}
         <div class="grow"></div>
+        {#if userRole === 'controller' && ws}
+            <Controls ws={ws} />
+        {/if}
         <div>
             <Button onclick={logout}>
                 <LogOutIcon size={18} />
