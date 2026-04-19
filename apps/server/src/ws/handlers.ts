@@ -36,7 +36,7 @@ export function handleMessage(ws: WSContext, raw: string) {
         error: "No user found for this connection. Closing.",
       }),
     );
-    ws.close();
+    // ws.close();
     return;
   }
 

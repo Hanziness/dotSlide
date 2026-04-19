@@ -19,14 +19,14 @@ export interface RoomImmediateState {
     lastUpdate: Date;
   };
   /** Navigation index -> file mapping */
-  thumbnails: Map<number, Blob>
+  thumbnails: Map<number, Blob>;
 }
 
 class RoomManager {
   /** Websocket rooms, maps to a set of connections */
-  private rooms: Map<string, Set<WSContext>>;
-  /** User map, storing information for each connected user */
-  private users: Map<WSContext, User>;
+  private rooms: Map<string, Set<WebSocket>>;
+  /** User map, storing information for each connected user - uses raw WebSocket as key for stable reference */
+  private users: Map<WebSocket, User>;
   /** Temporal (non-persistent) state for rooms */
   private temporalState: Map<string, RoomImmediateState>;
 
@@ -55,23 +55,28 @@ class RoomManager {
       this.rooms.set(room, new Set());
       this.temporalState.set(room, {
         laser: { x: 0, y: 0, lastUpdate: new Date(0) },
-        thumbnails: new Map()
+        thumbnails: new Map(),
       });
     }
 
-    // Add connection to room
-    this.rooms.get(room)?.add(ws);
-    this.users.set(ws, user);
+    // Use ws.raw (underlying Bun.WebSocket) for stable reference across callbacks
+    const rawWs = ws.raw as WebSocket;
+    this.rooms.get(room)?.add(rawWs);
+    this.users.set(rawWs, user);
+
+    console.log(this.rooms);
+    console.log(this.users);
   }
 
   async leave(ws: WSContext) {
+    const rawWs = ws.raw as WebSocket;
     this.rooms.forEach((connections) => {
-      if (connections.has(ws)) {
-        connections.delete(ws);
+      if (connections.has(rawWs)) {
+        connections.delete(rawWs);
       }
     });
 
-    this.users.delete(ws);
+    this.users.delete(rawWs);
   }
 
   /** Server method for broadcasting a message to all connected clients */
@@ -82,7 +87,8 @@ class RoomManager {
   }
 
   getUser(ws: WSContext): User | undefined {
-    return this.users.get(ws);
+    const rawWs = ws.raw as WebSocket;
+    return this.users.get(rawWs);
   }
 
   getTemporalState(room: string): RoomImmediateState | undefined {
@@ -99,15 +105,15 @@ class RoomManager {
   }
 
   getThumbnail(room: string, index: number): Blob | undefined {
-    return this.getTemporalState(room)?.thumbnails?.get(index)
+    return this.getTemporalState(room)?.thumbnails?.get(index);
   }
 
   setThumbnail(room: string, index: number, file: Blob) {
     if (!ALLOWED_FILE_TYPES.includes(file.type)) {
-      throw new Error(`Invalid file type. Received: ${file.type}`)
+      throw new Error(`Invalid file type. Received: ${file.type}`);
     }
 
-    this.temporalState.get(room)?.thumbnails.set(index, file)
+    this.temporalState.get(room)?.thumbnails.set(index, file);
   }
 }
 
