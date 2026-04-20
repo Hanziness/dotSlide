@@ -63,9 +63,6 @@ class RoomManager {
     const rawWs = ws.raw as WebSocket;
     this.rooms.get(room)?.add(rawWs);
     this.users.set(rawWs, user);
-
-    console.log(this.rooms);
-    console.log(this.users);
   }
 
   async leave(ws: WSContext) {

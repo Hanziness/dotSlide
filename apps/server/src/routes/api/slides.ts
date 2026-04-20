@@ -30,7 +30,6 @@ export const slideRoutes = new Hono<AuthEnv>()
     zValidator("param", z.object({ roomId: z.uuidv4(), index: z.coerce.number().gte(0) })),
     zValidator("form", z.object({ file: z.instanceof(File) })),
     async (c) => {
-      console.info("Incoming thumbnail upload");
       const index = c.req.valid("param").index;
 
       const user = c.get("user");
