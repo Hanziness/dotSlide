@@ -2,7 +2,7 @@ import type { SlideshowStore } from "@dotslide/framework/store";
 import { useSlideshowContext } from "@dotslide/framework/store";
 import type { ClientMessage } from "@dotslide/protocol";
 import { connectionState } from "./connection-state";
-import { client } from "./rpc-client";
+import { uploadPresentationState } from "./state";
 
 /**
  * Bidirectional sync between SlideshowContext nanostores and
@@ -53,11 +53,11 @@ export class SyncAdapter {
       if (this.isRemoteUpdate) return; // prevent echo
       if (connectionState.get() !== "connected-presenter") return;
 
-      client.api.control[":roomId"].metadata.$post({
-        param: { roomId: this.roomId },
-        json: _value,
-      });
-      console.log(_value);
+      const store = this.store;
+      if (!store) return;
+
+      // TODO This is async!
+      uploadPresentationState(this.roomId, store.get());
 
       const { navigationIndex } = this.store?.get() ?? { navigationIndex: 0 };
       this.send({

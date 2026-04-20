@@ -65,6 +65,7 @@ import { authClient } from "@dotslide/server/client"
 import { captureAndUpload } from "./capture";
 import { connectionState } from "./connection-state";
 import { client } from "./rpc-client";
+import { uploadPresentationState } from "./state";
 import { SyncAdapter } from "./sync";
 
 /**
@@ -80,6 +81,7 @@ class DsRemote extends HTMLElement {
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
   private indicatorTimer: ReturnType<typeof setTimeout> | null = null;
   private unsubscribeState: (() => void) | null = null;
+  private unsubscribeReady: (() => void) | null = null;
   private roomId: string | undefined
 
   private get serverUrl(): string {
@@ -112,8 +114,6 @@ class DsRemote extends HTMLElement {
       console.error("Remote didn't get a Room ID, quitting.")
       return
     }
-
-    await captureAndUpload(this.roomId)
     this.setupInviteUI();
   }
 
@@ -122,6 +122,8 @@ class DsRemote extends HTMLElement {
     if (this.indicatorTimer) clearTimeout(this.indicatorTimer);
     this.unsubscribeState?.();
     this.unsubscribeState = null;
+    this.unsubscribeReady?.();
+    this.unsubscribeReady = null;
     this.ws?.close();
     this.syncAdapter?.detach();
     connectionState.set("standalone");
@@ -204,6 +206,22 @@ class DsRemote extends HTMLElement {
     });
   }
 
+  private async uploadInitialPresentationState() {
+    if (!this.roomId) {
+      console.warn("No room ID is available for the presentation state");
+      return;
+    }
+
+    const slideshow = document.querySelector<HTMLElement>("ds-slideshow");
+    if (!slideshow) {
+      console.warn("No ds-slideshow element found for state upload");
+      return;
+    }
+
+    const ctx = useSlideshowContext(slideshow);
+    await uploadPresentationState(this.roomId, ctx.get());
+  }
+
   private handleServerMessage(msg: ServerMessage) {
     console.info(msg)
 
@@ -222,8 +240,14 @@ class DsRemote extends HTMLElement {
         connectionState.set(
           msg.role === "presenter" ? "connected-presenter" : "connected-viewer",
         );
-        if (msg.role === "presenter" && this.captureSlides) {
-          this.waitForReady().then(() => captureAndUpload(this.serverUrl));
+        if (msg.role === "presenter") {
+          this.waitForReady().then(async () => {
+            await this.uploadInitialPresentationState();
+
+            if (this.captureSlides && this.roomId) {
+              await captureAndUpload(this.roomId);
+            }
+          });
         }
         break;
       case "question":
@@ -234,10 +258,6 @@ class DsRemote extends HTMLElement {
         console.warn(`[dotslide] Server error: ${msg.message}`);
         break;
     }
-  }
-
-  sendSlides() {
-    const ctx = useSlideshowContext(this)
   }
 
   // ── Invite UI ──
@@ -392,16 +412,33 @@ class DsRemote extends HTMLElement {
    */
   private waitForReady(): Promise<void> {
     return new Promise((resolve) => {
-      // TODO Consider subscribing to the Slideshow context instead!
-      const check = () => {
-        const slideshow = document.querySelector<HTMLElement>("ds-slideshow");
-        if (slideshow?.getAttribute("data-ready") === "true") {
-          resolve();
+      const slideshow = document.querySelector<HTMLElement>("ds-slideshow");
+      if (!slideshow) {
+        console.warn("No ds-slideshow element found while waiting for readiness");
+        resolve();
+        return;
+      }
+
+      const ctx = useSlideshowContext(slideshow);
+      if (ctx.get().ready) {
+        resolve();
+        return;
+      }
+
+      this.unsubscribeReady?.();
+      this.unsubscribeReady = ctx.listen((value, _oldValue, changedKey) => {
+        if (changedKey !== "ready" && changedKey !== "phase" && changedKey !== "pending") {
           return;
         }
-        requestAnimationFrame(check);
-      };
-      check();
+
+        if (!value.ready) {
+          return;
+        }
+
+        this.unsubscribeReady?.();
+        this.unsubscribeReady = null;
+        resolve();
+      });
     });
   }
 }
