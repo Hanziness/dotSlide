@@ -1,4 +1,5 @@
 <script lang="ts">
+    import type { ClientMessage, NavigationSnapshot, ServerMessage } from "@dotslide/protocol";
     import { authClient } from "@dotslide/server/client";
     import { LogOutIcon } from "lucide-svelte";
     import { onMount } from "svelte";
@@ -6,7 +7,7 @@
     import { client } from "$lib/client";
     import Badge from "$lib/components/Badge.svelte";
     import Button from "$lib/components/Button.svelte";
-    import Controls from "$lib/components/presenter/Controls.svelte";
+    import Controller from "$lib/components/presenter/controller.svelte";
 
     const getRoomIdFromUrl = () => {
         const params = new URLSearchParams(location.search)
@@ -17,6 +18,9 @@
     let roomId: string | null = $state(null)
     let userRole: string | null = $state(null)
     let ws: WebSocket | null = $state(null)
+    let localNavState: NavigationSnapshot | null = $state(null)
+
+    $inspect(localNavState)
 
     onMount(async () => {
         session = await authClient.getSession()
@@ -46,7 +50,21 @@
         ws = new WebSocket(client.api.ws[":roomId"].$url({ param: { roomId } }))
         ws.onmessage = (msg) => {
             // Works 🥳
-            console.info(JSON.parse(msg.data))
+            const data = JSON.parse(msg.data) as ServerMessage
+            console.info(data)
+
+            if (data.type === 'sync') {
+                const { type, ...navData } = data
+                localNavState = navData
+            } else if (data.type === 'navigate') {
+                if (localNavState == null) return;
+                console.log(`Updating nav index to ${data.navigationIndex}`)
+                localNavState.navigationIndex = data.navigationIndex
+            }
+        }
+        ws.onopen = () => {
+            // Send a sync request on open
+            ws?.send(JSON.stringify({ type: "sync:request" } as ClientMessage) )
         }
     })
 
@@ -63,15 +81,25 @@
             <Badge>Presenter</Badge>
         {/if}
         <div class="grow"></div>
-        {#if userRole === 'controller' && ws}
-            <Controls ws={ws} />
-        {/if}
         <div>
             <Button onclick={logout}>
                 <LogOutIcon size={18} />
             </Button>
         </div>
     </div>
-
+    <div class="grow">
+        {#if localNavState != null && ws != null}
+        <Controller state={localNavState} onInput={(input) => {
+            switch (input) {
+                case 'prev':
+                    ws?.send(JSON.stringify({ type: "navigate", action: "prev" }))
+                    break;
+                case 'next':
+                    ws?.send(JSON.stringify({ type: "navigate", action: "next" }))
+                    break;
+            }
+        }} />
+        {/if}
+    </div>
 
 </div>
