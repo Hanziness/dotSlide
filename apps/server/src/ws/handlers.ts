@@ -1,4 +1,4 @@
-import { ClientMessage } from "@dotslide/protocol";
+import { ClientMessage, type NavigationSnapshot } from "@dotslide/protocol";
 import { and, eq } from "drizzle-orm";
 import type { WSContext } from "hono/ws";
 import { v4 as uuidv4 } from "uuid";
@@ -85,13 +85,13 @@ async function handleNavigate(
       })
       .from(presentation)
       .where(eq(presentation.id, user.room))
-  )[0].state as Record<string, unknown>;
+  )[0].state as NavigationSnapshot;
 
   let newIndex = state.navigationIndex;
 
   switch (msg.action) {
     case "next":
-      newIndex = newIndex + 1;
+      newIndex = Math.min(state.numSlides - 1, newIndex + 1);
       break;
     case "prev":
       newIndex = Math.max(newIndex - 1, 0);
