@@ -64,7 +64,7 @@ export function handleMessage(ws: WSContext, raw: string) {
       handleQuestionUpvote(ws, msg);
       break;
     case "sync:request":
-      console.warn("Unimplemented sync message");
+      handleSync(ws, msg);
       break;
   }
 }
@@ -285,4 +285,27 @@ async function handleQuestionUpvote(
     id: msg.id,
     upvotes: updateRes[0].upvotes.length,
   });
+}
+
+async function handleSync(ws: WSContext, msg: Extract<ClientMessage, { type: 'sync:request' }>) {
+  const wsUser = roomManager.getUser(ws);
+  if (!wsUser) {
+    ws.send(JSON.stringify({ error: "User not found" }));
+    return;
+  }
+
+  const state = (
+    await db
+      .select({
+        state: presentation.state,
+      })
+      .from(presentation)
+      .where(eq(presentation.id, wsUser.room))
+  )[0].state as NavigationSnapshot;
+
+  // Send the message only to the requester
+  ws.send(JSON.stringify({
+    type: "sync",
+    ...state
+  }))
 }
