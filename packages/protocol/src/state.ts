@@ -1,7 +1,5 @@
+import type { z } from "zod";
+import type { SyncBroadcast } from "./messages";
+
 /** Snapshot of the presentation state, sent on sync */
-export type NavigationSnapshot = {
-  navigationIndex: number;
-  activeSlide: number;
-  activeStep: number;
-  numSlides: number;
-};
+export type NavigationSnapshot = Omit<z.infer<typeof SyncBroadcast>, "type">
