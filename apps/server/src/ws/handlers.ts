@@ -1,4 +1,8 @@
-import { ClientMessage, type NavigationSnapshot } from "@dotslide/protocol";
+import {
+  ClientMessage,
+  type NavigationSnapshot,
+  SyncBroadcast,
+} from "@dotslide/protocol";
 import { and, eq } from "drizzle-orm";
 import type { WSContext } from "hono/ws";
 import { v4 as uuidv4 } from "uuid";
@@ -287,25 +291,40 @@ async function handleQuestionUpvote(
   });
 }
 
-async function handleSync(ws: WSContext, msg: Extract<ClientMessage, { type: 'sync:request' }>) {
+async function handleSync(
+  ws: WSContext,
+  msg: Extract<ClientMessage, { type: "sync:request" }>,
+) {
   const wsUser = roomManager.getUser(ws);
   if (!wsUser) {
     ws.send(JSON.stringify({ error: "User not found" }));
     return;
   }
 
-  const state = (
+  const rawState = (
     await db
       .select({
         state: presentation.state,
       })
       .from(presentation)
       .where(eq(presentation.id, wsUser.room))
-  )[0].state as NavigationSnapshot;
+  )[0]?.state;
 
-  // Send the message only to the requester
-  ws.send(JSON.stringify({
-    type: "sync",
-    ...state
-  }))
+  if (!rawState) {
+    ws.send(JSON.stringify({ error: "Presentation state not found" }));
+    return;
+  }
+
+  try {
+    const syncMsg = SyncBroadcast.parse({
+      type: "sync",
+      ...rawState,
+    });
+
+    // Send the message only to the requester
+    ws.send(JSON.stringify(syncMsg));
+  } catch {
+    ws.send(JSON.stringify({ error: "Invalid presentation state" }));
+    return;
+  }
 }
