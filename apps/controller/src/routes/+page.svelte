@@ -1,5 +1,9 @@
 <script lang="ts">
-    import type { ClientMessage, NavigationSnapshot, ServerMessage } from "@dotslide/protocol";
+    import {
+        type ClientMessage,
+        type NavigationSnapshot,
+        ServerMessage as ServerMessageSchema,
+    } from "@dotslide/protocol";
     import { authClient } from "@dotslide/server/client";
     import { LogOutIcon } from "lucide-svelte";
     import { onMount } from "svelte";
@@ -49,8 +53,15 @@
         console.log(client.api.ws[":roomId"].$url({ param: { roomId } }))
         ws = new WebSocket(client.api.ws[":roomId"].$url({ param: { roomId } }))
         ws.onmessage = (msg) => {
-            // Works 🥳
-            const data = JSON.parse(msg.data) as ServerMessage
+            const parsed = JSON.parse(msg.data)
+            const result = ServerMessageSchema.safeParse(parsed)
+
+            if (!result.success) {
+                console.error("Invalid server message", result.error)
+                return
+            }
+
+            const data = result.data
             console.info(data)
 
             if (data.type === 'sync') {
