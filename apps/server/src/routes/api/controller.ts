@@ -1,3 +1,4 @@
+import { NavigationSnapshotSchema } from "@dotslide/protocol";
 import { zValidator } from "@hono/zod-validator";
 import { eq } from "drizzle-orm";
 import { Hono } from "hono";
@@ -27,43 +28,47 @@ export const controllerRoutes = new Hono<AuthEnv>()
 
     return c.json(roomMeta[0], 200);
   })
-  .post("/:roomId/metadata", zValidator("json", z.looseObject({})), async (c) => {
-    // Check user role
-    const session = c.get("session");
-    if (!session) {
-      return c.json({ error: "Unauthenticated." }, 401);
-    }
+  .post(
+    "/:roomId/metadata",
+    zValidator("json", NavigationSnapshotSchema),
+    async (c) => {
+      // Check user role
+      const session = c.get("session");
+      if (!session) {
+        return c.json({ error: "Unauthenticated." }, 401);
+      }
 
-    // Check if currentRole is not `null` (i.e., user is not viewer)
-    const currentRole = await getUserPresentationRole(
-      c.req.param("roomId"),
-      session.userId,
-    );
-
-    if (!currentRole) {
-      return c.json(
-        { error: "You are not authorized to update this presentation." },
-        401,
+      // Check if currentRole is not `null` (i.e., user is not viewer)
+      const currentRole = await getUserPresentationRole(
+        c.req.param("roomId"),
+        session.userId,
       );
-    }
 
-    // Try to update presentation state
-    const res = await db
-      .update(presentation)
-      .set({
-        state: c.req.valid("json"),
-      })
-      .where(eq(presentation.id, c.req.param("roomId")))
-      .returning()
+      if (!currentRole) {
+        return c.json(
+          { error: "You are not authorized to update this presentation." },
+          401,
+        );
+      }
 
-    if (res.length !== 1) {
-      return c.json({ error: "Failed to update presentation state" }, 500)
-    }
+      // Try to update presentation state
+      const res = await db
+        .update(presentation)
+        .set({
+          state: c.req.valid("json"),
+        })
+        .where(eq(presentation.id, c.req.param("roomId")))
+        .returning();
 
-    console.log(res)
+      if (res.length !== 1) {
+        return c.json({ error: "Failed to update presentation state" }, 500);
+      }
 
-    return c.text("OK", 200)
-  })
+      console.log(res);
+
+      return c.text("OK", 200);
+    },
+  )
   .post(
     "/:roomId/navigate/:idx",
     zValidator(
