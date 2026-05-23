@@ -1,16 +1,12 @@
 // TODO Simplify this file
 
+import type { SlideshowContext } from "@dotslide/framework/store";
 import { client } from "./rpc-client";
 
 export type PresentationState = Record<string, unknown>;
 
-export type PresentationStateSource = {
-  root: HTMLElement;
-  [key: string]: unknown;
-};
-
 export function serializePresentationState(
-  state: PresentationStateSource,
+  state: SlideshowContext,
 ): PresentationState {
   const { root: _root, ...presentationState } = state;
   return presentationState;
@@ -18,7 +14,7 @@ export function serializePresentationState(
 
 export async function uploadPresentationState(
   roomId: string,
-  state: PresentationStateSource,
+  state: SlideshowContext,
 ): Promise<void> {
   const response = await client.api.control[":roomId"].metadata.$post({
     param: { roomId },
