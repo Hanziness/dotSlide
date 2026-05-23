@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { NavigationSnapshotSchema } from "./state";
 
 // ─── Server → Client messages ─────────────────────────────────
 
@@ -17,13 +18,8 @@ export const LaserBroadcast = z.object({
   lastUpdate: z.date(),
 });
 
-export const SyncBroadcast = z.object({
+export const SyncBroadcast = NavigationSnapshotSchema.extend({
   type: z.literal("sync"),
-  navigationIndex: z.number().int().min(0),
-  numSlides: z.number().int().min(0),
-  activeSlide: z.number().int().min(0),
-  activeStep: z.number().int().min(1),
-  numNavigationSteps: z.number().int().min(0)
 });
 
 export const QuestionBroadcast = z.object({
