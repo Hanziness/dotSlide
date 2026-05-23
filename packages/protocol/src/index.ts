@@ -14,5 +14,5 @@ export {
   SyncBroadcast,
   SyncRequest,
 } from "./messages";
-
 export type { NavigationSnapshot } from "./state";
+export { NavigationSnapshotSchema } from "./state";

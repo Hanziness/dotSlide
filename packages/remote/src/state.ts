@@ -1,15 +1,22 @@
 // TODO Simplify this file
 
 import type { SlideshowContext } from "@dotslide/framework/store";
+import {
+  type NavigationSnapshot,
+  NavigationSnapshotSchema,
+} from "@dotslide/protocol";
 import { client } from "./rpc-client";
-
-export type PresentationState = Record<string, unknown>;
 
 export function serializePresentationState(
   state: SlideshowContext,
-): PresentationState {
-  const { root: _root, ...presentationState } = state;
-  return presentationState;
+): NavigationSnapshot {
+  return NavigationSnapshotSchema.parse({
+    navigationIndex: state.navigationIndex,
+    numSlides: state.numSlides,
+    activeSlide: state.activeSlide,
+    activeStep: state.activeStep,
+    numNavigationSteps: state.navigationSequence.length,
+  });
 }
 
 export async function uploadPresentationState(
@@ -22,9 +29,6 @@ export async function uploadPresentationState(
   });
 
   if (!response.ok) {
-    console.warn(
-      "Failed to upload presentation state",
-      await response.text(),
-    );
+    console.warn("Failed to upload presentation state", await response.text());
   }
 }
