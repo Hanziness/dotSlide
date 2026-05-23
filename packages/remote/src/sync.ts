@@ -1,6 +1,6 @@
 import type { SlideshowStore } from "@dotslide/framework/store";
 import { useSlideshowContext } from "@dotslide/framework/store";
-import type { ClientMessage } from "@dotslide/protocol";
+import type { ClientMessage, NavigationSnapshot } from "@dotslide/protocol";
 import { connectionState } from "./connection-state";
 import { uploadPresentationState } from "./state";
 
@@ -83,12 +83,7 @@ export class SyncAdapter {
   }
 
   /** Apply a full state sync from the server */
-  applyFullSync(state: {
-    navigationIndex: number;
-    numSlides: number;
-    activeSlide: number;
-    activeStep: number;
-  }) {
+  applyFullSync(state: NavigationSnapshot) {
     if (!this.store) return;
     this.isRemoteUpdate = true;
     this.store.goTo(state.navigationIndex);
