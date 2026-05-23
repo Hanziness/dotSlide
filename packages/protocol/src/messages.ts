@@ -23,6 +23,7 @@ export const SyncBroadcast = z.object({
   numSlides: z.number().int().min(0),
   activeSlide: z.number().int().min(0),
   activeStep: z.number().int().min(1),
+  numNavigationSteps: z.number().int().min(0)
 });
 
 export const QuestionBroadcast = z.object({
