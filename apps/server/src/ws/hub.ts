@@ -1,4 +1,5 @@
 import type { ServerMessage } from "@dotslide/protocol";
+import type { PresentationRole } from "@dotslide/protocol";
 import { eq } from "drizzle-orm";
 import type { WSContext } from "hono/ws";
 import { db } from "../db";
@@ -7,7 +8,7 @@ import { presentation } from "../db/dotslide";
 interface User {
   userId: string;
   room: string;
-  role: string | null;
+  role: PresentationRole;
 }
 
 const ALLOWED_FILE_TYPES = ["image/png", "image/jpeg", "image/webp"];

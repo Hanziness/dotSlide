@@ -1,6 +1,7 @@
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import z from "zod";
+import { canPresent } from "@dotslide/protocol";
 import type { AuthEnv } from "../../middleware/env";
 import { getUserPresentationRole } from "../../session";
 import { roomManager } from "../../ws/hub";
@@ -45,7 +46,7 @@ export const slideRoutes = new Hono<AuthEnv>()
         user.id,
       );
 
-      if (role !== "presenter") {
+      if (!canPresent(role)) {
         return c.json({ error: "Insufficient permissions.", role }, 401);
       }
 

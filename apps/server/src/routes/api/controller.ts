@@ -38,13 +38,12 @@ export const controllerRoutes = new Hono<AuthEnv>()
         return c.json({ error: "Unauthenticated." }, 401);
       }
 
-      // Check if currentRole is not `null` (i.e., user is not viewer)
       const currentRole = await getUserPresentationRole(
         c.req.param("roomId"),
         session.userId,
       );
 
-      if (!currentRole) {
+       if (currentRole === "viewer") {
         return c.json(
           { error: "You are not authorized to update this presentation." },
           401,

@@ -1,3 +1,4 @@
+import { MembershipRoles } from "@dotslide/protocol";
 import { relations } from "drizzle-orm";
 import {
   blob,
@@ -17,7 +18,7 @@ export const presentation = sqliteTable("presentation", {
 export const members = sqliteTable("members", {
   presentation: text("id").references(() => presentation.id, { onDelete: "cascade" }).notNull(),
   user: text("user").references(() => user.id, { onDelete: "cascade" }).notNull(),
-  role: text("role", { enum: ["presenter", "controller"] }).notNull(),
+  role: text("role", { enum: [...MembershipRoles] }).notNull(),
   createdAt: integer("created_at", { mode: "timestamp_ms" }).$defaultFn(() => new Date()),
 }, (t) => [
   primaryKey({ columns: [t.presentation, t.user] }),

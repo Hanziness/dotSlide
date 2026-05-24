@@ -8,6 +8,7 @@ import { db } from "../../db";
 import { invites, members, presentation } from "../../db/dotslide";
 import type { AuthEnv } from "../../middleware/env";
 import { getUserPresentationRole } from "../../session";
+import { canPresent } from "@dotslide/protocol";
 
 const invitationTokenSchema = z.custom<(typeof invites)["$inferSelect"]>();
 
@@ -49,7 +50,7 @@ export const presenterRoutes = new Hono<AuthEnv>()
       session.userId,
     );
 
-    if (res !== "presenter") {
+    if (!canPresent(res)) {
       return c.json({ error: "No matching presentation found" }, 401);
     }
 
@@ -118,7 +119,7 @@ export const presenterRoutes = new Hono<AuthEnv>()
         session.userId,
       );
 
-      if (currentRole !== null) {
+      if (currentRole !== "viewer") {
         return c.json({ error: "You are already elevated", currentRole, user: session.userId }, 400);
       }
 
@@ -242,7 +243,7 @@ export const presenterRoutes = new Hono<AuthEnv>()
           ),
         );
 
-      if (role.length < 1) {
+      if (role.length < 1 || role[0].role !== "presenter") {
         return c.json(
           {
             error: `Insufficient permissions to modify "${c.req.param("roomId")}"`,

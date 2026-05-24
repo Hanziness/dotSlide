@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { PresentationRoleSchema } from "./roles";
 import { NavigationSnapshotSchema } from "./state";
 
 // ─── Server → Client messages ─────────────────────────────────
@@ -39,7 +40,7 @@ export const QuestionUpvoteBroadcast = z.object({
 
 export const RoleAssigned = z.object({
   type: z.literal("role"),
-  role: z.enum(["presenter", "viewer"]),
+  role: PresentationRoleSchema,
 });
 
 export const ErrorMessage = z.object({

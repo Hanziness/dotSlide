@@ -45,13 +45,14 @@ export function handleMessage(ws: WSContext, raw: string) {
   }
 
   // Permission check
-  if (!user.role) {
+  if (user.role === "viewer") {
     ws.send(
       JSON.stringify({
         type: "error",
         message: `Not permitted: ${msg.type}`,
       }),
     );
+    return;
   }
 
   switch (msg.type) {
@@ -141,7 +142,7 @@ function handleLaser(
     return;
   }
 
-  if (!user.role) {
+  if (user.role === "viewer") {
     console.warn(`User ${user.userId} is not allowed to modify laser`);
     return;
   }
@@ -176,7 +177,7 @@ async function handleQuestion(
     return;
   }
 
-  if (wsUser.role) {
+  if (wsUser.role !== "viewer") {
     ws.send(JSON.stringify({ error: "Only viewers can submit questions" }));
     return;
   }
