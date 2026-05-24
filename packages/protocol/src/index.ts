@@ -19,14 +19,17 @@ export type {
   PresentationRole,
 } from "./roles";
 export {
+  canControl,
+  canPresent,
+  isMembershipRole,
   MembershipRoleSchema,
   MembershipRoles,
   PresentationRoleSchema,
   PresentationRoles,
-  canControl,
-  canPresent,
-  isMembershipRole,
   toPresentationRole,
 } from "./roles";
-export type { NavigationSnapshot } from "./state";
-export { NavigationSnapshotSchema } from "./state";
+export type {
+  NavigationSnapshot,
+  SynchronizedPresentationState,
+} from "./state";
+export { createNavigationSnapshot, NavigationSnapshotSchema } from "./state";

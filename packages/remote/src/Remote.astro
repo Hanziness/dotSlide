@@ -65,7 +65,7 @@ import { authClient } from "@dotslide/server/client"
 import { captureAndUpload } from "./capture";
 import { connectionState } from "./connection-state";
 import { client } from "./rpc-client";
-import { uploadPresentationState } from "./state";
+import { projectPresentationState, uploadPresentationState } from "./state";
 import { SyncAdapter } from "./sync";
 
 /**
@@ -219,7 +219,10 @@ class DsRemote extends HTMLElement {
     }
 
     const ctx = useSlideshowContext(slideshow);
-    await uploadPresentationState(this.roomId, ctx.get());
+    await uploadPresentationState(
+      this.roomId,
+      projectPresentationState(ctx.get()),
+    );
   }
 
   private handleServerMessage(msg: ServerMessage) {

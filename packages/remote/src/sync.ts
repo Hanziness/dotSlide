@@ -2,7 +2,7 @@ import type { SlideshowStore } from "@dotslide/framework/store";
 import { useSlideshowContext } from "@dotslide/framework/store";
 import type { ClientMessage, NavigationSnapshot } from "@dotslide/protocol";
 import { connectionState } from "./connection-state";
-import { uploadPresentationState } from "./state";
+import { projectPresentationState, uploadPresentationState } from "./state";
 
 /**
  * Bidirectional sync between SlideshowContext nanostores and
@@ -57,7 +57,10 @@ export class SyncAdapter {
       if (!store) return;
 
       // TODO This is async!
-      uploadPresentationState(this.roomId, store.get());
+      uploadPresentationState(
+        this.roomId,
+        projectPresentationState(store.get()),
+      );
 
       const { navigationIndex } = this.store?.get() ?? { navigationIndex: 0 };
       this.send({

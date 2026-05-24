@@ -1,27 +1,34 @@
-// TODO Simplify this file
-
 import type { SlideshowContext } from "@dotslide/framework/store";
 import {
+  createNavigationSnapshot,
   type NavigationSnapshot,
-  NavigationSnapshotSchema,
+  type SynchronizedPresentationState,
 } from "@dotslide/protocol";
 import { client } from "./rpc-client";
 
-export function serializePresentationState(
+export function projectPresentationState(
   state: SlideshowContext,
-): NavigationSnapshot {
-  return NavigationSnapshotSchema.parse({
+): SynchronizedPresentationState {
+  return {
     navigationIndex: state.navigationIndex,
     numSlides: state.numSlides,
     activeSlide: state.activeSlide,
     activeStep: state.activeStep,
     numNavigationSteps: state.navigationSequence.length,
-  });
+  };
 }
+
+export function serializePresentationState(
+  state: SynchronizedPresentationState,
+): NavigationSnapshot {
+  return createNavigationSnapshot(state);
+}
+
+export type { SynchronizedPresentationState };
 
 export async function uploadPresentationState(
   roomId: string,
-  state: SlideshowContext,
+  state: SynchronizedPresentationState,
 ): Promise<void> {
   const response = await client.api.control[":roomId"].metadata.$post({
     param: { roomId },
