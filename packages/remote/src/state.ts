@@ -24,8 +24,6 @@ export function serializePresentationState(
   return createNavigationSnapshot(state);
 }
 
-export type { SynchronizedPresentationState };
-
 export async function uploadPresentationState(
   roomId: string,
   state: SynchronizedPresentationState,
