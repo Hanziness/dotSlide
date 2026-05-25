@@ -82,6 +82,7 @@ class DsRemote extends HTMLElement {
   private indicatorTimer: ReturnType<typeof setTimeout> | null = null;
   private unsubscribeState: (() => void) | null = null;
   private unsubscribeReady: (() => void) | null = null;
+  private readyWaitFrame: number | null = null;
   private roomId: string | undefined
 
   private get serverUrl(): string {
@@ -124,6 +125,10 @@ class DsRemote extends HTMLElement {
     this.unsubscribeState = null;
     this.unsubscribeReady?.();
     this.unsubscribeReady = null;
+    if (this.readyWaitFrame !== null) {
+      cancelAnimationFrame(this.readyWaitFrame);
+      this.readyWaitFrame = null;
+    }
     this.ws?.close();
     this.syncAdapter?.detach();
     connectionState.set("standalone");
@@ -415,33 +420,47 @@ class DsRemote extends HTMLElement {
    */
   private waitForReady(): Promise<void> {
     return new Promise((resolve) => {
-      const slideshow = document.querySelector<HTMLElement>("ds-slideshow");
-      if (!slideshow) {
-        console.warn("No ds-slideshow element found while waiting for readiness");
-        resolve();
-        return;
+      if (this.readyWaitFrame !== null) {
+        cancelAnimationFrame(this.readyWaitFrame);
+        this.readyWaitFrame = null;
       }
 
-      const ctx = useSlideshowContext(slideshow);
-      if (ctx.get().ready) {
-        resolve();
-        return;
-      }
+      const check = () => {
+        this.readyWaitFrame = null;
 
-      this.unsubscribeReady?.();
-      this.unsubscribeReady = ctx.listen((value, _oldValue, changedKey) => {
-        if (changedKey !== "ready" && changedKey !== "phase" && changedKey !== "pending") {
+        const slideshow = document.querySelector<HTMLElement>("ds-slideshow");
+        if (!slideshow) {
+          this.readyWaitFrame = requestAnimationFrame(check);
           return;
         }
 
-        if (!value.ready) {
+        const ctx = useSlideshowContext(slideshow);
+        if (ctx.get().ready) {
+          resolve();
           return;
         }
 
         this.unsubscribeReady?.();
-        this.unsubscribeReady = null;
-        resolve();
-      });
+        this.unsubscribeReady = ctx.listen((value, _oldValue, changedKey) => {
+          if (
+            changedKey !== "ready" &&
+            changedKey !== "phase" &&
+            changedKey !== "pending"
+          ) {
+            return;
+          }
+
+          if (!value.ready) {
+            return;
+          }
+
+          this.unsubscribeReady?.();
+          this.unsubscribeReady = null;
+          resolve();
+        });
+      };
+
+      check();
     });
   }
 }
