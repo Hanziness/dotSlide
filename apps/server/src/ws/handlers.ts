@@ -40,7 +40,7 @@ export function handleMessage(ws: WSContext, raw: string) {
         error: "No user found for this connection. Closing.",
       }),
     );
-    // ws.close();
+    ws.close();
     return;
   }
 
@@ -93,10 +93,14 @@ async function handleNavigate(
   )[0].state as NavigationSnapshot;
 
   let newIndex = state.navigationIndex;
+  const maxNavigationIndex = Math.max(
+    (state.numNavigationSteps ?? state.numSlides) - 1,
+    0,
+  );
 
   switch (msg.action) {
     case "next":
-      newIndex = Math.min(state.numSlides - 1, newIndex + 1);
+      newIndex = Math.min(maxNavigationIndex, newIndex + 1);
       break;
     case "prev":
       newIndex = Math.max(newIndex - 1, 0);
@@ -105,11 +109,12 @@ async function handleNavigate(
       newIndex = 0;
       break;
     case "last":
-      // Use numSlides as upper bound approximation
-      newIndex = Math.max(state.numSlides - 1, 0);
+      newIndex = maxNavigationIndex;
       break;
     case "goTo":
-      if (msg.index !== undefined) newIndex = Math.max(0, msg.index);
+      if (msg.index !== undefined) {
+        newIndex = Math.max(0, Math.min(msg.index, maxNavigationIndex));
+      }
       break;
   }
 
@@ -237,8 +242,6 @@ async function handleQuestionUpvote(
     return;
   }
 
-  const dbUser = dbUserRes[0];
-
   const upvoteListRes = await db
     .select({
       upvotes: question.upvotes,
@@ -294,7 +297,7 @@ async function handleQuestionUpvote(
 
 async function handleSync(
   ws: WSContext,
-  msg: Extract<ClientMessage, { type: "sync:request" }>,
+  _msg: Extract<ClientMessage, { type: "sync:request" }>,
 ) {
   const wsUser = roomManager.getUser(ws);
   if (!wsUser) {
@@ -316,16 +319,32 @@ async function handleSync(
     return;
   }
 
-  try {
-    const syncMsg = SyncBroadcast.parse({
+  const syncResult = SyncBroadcast.safeParse({
+    type: "sync",
+    ...rawState,
+  });
+
+  if (!syncResult.success) {
+    const legacyState = rawState as Partial<NavigationSnapshot>;
+    const fallbackResult = SyncBroadcast.safeParse({
       type: "sync",
-      ...rawState,
+      navigationIndex: legacyState.navigationIndex ?? 0,
+      numSlides: legacyState.numSlides ?? 0,
+      activeSlide: legacyState.activeSlide ?? 0,
+      activeStep: legacyState.activeStep ?? 1,
+      numNavigationSteps:
+        legacyState.numNavigationSteps ?? legacyState.numSlides ?? 0,
     });
 
-    // Send the message only to the requester
-    ws.send(JSON.stringify(syncMsg));
-  } catch {
-    ws.send(JSON.stringify({ error: "Invalid presentation state" }));
+    if (!fallbackResult.success) {
+      ws.send(JSON.stringify({ error: "Invalid presentation state" }));
+      return;
+    }
+
+    ws.send(JSON.stringify(fallbackResult.data));
     return;
   }
+
+  // Send the message only to the requester
+  ws.send(JSON.stringify(syncResult.data));
 }
