@@ -6,10 +6,18 @@
     "url": "https://github.com/Hanziness"
   },
   "type": "module",
+  "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch"
+  },
   "exports": {
-    ".": "./src/index.ts"
+    ".": {
+      "default": "./dist/index.mjs",
+      "types": "./dist/index.d.mts"
+    }
   },
   "dependencies": {
+    "tsdown": "^0.22.0",
     "zod": "^4.3.6"
   }
 }
