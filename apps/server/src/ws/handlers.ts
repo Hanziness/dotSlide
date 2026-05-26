@@ -1,7 +1,8 @@
 import {
   ClientMessage,
+  createNavigationSnapshot,
   type NavigationSnapshot,
-  SyncBroadcast,
+  NavigationSnapshotSchema,
 } from "@dotslide/protocol";
 import { and, eq } from "drizzle-orm";
 import type { WSContext } from "hono/ws";
@@ -74,6 +75,17 @@ export function handleMessage(ws: WSContext, raw: string) {
   }
 }
 
+function normalizeNavigationSnapshot(
+  rawState: unknown,
+): NavigationSnapshot | null {
+  const parsedState = NavigationSnapshotSchema.safeParse(rawState);
+  if (!parsedState.success) {
+    return null;
+  }
+
+  return parsedState.data;
+}
+
 async function handleNavigate(
   ws: WSContext,
   msg: Extract<ClientMessage, { type: "navigate" }>,
@@ -83,20 +95,28 @@ async function handleNavigate(
     return;
   }
 
-  const state = (
+  const rawState = (
     await db
       .select({
         state: presentation.state,
       })
       .from(presentation)
       .where(eq(presentation.id, user.room))
-  )[0].state as NavigationSnapshot;
+  )[0]?.state;
+
+  if (!rawState) {
+    console.warn(`Presentation ${user.room} has no navigation state`);
+    return;
+  }
+
+  const state = normalizeNavigationSnapshot(rawState);
+  if (!state) {
+    console.warn(`Presentation ${user.room} has invalid navigation state`);
+    return;
+  }
 
   let newIndex = state.navigationIndex;
-  const maxNavigationIndex = Math.max(
-    (state.numNavigationSteps ?? state.numSlides) - 1,
-    0,
-  );
+  const maxNavigationIndex = Math.max(state.numNavigationSteps - 1, 0);
 
   switch (msg.action) {
     case "next":
@@ -118,13 +138,15 @@ async function handleNavigate(
       break;
   }
 
+  const nextState = createNavigationSnapshot({
+    navigationIndex: newIndex,
+    navigationSequence: state.navigationSequence,
+  });
+
   const res = await db
     .update(presentation)
     .set({
-      state: {
-        ...state,
-        navigationIndex: newIndex,
-      },
+      state: nextState,
     })
     .where(eq(presentation.id, user.room))
     .returning();
@@ -319,32 +341,16 @@ async function handleSync(
     return;
   }
 
-  const syncResult = SyncBroadcast.safeParse({
-    type: "sync",
-    ...rawState,
-  });
-
-  if (!syncResult.success) {
-    const legacyState = rawState as Partial<NavigationSnapshot>;
-    const fallbackResult = SyncBroadcast.safeParse({
-      type: "sync",
-      navigationIndex: legacyState.navigationIndex ?? 0,
-      numSlides: legacyState.numSlides ?? 0,
-      activeSlide: legacyState.activeSlide ?? 0,
-      activeStep: legacyState.activeStep ?? 1,
-      numNavigationSteps:
-        legacyState.numNavigationSteps ?? legacyState.numSlides ?? 0,
-    });
-
-    if (!fallbackResult.success) {
-      ws.send(JSON.stringify({ error: "Invalid presentation state" }));
-      return;
-    }
-
-    ws.send(JSON.stringify(fallbackResult.data));
+  const normalizedState = normalizeNavigationSnapshot(rawState);
+  if (!normalizedState) {
+    ws.send(JSON.stringify({ error: "Invalid presentation state" }));
     return;
   }
 
-  // Send the message only to the requester
-  ws.send(JSON.stringify(syncResult.data));
+  ws.send(
+    JSON.stringify({
+      type: "sync",
+      ...normalizedState,
+    }),
+  );
 }

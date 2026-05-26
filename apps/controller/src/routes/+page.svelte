@@ -1,5 +1,8 @@
 <script lang="ts">
-    import type { NavigationSnapshot } from "@dotslide/protocol";
+    import {
+        deriveNavigationState,
+        type NavigationSnapshot,
+    } from "@dotslide/protocol";
     import { authClient } from "@dotslide/server/client";
     import { LogOutIcon } from "lucide-svelte";
     import { onMount } from "svelte";
@@ -66,17 +69,31 @@
                     isConnected = false;
                 },
                 onSyncState: (state) => {
-                    localNavState = state;
+                    localNavState = {
+                        ...state,
+                        ...deriveNavigationState(
+                            state.navigationSequence,
+                            state.navigationIndex,
+                        ),
+                    };
                 },
                 onNavigationUpdate: (navigationIndex) => {
-                    if (
-                        localNavState == null ||
-                        localNavState.navigationIndex === navigationIndex
-                    ) {
+                    if (localNavState == null) {
                         return;
                     }
 
-                    localNavState.navigationIndex = navigationIndex;
+                    if (localNavState.navigationIndex === navigationIndex) {
+                        return;
+                    }
+
+                    localNavState = {
+                        ...localNavState,
+                        navigationIndex,
+                        ...deriveNavigationState(
+                            localNavState.navigationSequence,
+                            navigationIndex,
+                        ),
+                    };
                 },
             });
             connection.start();
@@ -106,13 +123,12 @@
 </script>
 
 <div class="w-full h-full flex flex-col relative">
-    <div class="w-full flex flex-row items-center justify-start gap-2 p-2 border-b border-slate-800">
+    <div class="w-full flex flex-row justify-center items-center gap-2 p-2 relative">
         <div class="p-2">dotSlide</div>
         {#if userRole === "controller"}
             <Badge>Presenter</Badge>
         {/if}
-        <div class="grow"></div>
-        <div>
+        <div class="absolute right-2">
             <Button onclick={logout}>
                 <LogOutIcon size={18} />
             </Button>

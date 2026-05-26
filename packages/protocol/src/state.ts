@@ -1,20 +1,23 @@
 import { z } from "zod";
+import {
+  deriveNavigationState,
+  type NavigationNode,
+  NavigationNodeSchema,
+} from "./navigation.ts";
 
 /**
  * Selected projection of presentation state allowed to cross the sync boundary.
- * Only these fields may be serialized into the wire DTO.
+ * Only the topology and cursor may be serialized into the wire DTO.
  */
 export interface SynchronizedPresentationState {
   navigationIndex: number;
-  numSlides: number;
-  activeSlide: number;
-  activeStep: number;
-  numNavigationSteps: number;
+  navigationSequence: NavigationNode[];
 }
 
 /** Wire DTO snapshot of the selected presentation state projection. */
 export const NavigationSnapshotSchema = z.object({
   navigationIndex: z.number().int().min(0),
+  navigationSequence: z.array(NavigationNodeSchema),
   numSlides: z.number().int().min(0),
   activeSlide: z.number().int().min(0),
   activeStep: z.number().int().min(1),
@@ -26,11 +29,14 @@ export type NavigationSnapshot = z.infer<typeof NavigationSnapshotSchema>;
 export function createNavigationSnapshot(
   state: SynchronizedPresentationState,
 ): NavigationSnapshot {
+  const derived = deriveNavigationState(
+    state.navigationSequence,
+    state.navigationIndex,
+  );
+
   return NavigationSnapshotSchema.parse({
     navigationIndex: state.navigationIndex,
-    numSlides: state.numSlides,
-    activeSlide: state.activeSlide,
-    activeStep: state.activeStep,
-    numNavigationSteps: state.numNavigationSteps,
+    navigationSequence: state.navigationSequence,
+    ...derived,
   });
 }

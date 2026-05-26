@@ -14,6 +14,13 @@ export {
   SyncBroadcast,
   SyncRequest,
 } from "./messages";
+export type { NavigationDerivedState, NavigationNode } from "./navigation";
+export {
+  deriveNavigationState,
+  NavigationNodeSchema,
+  NavigationType,
+  NavigationTypeSchema,
+} from "./navigation";
 export type {
   MembershipRole,
   PresentationRole,

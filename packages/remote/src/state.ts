@@ -11,10 +11,7 @@ export function projectPresentationState(
 ): SynchronizedPresentationState {
   return {
     navigationIndex: state.navigationIndex,
-    numSlides: state.numSlides,
-    activeSlide: state.activeSlide,
-    activeStep: state.activeStep,
-    numNavigationSteps: state.navigationSequence.length,
+    navigationSequence: state.navigationSequence,
   };
 }
 

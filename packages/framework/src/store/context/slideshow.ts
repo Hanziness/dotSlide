@@ -1,5 +1,5 @@
+import { deriveNavigationState } from "@dotslide/protocol";
 import type { MapStore } from "nanostores";
-import { logger } from "../../utils";
 import { provideContext, useContext } from ".";
 import {
   createNavigationMethods,
@@ -80,36 +80,23 @@ type DerivedFields =
   | "ready"
   | "counters";
 
-/** Fields derived from navigation state */
-type NavigationDerivedFields = "activeSlide" | "activeStep" | "numSlides";
-
-/**
- * Compute derived field values from the current navigation state.
- * Extracted as a pure function so it can be used for both initial
- * values and subsequent updates.
- */
-function deriveNavigationState(
-  sequence: NavigationNode[],
-  index: number,
-): Pick<SlideshowContext, NavigationDerivedFields> {
-  const node = sequence[index];
-  return {
-    activeSlide: node?.slideIndex ?? 0,
-    activeStep: node?.stepIndex ?? 1,
-    numSlides: new Set(sequence.map((n) => n.slideIndex)).size,
-  };
-}
-
 export const createSlideshowContext = (
   root: HTMLElement,
   initialValue: Omit<SlideshowContext, "root" | DerivedFields>,
 ): SlideshowStore => {
   const { navigationSequence, navigationIndex } = initialValue;
 
+  const { activeSlide, activeStep, numSlides } = deriveNavigationState(
+    navigationSequence,
+    navigationIndex,
+  );
+
   const store = provideContext<SlideshowContext>(root, {
     ...initialValue,
     root,
-    ...deriveNavigationState(navigationSequence, navigationIndex),
+    activeSlide,
+    activeStep,
+    numSlides,
     // Readiness state — always starts in the registration window
     phase: "registering",
     pending: {},
@@ -124,9 +111,10 @@ export const createSlideshowContext = (
   store.listen((_value, _oldValue, changedKey) => {
     if (changedKey !== "navigationIndex") return;
     const { navigationSequence: seq, navigationIndex: idx } = store.get();
-    const node = seq[idx];
-    store.setKey("activeSlide", node?.slideIndex ?? 0);
-    store.setKey("activeStep", node?.stepIndex ?? 1);
+    const { activeSlide: nextSlide, activeStep: nextStep } =
+      deriveNavigationState(seq, idx);
+    store.setKey("activeSlide", nextSlide);
+    store.setKey("activeStep", nextStep);
   });
 
   // Derive `ready` from `phase` and `pending`.

@@ -20,12 +20,26 @@ const sameNavigationSnapshot = (
   current: NavigationSnapshot,
   next: NavigationSnapshot,
 ) => {
+  const sameNavigationSequence =
+    current.navigationSequence.length === next.navigationSequence.length &&
+    current.navigationSequence.every((node, index) => {
+      const nextNode = next.navigationSequence[index];
+      return (
+        nextNode != null &&
+        node.type === nextNode.type &&
+        node.slideIndex === nextNode.slideIndex &&
+        node.stepIndex === nextNode.stepIndex &&
+        node.slideId === nextNode.slideId
+      );
+    });
+
   return (
     current.navigationIndex === next.navigationIndex &&
     current.numSlides === next.numSlides &&
     current.activeSlide === next.activeSlide &&
     current.activeStep === next.activeStep &&
-    current.numNavigationSteps === next.numNavigationSteps
+    current.numNavigationSteps === next.numNavigationSteps &&
+    sameNavigationSequence
   );
 };
 

@@ -1,18 +1,8 @@
+import type { NavigationNode } from "@dotslide/protocol";
 import type { MapStore } from "nanostores";
 
-export enum NavigationType {
-  slide = "slide",
-  step = "step",
-}
-
-export type NavigationNode = {
-  type: NavigationType;
-  slideIndex: number;
-  stepIndex: number;
-
-  /** Auto-generated slide identifier (`slide-${slideIndex}`) */
-  slideId: string;
-};
+export type { NavigationNode } from "@dotslide/protocol";
+export { NavigationType } from "@dotslide/protocol";
 
 /** Minimal store shape required by navigation methods */
 export type NavigableContext = {
