@@ -10,6 +10,7 @@ function getLocalIP(): string {
 }
 
 const server = Bun.serve({
+  hostname: "0.0.0.0",
   port: config.port,
   fetch: app.fetch,
   websocket,
