@@ -4,9 +4,9 @@ import { auth } from "./auth";
 import { config } from "./config";
 import { authMiddleware } from "./middleware/auth";
 import type { AuthEnv } from "./middleware/env";
+import { isLocalDevelopmentOrigin } from "./network";
 import { servePresentationWithInjection } from "./presentation/serve";
 import { apiRoutes } from "./routes/api";
-import { wsRoute } from "./routes/ws";
 
 const app = new Hono<AuthEnv>();
 
@@ -14,12 +14,8 @@ const app = new Hono<AuthEnv>();
 app.use(
   "/api/*",
   cors({
-    origin: [
-      "localhost",
-      "http://localhost:5173",
-      "http://localhost:4321",
-      "http://localhost:4322",
-    ],
+    origin: (origin) =>
+      origin !== undefined && isLocalDevelopmentOrigin(origin) ? origin : null,
     credentials: true,
   }),
 );
@@ -29,7 +25,7 @@ app.use("/*", authMiddleware);
 app.on(["GET", "POST"], "/api/auth/*", (c) => auth.handler(c.req.raw));
 
 // ── API routes (chained for RPC type inference) ──
-const routes = app.route("/api", apiRoutes);
+const routes: typeof app = app.route("/api", apiRoutes);
 
 // ── Serve the built presentation (with client injection) ──
 servePresentationWithInjection(app, config.presentationDir);

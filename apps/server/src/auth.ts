@@ -4,8 +4,10 @@ import { anonymous } from "better-auth/plugins/anonymous";
 import { bearer } from "better-auth/plugins/bearer";
 import { oneTimeToken } from "better-auth/plugins/one-time-token";
 import { presenterOneTimeTokenTTLMinutes } from "./auth/presenter-token";
+import { config } from "./config";
 import { db } from "./db";
 import * as schema from "./db/auth";
+import { buildOrigin, getLocalIP, isLocalDevelopmentOrigin } from "./network";
 
 type DotslideAuthOptions = BetterAuthOptions & {
   plugins: [
@@ -24,6 +26,8 @@ type DotslideAuthOptions = BetterAuthOptions & {
     };
   };
 };
+
+const localIP = getLocalIP();
 
 const authOptions: DotslideAuthOptions = {
   database: drizzleAdapter(db, {
@@ -61,8 +65,23 @@ const authOptions: DotslideAuthOptions = {
     // Disable Secure flag for local HTTP usage
     useSecureCookies: false,
   },
-  trustedOrigins: ["http://localhost:5173", "http://localhost:4321", "http://localhost:4322"],
-  baseURL: "http://localhost:3000"
+  trustedOrigins: (request) => {
+    const origin = request?.headers.get("origin");
+
+    if (origin != null && isLocalDevelopmentOrigin(origin)) {
+      return [origin];
+    }
+
+    return [
+      "http://localhost:5173",
+      "http://localhost:4321",
+      "http://localhost:4322",
+      `http://${localIP}:5173`,
+      `http://${localIP}:4321`,
+      `http://${localIP}:4322`,
+    ];
+  },
+  baseURL: buildOrigin(localIP, config.port),
 };
 
 export const auth: Auth<DotslideAuthOptions> = betterAuth(authOptions);
