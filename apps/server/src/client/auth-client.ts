@@ -5,14 +5,9 @@ import {
 } from "better-auth/client/plugins";
 import { bearer } from "better-auth/plugins";
 
-export function createAuthClientInstance() {
-  const baseURL =
-    typeof window !== "undefined"
-      ? `http://${window.location.hostname}:9876`
-      : "http://localhost:9876";
-
+export function createAuthClientInstance(serverUrl: string) {
   return createAuthClient({
-    baseURL,
+    serverUrl,
     plugins: [
       anonymousClient(), // Viewers get instant sessions (no sign-up)
       oneTimeTokenClient(),
