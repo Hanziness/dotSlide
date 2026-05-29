@@ -3,11 +3,10 @@
         deriveNavigationState,
         type NavigationSnapshot,
     } from "@dotslide/protocol";
-    import { authClient } from "@dotslide/server/client";
     import { LogOutIcon } from "lucide-svelte";
     import { onMount } from "svelte";
     import { goto } from "$app/navigation";
-    import { client } from "$lib/client";
+    import { authClient, client } from "$lib/client";
     import Badge from "$lib/components/Badge.svelte";
     import Button from "$lib/components/Button.svelte";
     import Controller from "$lib/components/presenter/controller.svelte";
