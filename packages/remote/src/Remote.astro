@@ -52,10 +52,7 @@ const {
     <div class="invite-panel" data-visible="false">
       <div class="invite-panel-content">
         <p class="invite-label">Presenter invite link</p>
-        <div class="invite-link-row">
-          <input class="invite-link-input" type="text" readonly />
-          <button class="invite-copy-button" type="button" aria-label="Copy invite link">Copy</button>
-        </div>
+        <div class="invite-qr"></div>
         <p class="invite-status" />
       </div>
     </div>
@@ -65,6 +62,7 @@ const {
 <script>
 import { useSlideshowContext } from "@dotslide/framework/store";
 import type { ServerMessage } from "@dotslide/protocol";
+import { renderSVG } from 'uqr'
 import { captureAndUpload } from "./capture";
 import { connectionState } from "./connection-state";
 import { authClient, client } from "./rpc-client";
@@ -87,6 +85,18 @@ class DsRemote extends HTMLElement {
   private unsubscribeReady: (() => void) | null = null;
   private readyWaitFrame: number | null = null;
   private roomId: string | undefined
+  private linkInput: HTMLDivElement
+
+  constructor() {
+    super()
+    const inputQR = this.querySelector('.invite-qr')
+
+    if (!inputQR) {
+      throw new Error("Input QR element doesn't exist")
+    }
+
+    this.linkInput = inputQR as HTMLDivElement
+  }
 
   private get browserHost(): string {
     const host = window.location.host;
@@ -311,11 +321,9 @@ class DsRemote extends HTMLElement {
     const container = this.querySelector<HTMLElement>(".invite-container");
     const button = this.querySelector<HTMLElement>(".invite-button");
     const panel = this.querySelector<HTMLElement>(".invite-panel");
-    const linkInput = this.querySelector<HTMLInputElement>(".invite-link-input");
-    const copyButton = this.querySelector<HTMLElement>(".invite-copy-button");
     const statusEl = this.querySelector<HTMLElement>(".invite-status");
 
-    if (!container || !button || !panel || !linkInput || !copyButton || !statusEl) return;
+    if (!container || !button || !panel || !statusEl) return;
 
     // Show/hide the invite container based on connection state
     this.unsubscribeState = connectionState.subscribe((state) => {
@@ -335,7 +343,7 @@ class DsRemote extends HTMLElement {
         panel.setAttribute("data-visible", "false");
       } else {
         panel.setAttribute("data-visible", "true");
-        this.generateInviteLink(linkInput, statusEl, copyButton);
+        this.generateInviteLink(this.linkInput, statusEl);
       }
     });
 
@@ -345,29 +353,6 @@ class DsRemote extends HTMLElement {
         panel.setAttribute("data-visible", "false");
       }
     });
-
-    // Copy to clipboard
-    copyButton.addEventListener("click", () => {
-      const link = linkInput.value;
-      if (!link) return;
-
-      navigator.clipboard.writeText(link).then(
-        () => {
-          statusEl.textContent = "Copied!";
-          statusEl.className = "invite-status invite-status-success";
-          setTimeout(() => {
-            statusEl.textContent = "";
-            statusEl.className = "invite-status";
-          }, 2000);
-        },
-        () => {
-          // Fallback: select the input text
-          linkInput.select();
-          statusEl.textContent = "Press Ctrl+C to copy";
-          statusEl.className = "invite-status";
-        },
-      );
-    });
   }
 
   /**
@@ -375,17 +360,15 @@ class DsRemote extends HTMLElement {
    * the full invite link in the panel.
    */
   private async generateInviteLink(
-    linkInput: HTMLInputElement,
-    statusEl: HTMLElement,
-    copyButton: HTMLElement,
+    linkInput: HTMLDivElement,
+    statusEl: HTMLElement
   ) {
     if (!this.roomId) {
       console.warn("No room ID is available for the invite")
       return;
     }
 
-    linkInput.value = "";
-    copyButton.style.display = "none";
+    linkInput.replaceChildren()
     statusEl.textContent = "Generating link...";
     statusEl.className = "invite-status";
 
@@ -409,11 +392,14 @@ class DsRemote extends HTMLElement {
 
       const { token } = (await response.json()) as { token: string };
       const inviteUrl = `${this.controllerUrl}/auth/presenter?token=${encodeURIComponent(token)}`;
-      linkInput.value = inviteUrl;
-      copyButton.style.display = "";
+
+      linkInput.innerHTML = renderSVG(inviteUrl)
+
       statusEl.textContent = "Link expires in 5 minutes. Single use only.";
       statusEl.className = "invite-status";
-    } catch {
+    } catch (e) {
+      console.error("Error when generating invite link: ", e)
+
       statusEl.textContent = "Could not reach the server.";
       statusEl.className = "invite-status invite-status-error";
     }
@@ -622,47 +608,6 @@ customElements.define("ds-remote", DsRemote);
     font-weight: 600;
     color: #94a3b8;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-
-  .invite-link-row {
-    display: flex;
-    gap: 4px;
-  }
-
-  .invite-link-input {
-    flex: 1;
-    min-width: 0;
-    padding: 6px 8px;
-    font-size: 12px;
-    font-family: ui-monospace, monospace;
-    background: #0f172a;
-    color: #e2e8f0;
-    border: 1px solid #334155;
-    border-radius: 4px;
-    outline: none;
-  }
-
-  .invite-link-input:focus {
-    border-color: #3b82f6;
-  }
-
-  .invite-copy-button {
-    pointer-events: auto;
-    padding: 6px 12px;
-    font-size: 12px;
-    font-weight: 500;
-    background: #3b82f6;
-    color: #ffffff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: background 150ms ease;
-  }
-
-  .invite-copy-button:hover {
-    background: #2563eb;
   }
 
   .invite-status {
