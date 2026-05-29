@@ -5,19 +5,26 @@ import {
 } from "better-auth/client/plugins";
 import { bearer } from "better-auth/plugins";
 
-export const authClient = createAuthClient({
-  baseURL: "http://localhost:9876",
-  plugins: [
-    anonymousClient(), // Viewers get instant sessions (no sign-up)
-    oneTimeTokenClient(),
-    bearer(), // Supports Authorization: Bearer for WS handshake
-  ],
-});
+export function createAuthClientInstance() {
+  const baseURL =
+    typeof window !== "undefined"
+      ? `http://${window.location.hostname}:9876`
+      : "http://localhost:9876";
 
-export async function refreshSession(): Promise<
-  Awaited<ReturnType<typeof authClient.getSession>>
-> {
-  return authClient.getSession({
+  return createAuthClient({
+    baseURL,
+    plugins: [
+      anonymousClient(), // Viewers get instant sessions (no sign-up)
+      oneTimeTokenClient(),
+      bearer(), // Supports Authorization: Bearer for WS handshake
+    ],
+  });
+}
+
+export type AuthClientType = ReturnType<typeof createAuthClientInstance>
+
+export async function refreshSession(client: AuthClientType) {
+  return client.getSession({
     query: {
       disableCookieCache: true,
     },
