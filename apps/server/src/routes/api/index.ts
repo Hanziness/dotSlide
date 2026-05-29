@@ -5,7 +5,7 @@ import { controllerRoutes } from "./controller";
 import { presenterRoutes } from "./presenter";
 import { slideRoutes } from "./slides";
 
-export const apiRoutes: Hono<AuthEnv> = new Hono<AuthEnv>()
+export const apiRoutes = new Hono<AuthEnv>()
   .route("/control", controllerRoutes)
   .route("/presenter", presenterRoutes)
   .route("/slides", slideRoutes)
