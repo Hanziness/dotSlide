@@ -24,7 +24,7 @@
   <div class="p-4 w-full h-64 flex flex-col justify-center items-center gap-2">
     <div class="text-6xl font-mono font-bold flex flex-row items-start">
       <div>{props.state.activeSlide + 1}</div>
-      <div class="text-2xl">{props.state.activeStep + 1}</div>
+      <div class="text-2xl">{props.state.activeStep}</div>
     </div>
     <div class="text-4xl opacity-80">{props.state.numNavigationSteps}</div>
   </div>
