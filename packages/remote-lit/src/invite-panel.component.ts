@@ -1,6 +1,6 @@
 import { html, LitElement, unsafeCSS } from "lit";
-import { unsafeSVG } from "lit/directives/unsafe-svg.js";
 import { customElement, property } from "lit/decorators.js";
+import { unsafeSVG } from "lit/directives/unsafe-svg.js";
 import { renderSVG } from "uqr";
 import invitePanelCSS from "./invite-panel.css?inline";
 

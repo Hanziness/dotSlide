@@ -1,5 +1,5 @@
-export { InviteButton } from "./connect-button.component";
 export type { InviteLink } from "./connect-button.component";
+export { InviteButton } from "./connect-button.component";
 
 declare global {
   interface HTMLElementTagNameMap {

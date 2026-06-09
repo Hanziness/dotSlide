@@ -10,4 +10,6 @@ export interface RemoteContext {
   createRoom: () => Promise<string>;
 }
 
-export const remoteContext = createContext<RemoteContext>(Symbol('ds-remote-context'))
+export const remoteContext = createContext<RemoteContext>(
+  Symbol("ds-remote-context"),
+);
