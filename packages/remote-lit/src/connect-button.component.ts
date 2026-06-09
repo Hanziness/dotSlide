@@ -62,7 +62,7 @@ export class InviteButton extends LitElement {
     if (!this.invite) {
       return "";
     }
-    return `http://${this.host}:${this.controllerPort}/join?token=${this.invite.token}`;
+    return `http://${this.host}:${this.controllerPort}/auth/presenter?token=${this.invite.token}`;
   }
 
   render() {
