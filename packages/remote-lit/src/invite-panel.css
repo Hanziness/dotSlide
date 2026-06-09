@@ -1,0 +1,80 @@
+:host {
+  position: absolute;
+  bottom: 100%;
+  right: 0;
+  margin-bottom: 0.5rem;
+  z-index: 50;
+}
+
+.panel {
+  background: var(--color-base-100);
+  border: var(--border) solid var(--color-base-300);
+  border-radius: var(--radius-box);
+  box-shadow: 0 4px 16px oklch(0% 0 0 / 20%);
+  padding: 1rem;
+  min-width: 280px;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.panel-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-base-content);
+  margin: 0;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: var(--color-base-content);
+  cursor: pointer;
+  padding: 0.25rem;
+  line-height: 1;
+  font-size: 1.25rem;
+  opacity: 0.6;
+  border-radius: var(--radius-field);
+}
+
+.close-btn:hover {
+  opacity: 1;
+  background: var(--color-base-200);
+}
+
+.qr-container {
+  display: flex;
+  justify-content: center;
+  padding: 0.5rem;
+  background: white;
+  border-radius: var(--radius-box);
+}
+
+.qr-container svg {
+  width: 200px;
+  height: 200px;
+}
+
+.invite-url {
+  font-size: 0.75rem;
+  color: var(--color-base-content);
+  word-break: break-all;
+  background: var(--color-base-200);
+  padding: 0.5rem;
+  border-radius: var(--radius-field);
+  text-decoration: none;
+  display: block;
+  text-align: center;
+}
+
+.invite-url:hover {
+  background: var(--color-base-300);
+  text-decoration: underline;
+}
