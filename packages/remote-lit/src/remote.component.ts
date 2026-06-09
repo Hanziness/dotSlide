@@ -15,7 +15,10 @@ import { provide } from "@lit/context";
 import { type RemoteContext, remoteContext } from "./context";
 
 /**
- * An example element.
+ * Root remote control component for dotSlide presentations.
+ *
+ * Authenticates with the server, manages room lifecycle, and provides
+ * RemoteContext to child components via Lit context.
  *
  * @slot - This element has a slot
  * @csspart button - The button
@@ -29,7 +32,7 @@ export class Remote extends LitElement {
   private _remoteContext: RemoteContext;
 
   @property({ type: String, attribute: true, useDefault: true })
-  host: string | undefined = window.location.hostname;
+  host: string = window.location.hostname;
 
   @property({ type: Number, attribute: true, useDefault: true })
   serverPort: number = 9876;
@@ -62,13 +65,7 @@ export class Remote extends LitElement {
   constructor() {
     super();
 
-    console.info(remoteCSS);
     console.info("[remote] New Remote initializing...");
-
-    this._remoteContext = {
-      dsClient: this.dsClient,
-      auth: this.authInstance,
-    };
 
     if (this.slideshowRoot === null) {
       throw new Error("Remote was not part of a `ds-slideshow` element");
@@ -79,15 +76,35 @@ export class Remote extends LitElement {
       console.warn("[remote][store]", value);
     });
 
+    // Set up initial context with createRoom method
+    this._remoteContext = {
+      dsClient: this.dsClient,
+      auth: this.authInstance,
+      host: this.host,
+      controllerPort: this.controllerPort,
+      roomId: undefined,
+      createRoom: this.createRoom.bind(this),
+    };
+
     this.setup();
   }
 
-  async setup() {
-    // Authenticate
+  /** Authenticate with the server (called on initialization) */
+  private async setup() {
     const res = await this.authInstance.signIn.anonymous();
-    console.log(res);
+    console.info("[remote] Authenticated:", res);
+  }
 
-    // Create room
+  /**
+   * Create a presentation room on the server and connect via WebSocket.
+   * Called lazily when the user clicks the connect button.
+   * @returns The room ID
+   */
+  async createRoom(): Promise<string> {
+    if (this.roomId) {
+      return this.roomId;
+    }
+
     const createResponse = await this.dsClient.api.presenter.create.$post();
     if (!createResponse.ok) {
       throw new Error(
@@ -96,17 +113,28 @@ export class Remote extends LitElement {
     }
     this.roomId = (await createResponse.json()).id;
 
+    // Update context with the new roomId
+    this._remoteContext = {
+      ...this._remoteContext,
+      roomId: this.roomId,
+    };
+
     this.wsConnection = new WebSocket(
       this.dsClient.api.ws[":roomId"].$url({ param: { roomId: this.roomId } }),
     );
     this.wsConnection.onmessage = (ev) => {
-      console.info(ev);
+      console.info("[remote][ws]", ev);
     };
+
+    return this.roomId;
   }
 
   render() {
     return html`
-    <ds-invite-button></ds-invite-button>
-     `;
+      <ds-invite-button
+        .host=${this.host}
+        .controllerPort=${this.controllerPort}
+      ></ds-invite-button>
+    `;
   }
 }
