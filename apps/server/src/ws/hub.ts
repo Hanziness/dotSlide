@@ -1,5 +1,4 @@
-import type { ServerMessage } from "@dotslide/protocol";
-import type { PresentationRole } from "@dotslide/protocol";
+import type { PresentationRole, ServerMessage } from "@dotslide/protocol";
 import { eq } from "drizzle-orm";
 import type { WSContext } from "hono/ws";
 import { db } from "../db";
