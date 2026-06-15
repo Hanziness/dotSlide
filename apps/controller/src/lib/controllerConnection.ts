@@ -137,7 +137,7 @@ export class ControllerConnection {
       const result = ServerMessageSchema.safeParse(parsed);
 
       if (!result.success) {
-        console.error("Invalid server message", result.error);
+        console.error("Invalid server message", result.error, parsed);
         return;
       }
 
