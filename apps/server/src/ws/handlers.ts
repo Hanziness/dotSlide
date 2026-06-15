@@ -11,6 +11,7 @@ import { db } from "../db";
 import { user } from "../db/auth";
 import { presentation, question } from "../db/dotslide";
 import { roomManager } from "./hub";
+import { sendServerMessage } from "./message";
 
 export function handleMessage(ws: WSContext, raw: string) {
   let parsed: unknown;
@@ -200,12 +201,18 @@ async function handleQuestion(
   const wsUser = roomManager.getUser(ws);
   if (!wsUser) {
     console.warn("Failed to submit question because user doesn't exist", msg);
-    ws.send(JSON.stringify({ error: "User profile not found." }));
+    sendServerMessage(ws, {
+      type: "error",
+      message: "User profile not found.",
+    });
     return;
   }
 
   if (wsUser.role !== "viewer") {
-    ws.send(JSON.stringify({ error: "Only viewers can submit questions" }));
+    sendServerMessage(ws, {
+      type: "error",
+      message: "Only viewers can submit questions",
+    });
     return;
   }
 
@@ -250,7 +257,7 @@ async function handleQuestionUpvote(
 ) {
   const wsUser = roomManager.getUser(ws);
   if (!wsUser) {
-    ws.send(JSON.stringify({ error: "User not found" }));
+    sendServerMessage(ws, { type: "error", message: "User not found" });
     return;
   }
 
@@ -260,7 +267,10 @@ async function handleQuestionUpvote(
     .where(eq(user.id, wsUser.userId));
 
   if (dbUserRes.length < 1) {
-    ws.send(JSON.stringify({ error: "User not found in the database" }));
+    sendServerMessage(ws, {
+      type: "error",
+      message: "User not found in the database",
+    });
     return;
   }
 
@@ -274,11 +284,10 @@ async function handleQuestionUpvote(
     );
 
   if (upvoteListRes.length < 1) {
-    ws.send(
-      JSON.stringify({
-        error: `Question ${msg.id} not found in room ${wsUser.room}`,
-      }),
-    );
+    sendServerMessage(ws, {
+      type: "error",
+      message: `Question ${msg.id} not found in room ${wsUser.room}`,
+    });
   }
 
   const upvoteList = upvoteListRes[0].upvotes;
@@ -302,11 +311,10 @@ async function handleQuestionUpvote(
     .returning();
 
   if (updateRes.length < 1) {
-    ws.send(
-      JSON.stringify({
-        error: `Failed to insert upvote for question "${msg.id}"`,
-      }),
-    );
+    sendServerMessage(ws, {
+      type: "error",
+      message: `Failed to insert upvote for question "${msg.id}"`,
+    });
     return;
   }
 
@@ -323,7 +331,10 @@ async function handleSync(
 ) {
   const wsUser = roomManager.getUser(ws);
   if (!wsUser) {
-    ws.send(JSON.stringify({ error: "User not found" }));
+    sendServerMessage(ws, {
+      type: "error",
+      message: "User not found",
+    });
     return;
   }
 
@@ -337,20 +348,24 @@ async function handleSync(
   )[0]?.state;
 
   if (!rawState) {
-    ws.send(JSON.stringify({ error: "Presentation state not found" }));
+    sendServerMessage(ws, {
+      type: "error",
+      message: "Presentation state not found",
+    });
     return;
   }
 
   const normalizedState = normalizeNavigationSnapshot(rawState);
   if (!normalizedState) {
-    ws.send(JSON.stringify({ error: "Invalid presentation state" }));
+    sendServerMessage(ws, {
+      type: "error",
+      message: "Invalid presentation state",
+    });
     return;
   }
 
-  ws.send(
-    JSON.stringify({
-      type: "sync",
-      ...normalizedState,
-    }),
-  );
+  sendServerMessage(ws, {
+    type: "sync",
+    ...normalizedState,
+  });
 }
