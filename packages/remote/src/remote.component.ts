@@ -11,6 +11,11 @@ import { customElement, property, state } from "lit/decorators.js";
 import remoteCSS from "./remote.css?inline";
 
 import "./connect-button.component";
+import {
+  type ClientMessage,
+  createNavigationSnapshot,
+  ServerMessage,
+} from "@dotslide/protocol";
 import { provide } from "@lit/context";
 import { type RemoteContext, remoteContext } from "./context";
 
@@ -59,6 +64,9 @@ export class Remote extends LitElement {
   @state()
   roomId: string | undefined;
 
+  /** Used to skip a navigation update if it was updated via sync. */
+  private remoteNavigation: boolean = false;
+
   private slideshowRoot = this.closest("ds-slideshow") as HTMLElement;
   private ctx: SlideshowStore;
 
@@ -72,8 +80,23 @@ export class Remote extends LitElement {
     }
 
     this.ctx = useSlideshowContext(this.slideshowRoot);
-    this.ctx.subscribe((value) => {
-      console.warn("[remote][store]", value);
+    this.ctx.subscribe((newValue, oldValue) => {
+      if (!this.roomId) {
+        return;
+      }
+
+      if (newValue.navigationIndex !== oldValue?.navigationIndex) {
+        // if (this.remoteNavigation) {
+        //   this.remoteNavigation = false
+        //   return
+        // }
+
+        this.sendMessage({
+          type: "navigate",
+          action: "goTo",
+          index: newValue.navigationIndex
+        })
+      }
     });
 
     // Set up initial context with createRoom method
@@ -112,6 +135,12 @@ export class Remote extends LitElement {
       );
     }
     this.roomId = (await createResponse.json()).id;
+    await this.dsClient.api.control[":roomId"].metadata.$post({
+      json: {
+        ...createNavigationSnapshot(this.ctx.get()),
+      },
+      param: { roomId: this.roomId },
+    });
 
     // Update context with the new roomId
     this._remoteContext = {
@@ -124,9 +153,56 @@ export class Remote extends LitElement {
     );
     this.wsConnection.onmessage = (ev) => {
       console.info("[remote][ws]", ev);
+      this.handleMessage(ev);
     };
 
     return this.roomId;
+  }
+
+  handleMessage(msg: MessageEvent<string>) {
+    const serverMsgRes = ServerMessage.safeParse(JSON.parse(msg.data));
+
+    if (!serverMsgRes.success) {
+      console.warn(
+        "[remote] Failed to parse server message: ",
+        msg.data,
+        serverMsgRes.error,
+      );
+      return;
+    }
+
+    const parsedMsg = serverMsgRes.data;
+
+    switch (parsedMsg.type) {
+      case "error":
+        console.error("[remote] server error:", parsedMsg.message);
+        return;
+      case "navigate": {
+        // TODO This is not good. I just want to prevent local updates from triggering a remote update, but maybe that's not even needed.
+        // this.remoteNavigation = true;
+        const currentState = this.ctx.get();
+        const parsedNav = createNavigationSnapshot({
+          navigationIndex: parsedMsg.navigationIndex,
+          navigationSequence: currentState.navigationSequence,
+        });
+        this.ctx.set({
+          ...this.ctx.get(),
+          ...parsedNav,
+        });
+        return;
+      }
+      case "sync": {
+        const { type, ...snapshot } = parsedMsg;
+        this.ctx.set({
+          ...this.ctx.get(),
+          ...snapshot,
+        });
+      }
+    }
+  }
+
+  sendMessage(msg: ClientMessage) {
+    this.wsConnection?.send(JSON.stringify(msg));
   }
 
   render() {
