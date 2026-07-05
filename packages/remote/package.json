@@ -25,11 +25,7 @@
     "@dotslide/framework": "workspace:*"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4.3.0",
-    "@tsdown/css": "^0.22.1",
-    "postcss-import": "^16.1.1",
-    "tsdown": "^0.22.1",
-    "typescript": "~6.0.2",
+    "typescript": "^6.0.2",
     "vite": "^8.0.16"
   }
 }
