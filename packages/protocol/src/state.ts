@@ -3,7 +3,7 @@ import {
   deriveNavigationState,
   type NavigationNode,
   NavigationNodeSchema,
-} from "./navigation.ts";
+} from "./navigation";
 
 /**
  * Selected projection of presentation state allowed to cross the sync boundary.
