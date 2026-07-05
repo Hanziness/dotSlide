@@ -7,7 +7,6 @@ import { type RemoteContext, remoteContext } from "./context";
 
 export type InviteLink = {
   token: string;
-  expires: Date;
 };
 
 @customElement("ds-invite-button")
@@ -45,7 +44,6 @@ export class InviteButton extends LitElement {
       const body = await invite.json();
       this.invite = {
         token: body.token,
-        expires: new Date(),
       };
       this.panelOpen = true;
     } else {

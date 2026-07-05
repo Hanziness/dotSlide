@@ -46,17 +46,14 @@ export class Remote extends LitElement {
   controllerPort: number = 5173;
 
   /** WebSocket connection to the dotSlide Server */
-  @state()
   private wsConnection: WebSocket | undefined;
 
-  @state()
-  dsClient: Client = dsClient(`http://${this.host}:${this.serverPort}`, {
+  private dsClient: Client = dsClient(`http://${this.host}:${this.serverPort}`, {
     init: {
       credentials: "include",
     },
   });
 
-  @state()
   private authInstance = createAuthClientInstance(
     `http://${this.host}:${this.serverPort}`,
   );
@@ -64,16 +61,11 @@ export class Remote extends LitElement {
   @state()
   roomId: string | undefined;
 
-  /** Used to skip a navigation update if it was updated via sync. */
-  private remoteNavigation: boolean = false;
-
   private slideshowRoot = this.closest("ds-slideshow") as HTMLElement;
   private ctx: SlideshowStore;
 
   constructor() {
     super();
-
-    console.info("[remote] New Remote initializing...");
 
     if (this.slideshowRoot === null) {
       throw new Error("Remote was not part of a `ds-slideshow` element");
@@ -86,11 +78,6 @@ export class Remote extends LitElement {
       }
 
       if (newValue.navigationIndex !== oldValue?.navigationIndex) {
-        // if (this.remoteNavigation) {
-        //   this.remoteNavigation = false
-        //   return
-        // }
-
         this.sendMessage({
           type: "navigate",
           action: "goTo",
@@ -114,8 +101,7 @@ export class Remote extends LitElement {
 
   /** Authenticate with the server (called on initialization) */
   private async setup() {
-    const res = await this.authInstance.signIn.anonymous();
-    console.info("[remote] Authenticated:", res);
+    await this.authInstance.signIn.anonymous();
   }
 
   /**
@@ -152,7 +138,6 @@ export class Remote extends LitElement {
       this.dsClient.api.ws[":roomId"].$url({ param: { roomId: this.roomId } }),
     );
     this.wsConnection.onmessage = (ev) => {
-      console.info("[remote][ws]", ev);
       this.handleMessage(ev);
     };
 
@@ -178,8 +163,6 @@ export class Remote extends LitElement {
         console.error("[remote] server error:", parsedMsg.message);
         return;
       case "navigate": {
-        // TODO This is not good. I just want to prevent local updates from triggering a remote update, but maybe that's not even needed.
-        // this.remoteNavigation = true;
         const currentState = this.ctx.get();
         const parsedNav = createNavigationSnapshot({
           navigationIndex: parsedMsg.navigationIndex,
