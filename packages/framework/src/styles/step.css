@@ -1,0 +1,9 @@
+@layer dotslide {
+  ds-step {
+    display: contents;
+  }
+
+  ds-step:not(.active) {
+    display: none;
+  }
+}

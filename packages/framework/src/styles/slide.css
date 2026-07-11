@@ -1,0 +1,21 @@
+@layer dotslide {
+  ds-slide {
+    position: relative;
+    background-color: var(--ds-slide-bg, white);
+    width: calc(var(--slide-width) * var(--slide-scale));
+    height: calc(var(--slide-height) * var(--slide-scale));
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  ds-slide:not(.active) {
+    display: none;
+  }
+
+  ds-slide > div.slide-container {
+    width: var(--slide-width);
+    height: var(--slide-height);
+    scale: var(--slide-scale);
+    transform-origin: 0 0;
+  }
+}
