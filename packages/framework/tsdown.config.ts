@@ -10,6 +10,7 @@ export default defineConfig({
   // Bundle these dependencies (don't externalize)
   deps: {
     alwaysBundle: ["nanostores", "@dotslide/protocol"],
+    neverBundle: ["zod"],
   },
   // Target modern browsers that support custom elements
   target: "es2020",
