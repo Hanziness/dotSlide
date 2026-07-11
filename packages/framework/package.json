@@ -7,7 +7,10 @@
   },
   "type": "module",
   "exports": {
-    ".": "./index.ts",
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
     "./widgets": "./widgets.ts",
     "./store": "./store.ts",
     "./layout": "./layout.ts",
@@ -25,10 +28,14 @@
     "dotslide",
     "astro-component"
   ],
-  "scripts": {},
+  "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch"
+  },
   "devDependencies": {
     "@astrojs/ts-plugin": "^1.10.6",
-    "astro": "^5.17.1"
+    "astro": "^5.17.1",
+    "tsdown": "^0.22.4"
   },
   "peerDependencies": {
     "astro": "^4.0.0 || ^5.0.0 || ^6.0.0"
