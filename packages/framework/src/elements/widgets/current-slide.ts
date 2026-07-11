@@ -1,0 +1,38 @@
+import { injectStyles } from "../../utils/styles.js";
+import { sectionContext } from "../../store/index.js";
+import { useSlideContext } from "../../store/context/slide.js";
+import { getSlidePositionInSection } from "../../utils/section.js";
+
+const css = "ds-current-slide { display: inline; }";
+
+injectStyles(css, "current-slide");
+
+export class CurrentSlide extends HTMLElement {
+  private _unsubscribe?: () => void;
+
+  connectedCallback() {
+    const slideCtx = useSlideContext(this);
+    if (!slideCtx) return;
+    const slideIndex = slideCtx.get().index;
+    const withinAttr = this.getAttribute("data-within");
+    const within = withinAttr ? parseInt(withinAttr, 10) : undefined;
+
+    if (within === undefined) {
+      this.textContent = String(slideIndex + 1);
+      return;
+    }
+
+    this._unsubscribe = sectionContext.subscribe((ctx) => {
+      if (!ctx.initialized) return;
+      this._unsubscribe?.();
+      const pos = getSlidePositionInSection(slideIndex, within);
+      this.textContent = pos ? String(pos.position) : "?";
+    });
+  }
+
+  disconnectedCallback() {
+    this._unsubscribe?.();
+  }
+}
+
+customElements.define("ds-current-slide", CurrentSlide);
