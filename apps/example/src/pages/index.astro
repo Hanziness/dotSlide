@@ -1,56 +1,79 @@
 ---
-
-import { Counter, Reference, Root, Slide, Slideshow, StyleHelper } from "@dotslide/framework";
-import { Flex, Item, List } from "@dotslide/framework/layout";
 import "../global.css";
 import "@dotslide/framework/themes/default.css";
-
-import Remote from "@dotslide/remote/astro";
-import SectionWithSlide from "../components/SectionWithSlide.astro";
-// Custom slides
-import Title from "../components/slides/Title.astro";
 ---
 
-<Root>
-	<StyleHelper />
-	<Slideshow width={1024} height={768}>
-		<Title title="A Guide to Today's AI" author="John Doe" />
-		<Slide>Hi there</Slide>
-		<SectionWithSlide level={1} title="The basics" />
-		<Slide>
-			<p>Oh look, another slide!</p>
+<ds-slideshow data-slideshow-width="1024" data-slideshow-height="768">
+	<ds-keyboard-handler></ds-keyboard-handler>
+	<ds-slide-controls></ds-slide-controls>
+	<ds-loader></ds-loader>
 
-			<p>Here's a test counter: <Counter type="test" /></p>
-		</Slide>
-		<SectionWithSlide level={2} title="Introduction" />
-		<Slide>
-			<p>The second test counter: <Counter type="test" id="test-2" />, but this one is a different one: <Counter type="table" /></p>
-			<p>Here's a row:</p>
-			<Flex>
-				<Item>One</Item>
-				<Item>Two</Item>
-			</Flex>
+	<!-- Title Slide -->
+	<ds-slide class="flex flex-col items-center justify-center gap-4 bg-slate-100">
+		<h1 class="font-bold text-xl">A Guide to Today's AI</h1>
+		<div>John Doe</div>
+	</ds-slide>
 
-			<p>And these are two lists:</p>
-			<List.Root unordered>
-				<List.Item>Item 1</List.Item>
-				<List.Item>Item 2</List.Item>
-			</List>
+	<ds-slide>
+		<p>Hi there</p>
+	</ds-slide>
 
-			<List.Root ordered start={3}>
-				<List.Item>Item 3</List.Item>
-				<List.Item>Item 4</List.Item>
-			</List>
+	<!-- Section: The basics -->
+	<ds-section level="1" title="The basics"></ds-section>
+	<ds-slide class="bg-slate-100">
+		<div class="h-full px-16 flex flex-col items-center justify-center">
+			<div><ds-current-section data-display="numeric" data-separator="." data-suffix="."></ds-current-section></div>
+			<div class="w-full my-4 h-1 bg-black rounded-full" />
+			<h2 class="text-lg font-bold text-left">The basics</h2>
+		</div>
+	</ds-slide>
 
-			<p class="mt-8">And this is a column:</p>
-			<Flex column>
-				<div>One</div>
-				<div>Two</div>
-			</Flex>
-		</Slide>
-		<Slide>
-			<p>Let's see if <Reference id="test-2" /> exists.</p>
-		</Slide>
-		<Remote />
-	</Slideshow>
-</Root>
+	<ds-slide>
+		<p>Oh look, another slide!</p>
+		<p>Here's a test counter: <ds-counter data-type="test"></ds-counter></p>
+	</ds-slide>
+
+	<!-- Section: Introduction -->
+	<ds-section level="2" title="Introduction"></ds-section>
+	<ds-slide class="bg-slate-100">
+		<div class="h-full px-16 flex flex-col items-center justify-center">
+			<div><ds-current-section data-display="numeric" data-separator="." data-suffix="."></ds-current-section></div>
+			<div class="w-full my-4 h-1 bg-black rounded-full" />
+			<h2 class="text-lg font-bold text-left">Introduction</h2>
+		</div>
+	</ds-slide>
+
+	<ds-slide>
+		<p>The second test counter: <ds-counter data-type="test" data-id="test-2"></ds-counter>, but this one is a different one: <ds-counter data-type="table"></ds-counter></p>
+		<p>Here's a row:</p>
+		<ds-flex>
+			<ds-item>One</ds-item>
+			<ds-item>Two</ds-item>
+		</ds-flex>
+
+		<p>And these are two lists:</p>
+		<ds-list data-mode="unordered">
+			<ds-list-item>Item 1</ds-list-item>
+			<ds-list-item>Item 2</ds-list-item>
+		</ds-list>
+
+		<ds-list data-mode="ordered" style="--ds-list-start: 3">
+			<ds-list-item>Item 3</ds-list-item>
+			<ds-list-item>Item 4</ds-list-item>
+		</ds-list>
+
+		<p class="mt-8">And this is a column:</p>
+		<ds-flex mode="column">
+			<div>One</div>
+			<div>Two</div>
+		</ds-flex>
+	</ds-slide>
+
+	<ds-slide>
+		<p>Let's see if <ds-reference data-id="test-2"></ds-reference> exists.</p>
+	</ds-slide>
+</ds-slideshow>
+
+<script>
+	import "@dotslide/framework";
+</script>
