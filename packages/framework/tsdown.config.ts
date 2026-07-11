@@ -9,7 +9,6 @@ export default defineConfig({
   clean: true,
   // Bundle these dependencies (don't externalize)
   deps: {
-    alwaysBundle: ["nanostores", "@dotslide/protocol"],
     neverBundle: ["zod"],
   },
   // Target modern browsers that support custom elements
