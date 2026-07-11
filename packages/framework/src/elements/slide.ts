@@ -1,6 +1,6 @@
-import { injectStyles } from "../utils/styles"
-import { createSlideContext } from "../store/context/slide"
-import { logger } from "../utils"
+import { createSlideContext } from "../store/context/slide";
+import { logger } from "../utils";
+import { injectStyles } from "../utils/styles";
 
 const css = `@layer dotslide {
   ds-slide {
@@ -22,31 +22,33 @@ const css = `@layer dotslide {
     scale: var(--slide-scale);
     transform-origin: 0 0;
   }
-}`
+}`;
 
 export class Slide extends HTMLElement {
   connectedCallback() {
-    injectStyles(css, "slide")
+    injectStyles(css, "slide");
 
     queueMicrotask(() => {
-      const slideshow = this.closest("ds-slideshow")
+      const slideshow = this.closest("ds-slideshow");
       if (!slideshow) {
-        logger.warn("Slide is not rendered inside a ds-slideshow")
-        return
+        logger.warn("Slide is not rendered inside a ds-slideshow");
+        return;
       }
 
-      const slides = Array.from(slideshow.querySelectorAll<HTMLElement>("ds-slide"))
-      const slideIndex = slides.indexOf(this)
+      const slides = Array.from(
+        slideshow.querySelectorAll<HTMLElement>("ds-slide"),
+      );
+      const slideIndex = slides.indexOf(this);
 
       if (slideIndex === -1) {
-        logger.warn("Slide could not determine its index within the slideshow")
-        return
+        logger.warn("Slide could not determine its index within the slideshow");
+        return;
       }
 
-      this.setAttribute("data-slide-index", slideIndex.toString())
-      createSlideContext(this, { index: slideIndex })
-    })
+      this.setAttribute("data-slide-index", slideIndex.toString());
+      createSlideContext(this, { index: slideIndex });
+    });
   }
 }
 
-customElements.define("ds-slide", Slide)
+customElements.define("ds-slide", Slide);

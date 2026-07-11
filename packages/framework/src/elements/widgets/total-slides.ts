@@ -12,23 +12,25 @@ export class TotalSlides extends HTMLElement {
   private _unsubscribe?: () => void;
 
   connectedCallback() {
-    const slideCtx = useSlideContext(this);
-    if (!slideCtx) return;
-    const slideIndex = slideCtx.get().index;
-    const withinAttr = this.getAttribute("data-within");
-    const within = withinAttr ? parseInt(withinAttr, 10) : undefined;
+    queueMicrotask(() => {
+      const slideCtx = useSlideContext(this);
+      if (!slideCtx) return;
+      const slideIndex = slideCtx.get().index;
+      const withinAttr = this.getAttribute("data-within");
+      const within = withinAttr ? parseInt(withinAttr, 10) : undefined;
 
-    if (within === undefined) {
-      const slideshowCtx = useSlideshowContext(this);
-      this.textContent = String(slideshowCtx.get().numSlides);
-      return;
-    }
+      if (within === undefined) {
+        const slideshowCtx = useSlideshowContext(this);
+        this.textContent = String(slideshowCtx.get().numSlides);
+        return;
+      }
 
-    this._unsubscribe = sectionContext.subscribe((ctx) => {
-      if (!ctx.initialized) return;
-      this._unsubscribe?.();
-      const pos = getSlidePositionInSection(slideIndex, within);
-      this.textContent = pos ? String(pos.total) : "?";
+      this._unsubscribe = sectionContext.subscribe((ctx) => {
+        if (!ctx.initialized) return;
+        this._unsubscribe?.();
+        const pos = getSlidePositionInSection(slideIndex, within);
+        this.textContent = pos ? String(pos.total) : "?";
+      });
     });
   }
 
