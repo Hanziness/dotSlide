@@ -1,3 +1,4 @@
+import { type PresentationRole, toPresentationRole } from "@dotslide/protocol";
 import { and, eq } from "drizzle-orm";
 import { auth } from "./auth";
 import { db } from "./db";
@@ -16,14 +17,16 @@ export async function getFreshSession(
   });
 }
 
-export async function getUserPresentationRole(presentationId: string, userId: string) {
-  const res = await db.select().from(members).where(
-    and(eq(members.presentation, presentationId), eq(members.user, userId))
-  )
+export async function getUserPresentationRole(
+  presentationId: string,
+  userId: string,
+): Promise<PresentationRole> {
+  const res = await db
+    .select()
+    .from(members)
+    .where(
+      and(eq(members.presentation, presentationId), eq(members.user, userId)),
+    );
 
-  if (res.length === 0) {
-    return null
-  } else {
-    return res[0].role
-  }
+  return toPresentationRole(res[0]?.role ?? null);
 }

@@ -1,4 +1,9 @@
-import { ClientMessage } from "@dotslide/protocol";
+import {
+  ClientMessage,
+  createNavigationSnapshot,
+  type NavigationSnapshot,
+  NavigationSnapshotSchema,
+} from "@dotslide/protocol";
 import { and, eq } from "drizzle-orm";
 import type { WSContext } from "hono/ws";
 import { v4 as uuidv4 } from "uuid";
@@ -6,6 +11,7 @@ import { db } from "../db";
 import { user } from "../db/auth";
 import { presentation, question } from "../db/dotslide";
 import { roomManager } from "./hub";
+import { sendServerMessage } from "./message";
 
 export function handleMessage(ws: WSContext, raw: string) {
   let parsed: unknown;
@@ -41,13 +47,14 @@ export function handleMessage(ws: WSContext, raw: string) {
   }
 
   // Permission check
-  if (!user.role) {
+  if (user.role === "viewer") {
     ws.send(
       JSON.stringify({
         type: "error",
         message: `Not permitted: ${msg.type}`,
       }),
     );
+    return;
   }
 
   switch (msg.type) {
@@ -64,9 +71,20 @@ export function handleMessage(ws: WSContext, raw: string) {
       handleQuestionUpvote(ws, msg);
       break;
     case "sync:request":
-      console.warn("Unimplemented sync message");
+      handleSync(ws, msg);
       break;
   }
+}
+
+function normalizeNavigationSnapshot(
+  rawState: unknown,
+): NavigationSnapshot | null {
+  const parsedState = NavigationSnapshotSchema.safeParse(rawState);
+  if (!parsedState.success) {
+    return null;
+  }
+
+  return parsedState.data;
 }
 
 async function handleNavigate(
@@ -78,20 +96,32 @@ async function handleNavigate(
     return;
   }
 
-  const state = (
+  const rawState = (
     await db
       .select({
         state: presentation.state,
       })
       .from(presentation)
       .where(eq(presentation.id, user.room))
-  )[0].state as Record<string, unknown>;
+  )[0]?.state;
+
+  if (!rawState) {
+    console.warn(`Presentation ${user.room} has no navigation state`);
+    return;
+  }
+
+  const state = normalizeNavigationSnapshot(rawState);
+  if (!state) {
+    console.warn(`Presentation ${user.room} has invalid navigation state`);
+    return;
+  }
 
   let newIndex = state.navigationIndex;
+  const maxNavigationIndex = Math.max(state.numNavigationSteps - 1, 0);
 
   switch (msg.action) {
     case "next":
-      newIndex = newIndex + 1;
+      newIndex = Math.min(maxNavigationIndex, newIndex + 1);
       break;
     case "prev":
       newIndex = Math.max(newIndex - 1, 0);
@@ -100,21 +130,24 @@ async function handleNavigate(
       newIndex = 0;
       break;
     case "last":
-      // Use numSlides as upper bound approximation
-      newIndex = Math.max(state.numSlides - 1, 0);
+      newIndex = maxNavigationIndex;
       break;
     case "goTo":
-      if (msg.index !== undefined) newIndex = Math.max(0, msg.index);
+      if (msg.index !== undefined) {
+        newIndex = Math.max(0, Math.min(msg.index, maxNavigationIndex));
+      }
       break;
   }
+
+  const nextState = createNavigationSnapshot({
+    navigationIndex: newIndex,
+    navigationSequence: state.navigationSequence,
+  });
 
   const res = await db
     .update(presentation)
     .set({
-      state: {
-        ...state,
-        navigationIndex: newIndex,
-      },
+      state: nextState,
     })
     .where(eq(presentation.id, user.room))
     .returning();
@@ -137,7 +170,7 @@ function handleLaser(
     return;
   }
 
-  if (!user.role) {
+  if (user.role === "viewer") {
     console.warn(`User ${user.userId} is not allowed to modify laser`);
     return;
   }
@@ -168,12 +201,18 @@ async function handleQuestion(
   const wsUser = roomManager.getUser(ws);
   if (!wsUser) {
     console.warn("Failed to submit question because user doesn't exist", msg);
-    ws.send(JSON.stringify({ error: "User profile not found." }));
+    sendServerMessage(ws, {
+      type: "error",
+      message: "User profile not found.",
+    });
     return;
   }
 
-  if (wsUser.role) {
-    ws.send(JSON.stringify({ error: "Only viewers can submit questions" }));
+  if (wsUser.role !== "viewer") {
+    sendServerMessage(ws, {
+      type: "error",
+      message: "Only viewers can submit questions",
+    });
     return;
   }
 
@@ -218,7 +257,7 @@ async function handleQuestionUpvote(
 ) {
   const wsUser = roomManager.getUser(ws);
   if (!wsUser) {
-    ws.send(JSON.stringify({ error: "User not found" }));
+    sendServerMessage(ws, { type: "error", message: "User not found" });
     return;
   }
 
@@ -228,11 +267,12 @@ async function handleQuestionUpvote(
     .where(eq(user.id, wsUser.userId));
 
   if (dbUserRes.length < 1) {
-    ws.send(JSON.stringify({ error: "User not found in the database" }));
+    sendServerMessage(ws, {
+      type: "error",
+      message: "User not found in the database",
+    });
     return;
   }
-
-  const dbUser = dbUserRes[0];
 
   const upvoteListRes = await db
     .select({
@@ -244,11 +284,10 @@ async function handleQuestionUpvote(
     );
 
   if (upvoteListRes.length < 1) {
-    ws.send(
-      JSON.stringify({
-        error: `Question ${msg.id} not found in room ${wsUser.room}`,
-      }),
-    );
+    sendServerMessage(ws, {
+      type: "error",
+      message: `Question ${msg.id} not found in room ${wsUser.room}`,
+    });
   }
 
   const upvoteList = upvoteListRes[0].upvotes;
@@ -256,7 +295,6 @@ async function handleQuestionUpvote(
   const upvoteIdx = upvoteList.indexOf(wsUser.userId);
   if (upvoteIdx >= 0) {
     // Take away upvote
-    // TODO Should users be able to revoke their upvotes? Maybe not?
     upvoteList.splice(upvoteIdx, 1);
   } else {
     // Add upvote
@@ -272,11 +310,10 @@ async function handleQuestionUpvote(
     .returning();
 
   if (updateRes.length < 1) {
-    ws.send(
-      JSON.stringify({
-        error: `Failed to insert upvote for question "${msg.id}"`,
-      }),
-    );
+    sendServerMessage(ws, {
+      type: "error",
+      message: `Failed to insert upvote for question "${msg.id}"`,
+    });
     return;
   }
 
@@ -284,5 +321,50 @@ async function handleQuestionUpvote(
     type: "question:upvote",
     id: msg.id,
     upvotes: updateRes[0].upvotes.length,
+  });
+}
+
+async function handleSync(
+  ws: WSContext,
+  _msg: Extract<ClientMessage, { type: "sync:request" }>,
+) {
+  const wsUser = roomManager.getUser(ws);
+  if (!wsUser) {
+    sendServerMessage(ws, {
+      type: "error",
+      message: "User not found",
+    });
+    return;
+  }
+
+  const rawState = (
+    await db
+      .select({
+        state: presentation.state,
+      })
+      .from(presentation)
+      .where(eq(presentation.id, wsUser.room))
+  )[0]?.state;
+
+  if (!rawState) {
+    sendServerMessage(ws, {
+      type: "error",
+      message: "Presentation state not found",
+    });
+    return;
+  }
+
+  const normalizedState = normalizeNavigationSnapshot(rawState);
+  if (!normalizedState) {
+    sendServerMessage(ws, {
+      type: "error",
+      message: "Invalid presentation state",
+    });
+    return;
+  }
+
+  sendServerMessage(ws, {
+    type: "sync",
+    ...normalizedState,
   });
 }

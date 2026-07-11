@@ -1,9 +1,9 @@
 <script lang="ts">
-import { authClient, refreshSession } from "@dotslide/server/client";
+import { refreshSession } from "@dotslide/server/client";
 import { onMount } from "svelte";
 import { goto } from "$app/navigation";
 import { page } from "$app/stores";
-import { client } from "$lib/client";
+import { authClient, client } from "$lib/client";
 
 type Status =
   | { state: "loading" }
@@ -52,7 +52,7 @@ onMount(async () => {
     const roomId = (await response.json()).room
 
     // Refresh session so downstream sees presenter role immediately
-    await refreshSession();
+    await refreshSession(authClient);
 
     status = { state: "success" };
     await goto(`/?p=${roomId}`, { replaceState: true });

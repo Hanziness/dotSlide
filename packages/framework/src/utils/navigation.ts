@@ -1,7 +1,4 @@
-import {
-  type NavigationNode,
-  NavigationType,
-} from "../store/context/navigation";
+import { type NavigationNode, NavigationType } from "@dotslide/protocol";
 
 /**
  * Compute the highest step number referenced by any `<ds-step>` descendant.

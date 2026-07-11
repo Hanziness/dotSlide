@@ -5,7 +5,7 @@ import { Flex, Item, List } from "@dotslide/framework/layout";
 import "../global.css";
 import "@dotslide/framework/themes/default.css";
 
-import { Remote } from "@dotslide/remote";
+import Remote from "@dotslide/remote/astro";
 import SectionWithSlide from "../components/SectionWithSlide.astro";
 // Custom slides
 import Title from "../components/slides/Title.astro";
@@ -51,6 +51,6 @@ import Title from "../components/slides/Title.astro";
 		<Slide>
 			<p>Let's see if <Reference id="test-2" /> exists.</p>
 		</Slide>
-		<!-- <Remote serverUrl="http://localhost:9876" controllerUrl="http://localhost:5173" /> -->
+		<Remote />
 	</Slideshow>
 </Root>

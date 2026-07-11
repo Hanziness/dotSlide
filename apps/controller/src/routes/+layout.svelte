@@ -12,5 +12,7 @@
 :global(html), :global(body) {
 	background-color: black;
 	color: var(--color-slate-50);
+	width: 100%;
+	height: 100%;
 }
 </style>

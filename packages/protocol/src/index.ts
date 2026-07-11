@@ -14,5 +14,29 @@ export {
   SyncBroadcast,
   SyncRequest,
 } from "./messages";
-
-export type { NavigationSnapshot } from "./state";
+export type { NavigationDerivedState, NavigationNode } from "./navigation";
+export {
+  deriveNavigationState,
+  NavigationNodeSchema,
+  NavigationType,
+  NavigationTypeSchema,
+} from "./navigation";
+export type {
+  MembershipRole,
+  PresentationRole,
+} from "./roles";
+export {
+  canControl,
+  canPresent,
+  isMembershipRole,
+  MembershipRoleSchema,
+  MembershipRoles,
+  PresentationRoleSchema,
+  PresentationRoles,
+  toPresentationRole,
+} from "./roles";
+export type {
+  NavigationSnapshot,
+  SynchronizedPresentationState,
+} from "./state";
+export { createNavigationSnapshot, NavigationSnapshotSchema } from "./state";

@@ -1,6 +1,7 @@
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import z from "zod";
+import { canPresent } from "@dotslide/protocol";
 import type { AuthEnv } from "../../middleware/env";
 import { getUserPresentationRole } from "../../session";
 import { roomManager } from "../../ws/hub";
@@ -30,7 +31,6 @@ export const slideRoutes = new Hono<AuthEnv>()
     zValidator("param", z.object({ roomId: z.uuidv4(), index: z.coerce.number().gte(0) })),
     zValidator("form", z.object({ file: z.instanceof(File) })),
     async (c) => {
-      console.info("Incoming thumbnail upload");
       const index = c.req.valid("param").index;
 
       const user = c.get("user");
@@ -46,7 +46,7 @@ export const slideRoutes = new Hono<AuthEnv>()
         user.id,
       );
 
-      if (role !== "presenter") {
+      if (!canPresent(role)) {
         return c.json({ error: "Insufficient permissions.", role }, 401);
       }
 

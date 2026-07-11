@@ -14,8 +14,10 @@ onMount(() => {
 })
 </script>
 
-<AuthLoginPage
-  title="Join the presentation"
-  submitLabel="View presentation"
-  roomId={roomId}
-/>
+{#if roomId != null}
+  <AuthLoginPage
+    title="Join the presentation"
+    submitLabel="View presentation"
+    roomId={roomId}
+  />
+{/if}

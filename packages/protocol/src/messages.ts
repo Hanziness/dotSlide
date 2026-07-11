@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { PresentationRoleSchema } from "./roles";
+import { NavigationSnapshotSchema } from "./state";
 
 // ─── Server → Client messages ─────────────────────────────────
 
@@ -17,12 +19,8 @@ export const LaserBroadcast = z.object({
   lastUpdate: z.date(),
 });
 
-export const SyncBroadcast = z.object({
+export const SyncBroadcast = NavigationSnapshotSchema.extend({
   type: z.literal("sync"),
-  navigationIndex: z.number().int().min(0),
-  numSlides: z.number().int().min(0),
-  activeSlide: z.number().int().min(0),
-  activeStep: z.number().int().min(1),
 });
 
 export const QuestionBroadcast = z.object({
@@ -42,7 +40,7 @@ export const QuestionUpvoteBroadcast = z.object({
 
 export const RoleAssigned = z.object({
   type: z.literal("role"),
-  role: z.enum(["presenter", "viewer"]),
+  role: PresentationRoleSchema,
 });
 
 export const ErrorMessage = z.object({
