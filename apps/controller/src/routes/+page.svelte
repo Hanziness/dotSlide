@@ -34,7 +34,6 @@
             }
 
             if (!currentSession.data) {
-                // TODO Make note that the user has not yet picked a name, so we need to request one from them before login
                 await authClient.signIn.anonymous();
                 if (isCancelled) {
                     return;

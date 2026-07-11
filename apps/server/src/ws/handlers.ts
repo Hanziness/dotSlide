@@ -295,7 +295,6 @@ async function handleQuestionUpvote(
   const upvoteIdx = upvoteList.indexOf(wsUser.userId);
   if (upvoteIdx >= 0) {
     // Take away upvote
-    // TODO Should users be able to revoke their upvotes? Maybe not?
     upvoteList.splice(upvoteIdx, 1);
   } else {
     // Add upvote

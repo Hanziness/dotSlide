@@ -10,8 +10,6 @@ import type { AuthEnv } from "../../middleware/env";
 import { getUserPresentationRole } from "../../session";
 import { roomManager } from "../../ws/hub";
 
-// TODO Most of these methods require elevated permissions which are not yet checked!
-
 export const controllerRoutes = new Hono<AuthEnv>()
   .use("/*", requireLoginMiddleware)
   .get("/:roomId/metadata", async (c) => {

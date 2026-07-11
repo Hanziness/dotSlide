@@ -30,9 +30,6 @@ class RoomManager {
   /** Temporal (non-persistent) state for rooms */
   private temporalState: Map<string, RoomImmediateState>;
 
-  // TODO Who creates `User` objects?
-  // WebSocket room manager: https://oneuptime.com/blog/post/2026-01-24-websocket-room-channel-management/view
-
   constructor() {
     this.rooms = new Map();
     this.users = new Map();
