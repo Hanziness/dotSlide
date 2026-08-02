@@ -97,7 +97,7 @@ export class Slideshow extends HTMLElement {
   }
 
   connectedCallback() {
-    const slideshowId = this.dataset.slideshowId as string;
+    const slideshowId = this.slideshowId;
     this._resizeObserver = new ResizeObserver((entries) => {
       if (entries.length < 1) {
         return;
