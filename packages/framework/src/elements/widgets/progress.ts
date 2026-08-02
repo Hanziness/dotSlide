@@ -1,8 +1,8 @@
-import { injectStyles } from "../../utils/styles.js";
-import { createSectionContext } from "../../store/index.js";
 import { useSlideContext } from "../../store/context/slide.js";
 import { useSlideshowContext } from "../../store/context/slideshow.js";
+import { createSectionContext } from "../../store/index.js";
 import { getSlidePositionInSection } from "../../utils/section.js";
+import { injectStyles } from "../../utils/styles.js";
 
 const css = `ds-progress { display: inline; }
 ds-progress .track {
@@ -38,7 +38,10 @@ export class Progress extends HTMLElement {
       }
 
       const slideCtx = useSlideContext(this);
-      if (!slideCtx) return;
+      if (!slideCtx) {
+        console.warn("<ds-progress> was place outside of a <ds-slide>. This is not supported.")
+        return;
+      };
       const slideIndex = slideCtx.get().index;
 
       const slideshowRoot = this.closest("ds-slideshow");
@@ -58,7 +61,11 @@ export class Progress extends HTMLElement {
         let total: number;
 
         if (within !== undefined) {
-          const pos = getSlidePositionInSection(slideshowRoot, slideIndex, within);
+          const pos = getSlidePositionInSection(
+            slideshowRoot,
+            slideIndex,
+            within,
+          );
           if (!pos) return;
           position = pos.position;
           total = pos.total;
