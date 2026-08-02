@@ -1,5 +1,5 @@
 import { injectStyles } from "../../utils/styles.js";
-import { useSectionContext } from "../../store/index.js";
+import { createSectionContext } from "../../store/index.js";
 import { useSlideContext } from "../../store/context/slide.js";
 import { useSlideshowContext } from "../../store/context/slideshow.js";
 import { getSlidePositionInSection } from "../../utils/section.js";
@@ -44,8 +44,7 @@ export class Progress extends HTMLElement {
       const slideshowRoot = this.closest("ds-slideshow");
       if (!(slideshowRoot instanceof HTMLElement)) return;
 
-      const sectionStore = useSectionContext(this);
-      if (!sectionStore) return;
+      const sectionStore = createSectionContext(slideshowRoot);
 
       this._unsubscribe = sectionStore.subscribe((ctx) => {
         if (!ctx.initialized) return;
