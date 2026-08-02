@@ -12,9 +12,6 @@ import { injectStyles } from "../utils/styles";
 
 const slideshowCss = `ds-slideshow {
   --fit-scale: 1;
-  --slide-width: attr(data-slideshow-width px);
-  --slide-height: attr(data-slideshow-height px);
-  --slide-scale: attr(data-slideshow-scale, 1);
 
   position: relative;
   contain: layout style paint;
