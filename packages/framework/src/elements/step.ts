@@ -10,9 +10,10 @@ const css = `@layer dotslide {
   }
 }`
 
+injectStyles(css, "step")
+
 export class Step extends HTMLElement {
   connectedCallback() {
-    injectStyles(css, "step")
   }
 
   /** First step where this content is visible (inclusive, 1-based) */

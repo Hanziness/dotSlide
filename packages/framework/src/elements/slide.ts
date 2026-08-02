@@ -24,9 +24,10 @@ const css = `@layer dotslide {
   }
 }`;
 
+injectStyles(css, "slide");
+
 export class Slide extends HTMLElement {
   connectedCallback() {
-    injectStyles(css, "slide");
 
     queueMicrotask(() => {
       const slideshow = this.closest("ds-slideshow");
