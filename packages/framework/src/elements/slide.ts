@@ -5,6 +5,7 @@ import { injectStyles } from "../utils/styles";
 const css = `@layer dotslide {
   ds-slide {
     position: relative;
+    background-color: var(--ds-slide-bg, white);
     width: calc(var(--slide-width) * var(--slide-scale));
     height: calc(var(--slide-height) * var(--slide-scale));
     flex-shrink: 0;
