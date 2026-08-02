@@ -19,6 +19,8 @@ ds-button button {
 injectStyles(buttonCss, "button");
 
 export class DsButton extends HTMLElement {
+  private _clickHandler?: (e: Event) => void;
+
   connectedCallback() {
     if (!this.querySelector("button")) {
       const btn = document.createElement("button");
@@ -37,10 +39,19 @@ export class DsButton extends HTMLElement {
 
     const ctx = useSlideshowContext(this);
     const btn = this.querySelector("button")!;
-    btn.addEventListener("click", (e) => {
+    this._clickHandler = (e) => {
       e.stopPropagation();
       ctx[action]();
-    });
+    };
+    btn.addEventListener("click", this._clickHandler);
+  }
+
+  disconnectedCallback() {
+    if (this._clickHandler) {
+      const btn = this.querySelector("button");
+      btn?.removeEventListener("click", this._clickHandler);
+      this._clickHandler = undefined;
+    }
   }
 }
 
