@@ -1,5 +1,5 @@
 import { injectStyles } from "../../utils/styles.js";
-import { sectionContext } from "../../store/index.js";
+import { useSectionContext } from "../../store/index.js";
 import { useSlideContext } from "../../store/context/slide.js";
 import { useSlideshowContext } from "../../store/context/slideshow.js";
 import { getSlidePositionInSection } from "../../utils/section.js";
@@ -41,7 +41,13 @@ export class Progress extends HTMLElement {
       if (!slideCtx) return;
       const slideIndex = slideCtx.get().index;
 
-      this._unsubscribe = sectionContext.subscribe((ctx) => {
+      const slideshowRoot = this.closest("ds-slideshow");
+      if (!(slideshowRoot instanceof HTMLElement)) return;
+
+      const sectionStore = useSectionContext(this);
+      if (!sectionStore) return;
+
+      this._unsubscribe = sectionStore.subscribe((ctx) => {
         if (!ctx.initialized) return;
         this._unsubscribe?.();
 
@@ -53,7 +59,7 @@ export class Progress extends HTMLElement {
         let total: number;
 
         if (within !== undefined) {
-          const pos = getSlidePositionInSection(slideIndex, within);
+          const pos = getSlidePositionInSection(slideshowRoot, slideIndex, within);
           if (!pos) return;
           position = pos.position;
           total = pos.total;

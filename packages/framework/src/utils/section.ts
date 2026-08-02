@@ -1,5 +1,5 @@
 import type { SectionInfo } from "../store";
-import { sectionContext } from "../store";
+import { createSectionContext, useSectionContext } from "../store";
 import { useSlideshowContext } from "../store/context/slideshow";
 import { logger } from "./logger";
 
@@ -12,12 +12,8 @@ import { logger } from "./logger";
  * 2. Auto-increment section numbers based on level
  * 3. Map each slide to its preceding section
  */
-export function buildSectionHierarchy(): void {
-  const slideshowRoot = document.querySelector<HTMLElement>("ds-slideshow");
-  if (!slideshowRoot) {
-    logger.warn("Cannot build section hierarchy: slideshow root not found");
-    return;
-  }
+export function buildSectionHierarchy(slideshowRoot: HTMLElement): void {
+  const sectionStore = createSectionContext(slideshowRoot);
 
   // Get all slides and sections in DOM order
   const elements = slideshowRoot.querySelectorAll<HTMLElement>(
@@ -78,8 +74,8 @@ export function buildSectionHierarchy(): void {
   });
 
   // Update the store
-  sectionContext.set({
-    ...sectionContext.get(),
+  sectionStore.set({
+    ...sectionStore.get(),
     sectionsBySlide,
     initialized: true,
   });
@@ -109,7 +105,12 @@ export function getCurrentSection(
   slideshowRoot: HTMLElement,
   slideIndexOrElement?: number | HTMLElement | null,
 ): SectionInfo | null {
-  const context = sectionContext.get();
+  const sectionStore = useSectionContext(slideshowRoot);
+  if (!sectionStore) {
+    logger.warn("Section context not found for slideshow root");
+    return null;
+  }
+  const context = sectionStore.get();
   const slideshowContext = useSlideshowContext(slideshowRoot);
 
   if (!context.initialized) {
@@ -169,10 +170,13 @@ export type SlidePosition = {
  * @returns Position info, or null if slide not found in section data
  */
 export function getSlidePositionInSection(
+  slideshowRoot: HTMLElement,
   slideIndex: number,
   level?: number,
 ): SlidePosition | null {
-  const { sectionsBySlide } = sectionContext.get();
+  const sectionStore = useSectionContext(slideshowRoot);
+  if (!sectionStore) return null;
+  const { sectionsBySlide } = sectionStore.get();
   const targetSection = sectionsBySlide[slideIndex];
   if (!targetSection) return null;
 

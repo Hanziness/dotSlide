@@ -42,7 +42,8 @@ export type { NavigationNode, NavigableContext, NavigationMethods } from "./stor
 export { NavigationType, createNavigationMethods } from "./store/context/navigation.js";
 
 // Re-export section utilities and types
-export type { SectionInfo } from "./store/index.js";
+export type { SectionInfo, SectionContext } from "./store/index.js";
+export { createSectionContext, useSectionContext } from "./store/index.js";
 export { buildSectionHierarchy, getCurrentSection, getSectionString, getSlidePositionInSection } from "./utils/section.js";
 export type { SlidePosition } from "./utils/section.js";
 

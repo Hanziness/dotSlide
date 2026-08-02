@@ -1,4 +1,4 @@
-import { sectionContext } from "../store";
+import { createSectionContext } from "../store";
 import { buildSectionHierarchy } from "../utils/section";
 
 /**
@@ -18,11 +18,16 @@ class Section extends HTMLElement {
       this.dataset.sectionTitle = title;
     }
 
+    const slideshowRoot = this.closest("ds-slideshow");
+    if (!(slideshowRoot instanceof HTMLElement)) return;
+
+    const sectionStore = createSectionContext(slideshowRoot);
+
     // Build section hierarchy once — uses a flag check to run exactly once
-    if (!sectionContext.get().initialized) {
+    if (!sectionStore.get().initialized) {
       queueMicrotask(() => {
-        if (!sectionContext.get().initialized) {
-          buildSectionHierarchy();
+        if (!sectionStore.get().initialized) {
+          buildSectionHierarchy(slideshowRoot);
         }
       });
     }

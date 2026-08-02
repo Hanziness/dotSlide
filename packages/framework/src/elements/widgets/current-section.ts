@@ -1,5 +1,5 @@
 import { useSlideContext } from "../../store/context/slide.js";
-import { sectionContext } from "../../store/index.js";
+import { useSectionContext } from "../../store/index.js";
 import { injectStyles } from "../../utils/styles.js";
 
 const css = "ds-current-section { display: inline; }";
@@ -14,7 +14,10 @@ export class CurrentSection extends HTMLElement {
       const slideCtx = useSlideContext(this);
       if (!slideCtx) return;
 
-      this._unsubscribe = sectionContext.subscribe((ctx) => {
+      const sectionStore = useSectionContext(this);
+      if (!sectionStore) return;
+
+      this._unsubscribe = sectionStore.subscribe((ctx) => {
         if (!ctx.initialized) return;
         this._unsubscribe?.();
 
