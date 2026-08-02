@@ -68,15 +68,22 @@ export class Slideshow extends HTMLElement {
   /** Unique identifier of this Slideshow */
   slideshowId: string;
   /** Display size of the Slideshow, in pixels */
-  slideshowSize: Size;
+  slideshowSize: Size = { width: 0, height: 0 };
 
   private _resizeObserver?: ResizeObserver;
   private _onHashChange?: () => void;
   private _onResourceRegister?: (e: Event) => void;
   private _onResourceReady?: (e: Event) => void;
+  private _initialized = false;
 
   constructor() {
     super();
+    this.slideshowId = this.dataset.slideshowId ?? generateId();
+  }
+
+  connectedCallback() {
+    if (this._initialized) return;
+    this._initialized = true;
 
     const slideWidth = this.getAttribute("data-slideshow-width");
     const slideHeight = this.getAttribute("data-slideshow-height");
@@ -85,18 +92,11 @@ export class Slideshow extends HTMLElement {
       throw new Error("Slideshow width or height is undefined");
     }
 
-    const width = Number.parseInt(slideWidth, 10);
-    const height = Number.parseInt(slideHeight, 10);
-
     this.slideshowSize = {
-      width,
-      height,
+      width: Number.parseInt(slideWidth, 10),
+      height: Number.parseInt(slideHeight, 10),
     };
 
-    this.slideshowId = this.dataset.slideshowId ?? generateId();
-  }
-
-  connectedCallback() {
     const slideshowId = this.slideshowId;
     this._resizeObserver = new ResizeObserver((entries) => {
       if (entries.length < 1) {
