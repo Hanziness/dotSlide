@@ -1,7 +1,6 @@
 import type { ResourceInfo } from "../store/context/slideshow";
 import { generateId } from ".";
 import { RESOURCE_READY, RESOURCE_REGISTER } from "./events";
-import { logger } from "./logger";
 
 /**
  * Handle returned from {@link registerResource} that signals readiness.
@@ -92,7 +91,7 @@ export function registerResource(
     id: resourceId,
     ready: () => signal(),
     error: (err: Error) => {
-      logger.error(`Resource ${resourceId} failed:`, err);
+      console.error(`[dotslide] Resource ${resourceId} failed:`, err);
       signal(err);
     },
   };

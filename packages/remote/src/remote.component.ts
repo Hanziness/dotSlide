@@ -1,5 +1,5 @@
+import type { SlideshowStore } from "@dotslide/framework";
 import { useSlideshowContext } from "@dotslide/framework";
-import type { SlideshowStore } from "@dotslide/framework/store";
 import {
   type Client,
   createAuthClientInstance,
@@ -48,11 +48,14 @@ export class Remote extends LitElement {
   /** WebSocket connection to the dotSlide Server */
   private wsConnection: WebSocket | undefined;
 
-  private dsClient: Client = dsClient(`http://${this.host}:${this.serverPort}`, {
-    init: {
-      credentials: "include",
+  private dsClient: Client = dsClient(
+    `http://${this.host}:${this.serverPort}`,
+    {
+      init: {
+        credentials: "include",
+      },
     },
-  });
+  );
 
   private authInstance = createAuthClientInstance(
     `http://${this.host}:${this.serverPort}`,
@@ -81,8 +84,8 @@ export class Remote extends LitElement {
         this.sendMessage({
           type: "navigate",
           action: "goTo",
-          index: newValue.navigationIndex
-        })
+          index: newValue.navigationIndex,
+        });
       }
     });
 

@@ -3,6 +3,9 @@
    Import this file once in your presentation's root layout:
      import "@dotslide/framework/themes/default.css";
    Then override any token to customise: */
+
+@layer dotslide;
+
 :root {
   --ds-body-bg: black;
   --ds-slide-bg: white;

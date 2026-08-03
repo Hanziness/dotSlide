@@ -1,4 +1,4 @@
-import { mapCreator } from "nanostores";
+import { type MapStore, map } from "nanostores";
 
 /** Information about a section in the hierarchy */
 export type SectionInfo = {
@@ -19,8 +19,28 @@ export type SectionContext = {
   initialized: boolean;
 };
 
-const createSectionContext = mapCreator<SectionContext>((store, id) => {
-  store.set({ id, sectionsBySlide: {}, initialized: false });
-});
+const sectionContexts = new WeakMap<HTMLElement, MapStore<SectionContext>>();
 
-export const sectionContext = createSectionContext("default");
+/** Create or retrieve a section context scoped to a slideshow root element */
+export function createSectionContext(
+  root: HTMLElement,
+): MapStore<SectionContext> {
+  if (!sectionContexts.has(root)) {
+    const store = map<SectionContext>({
+      id: root.dataset.slideshowId ?? "default",
+      sectionsBySlide: {},
+      initialized: false,
+    });
+    sectionContexts.set(root, store);
+  }
+  return sectionContexts.get(root)!;
+}
+
+/** Retrieve the section context for a child element's parent slideshow */
+export function useSectionContext(
+  child: HTMLElement,
+): MapStore<SectionContext> | undefined {
+  const root = child.closest("ds-slideshow");
+  if (!(root instanceof HTMLElement)) return undefined;
+  return sectionContexts.get(root);
+}

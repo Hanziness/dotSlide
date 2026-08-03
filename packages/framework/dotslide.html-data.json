@@ -1,0 +1,289 @@
+{
+  "version": 1.1,
+  "tags": [
+    {
+      "name": "ds-slideshow",
+      "description": "Root container for a dotslide presentation. Manages navigation state, resize handling, and hash routing.",
+      "attributes": [
+        {
+          "name": "width",
+          "description": "Internal width of the slides in pixels",
+          "valueSet": "number"
+        },
+        {
+          "name": "height",
+          "description": "Internal height of the slides in pixels",
+          "valueSet": "number"
+        },
+        {
+          "name": "controls",
+          "description": "Show on-screen navigation controls",
+          "valueSet": "boolean"
+        },
+        {
+          "name": "keyboard",
+          "description": "Enable keyboard navigation",
+          "valueSet": "boolean"
+        }
+      ]
+    },
+    {
+      "name": "ds-slide",
+      "description": "Individual slide within a slideshow. Automatically determines its index via DOM queries."
+    },
+    {
+      "name": "ds-step",
+      "description": "Progressive disclosure within a slide. Content is visible only between 'from' and 'to' steps.",
+      "attributes": [
+        {
+          "name": "from",
+          "description": "First step where this content is visible (inclusive, 1-based)",
+          "valueSet": "number"
+        },
+        {
+          "name": "to",
+          "description": "Last step where this content is visible (inclusive, 1-based)",
+          "valueSet": "number"
+        }
+      ]
+    },
+    {
+      "name": "ds-section",
+      "description": "Hierarchical section marker for navigation. Creates section hierarchy for widgets.",
+      "attributes": [
+        {
+          "name": "level",
+          "description": "Section level (1-6)",
+          "valueSet": "number"
+        },
+        {
+          "name": "title",
+          "description": "Section title",
+          "valueSet": "string"
+        }
+      ]
+    },
+    {
+      "name": "ds-keyboard-handler",
+      "description": "Keyboard navigation handler. Maps arrow keys, PageUp/Down, Home/End to navigation actions."
+    },
+    {
+      "name": "ds-button",
+      "description": "Navigation button. Wraps children in a button element and triggers navigation action on click.",
+      "attributes": [
+        {
+          "name": "data-action",
+          "description": "Navigation action to trigger",
+          "valueSet": "next|prev|first|last"
+        }
+      ]
+    },
+    {
+      "name": "ds-overlay",
+      "description": "Positioning utility for overlays. Positions children relative to the slideshow container.",
+      "attributes": [
+        {
+          "name": "data-location",
+          "description": "Vertical position",
+          "valueSet": "top|bottom|center"
+        },
+        {
+          "name": "data-alignment",
+          "description": "Horizontal alignment",
+          "valueSet": "left|center|right"
+        },
+        {
+          "name": "data-padding",
+          "description": "Apply padding",
+          "valueSet": "boolean"
+        }
+      ]
+    },
+    {
+      "name": "ds-slide-controls",
+      "description": "Composite control element. Renders prev/next buttons in a bottom-left overlay."
+    },
+    {
+      "name": "ds-progress",
+      "description": "Progress indicator. Shows slide progress as fraction, percentage, or bar.",
+      "attributes": [
+        {
+          "name": "data-within",
+          "description": "Show progress within a specific section level",
+          "valueSet": "number"
+        },
+        {
+          "name": "data-display",
+          "description": "Display mode",
+          "valueSet": "fraction|percentage|bar"
+        }
+      ]
+    },
+    {
+      "name": "ds-current-slide",
+      "description": "Displays current slide number (1-based).",
+      "attributes": [
+        {
+          "name": "data-within",
+          "description": "Show position within a specific section level",
+          "valueSet": "number"
+        }
+      ]
+    },
+    {
+      "name": "ds-total-slides",
+      "description": "Displays total number of slides.",
+      "attributes": [
+        {
+          "name": "data-within",
+          "description": "Show total within a specific section level",
+          "valueSet": "number"
+        }
+      ]
+    },
+    {
+      "name": "ds-current-section",
+      "description": "Displays current section information.",
+      "attributes": [
+        {
+          "name": "data-display",
+          "description": "Display mode",
+          "valueSet": "numeric|text"
+        },
+        {
+          "name": "data-level",
+          "description": "Show only this level (1-6)",
+          "valueSet": "number"
+        },
+        {
+          "name": "data-separator",
+          "description": "Separator between levels (default: '.')",
+          "valueSet": "string"
+        },
+        {
+          "name": "data-prefix",
+          "description": "Text prefix",
+          "valueSet": "string"
+        },
+        {
+          "name": "data-suffix",
+          "description": "Text suffix",
+          "valueSet": "string"
+        }
+      ]
+    },
+    {
+      "name": "ds-loader",
+      "description": "Loading overlay. Shows progress bar while resources load.",
+      "attributes": [
+        {
+          "name": "state",
+          "description": "Loader state",
+          "valueSet": "loading|finished"
+        },
+        {
+          "name": "data-debug",
+          "description": "Debug mode (no fade delay)",
+          "valueSet": "boolean"
+        }
+      ]
+    },
+    {
+      "name": "ds-flex",
+      "description": "Flexbox layout container.",
+      "attributes": [
+        {
+          "name": "gap",
+          "description": "Gap between items (in rem)",
+          "valueSet": "number"
+        },
+        {
+          "name": "justify",
+          "description": "Justify content",
+          "valueSet": "start|center|end|space-between|space-around|space-evenly"
+        },
+        {
+          "name": "align",
+          "description": "Align items",
+          "valueSet": "start|center|end|stretch|baseline"
+        },
+        {
+          "name": "mode",
+          "description": "Flex direction",
+          "valueSet": "row|column|row-reverse|column-reverse"
+        }
+      ]
+    },
+    {
+      "name": "ds-item",
+      "description": "Flex item wrapper. Use with ds-flex."
+    },
+    {
+      "name": "ds-list",
+      "description": "List container. Supports ordered and unordered modes.",
+      "attributes": [
+        {
+          "name": "data-mode",
+          "description": "List mode",
+          "valueSet": "ordered|unordered"
+        },
+        {
+          "name": "data-start",
+          "description": "Starting number for ordered lists",
+          "valueSet": "number"
+        }
+      ]
+    },
+    {
+      "name": "ds-list-item",
+      "description": "List item. Use with ds-list."
+    },
+    {
+      "name": "ds-image",
+      "description": "Image wrapper with resource registration. Wrap an <img> element.",
+      "attributes": []
+    },
+    {
+      "name": "ds-video",
+      "description": "Video wrapper with slide-visibility playback control. Wrap a <video> element.",
+      "attributes": []
+    },
+    {
+      "name": "ds-counter",
+      "description": "Counter element. Registers a counter with the slideshow context.",
+      "attributes": [
+        {
+          "name": "data-type",
+          "description": "Counter type (e.g., 'figure', 'table')",
+          "valueSet": "string"
+        },
+        {
+          "name": "data-id",
+          "description": "Optional ID for referencing this counter",
+          "valueSet": "string"
+        }
+      ]
+    },
+    {
+      "name": "ds-reference",
+      "description": "Reference element. Displays the value of a counter by ID.",
+      "attributes": [
+        {
+          "name": "data-id",
+          "description": "ID of the counter to reference",
+          "valueSet": "string"
+        },
+        {
+          "name": "prefix",
+          "description": "Text prefix",
+          "valueSet": "string"
+        },
+        {
+          "name": "suffix",
+          "description": "Text suffix",
+          "valueSet": "string"
+        }
+      ]
+    }
+  ]
+}
