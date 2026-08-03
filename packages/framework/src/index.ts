@@ -1,71 +1,114 @@
 // dotslide - Vanilla Custom Elements Framework
 // Entry point for the CE bundle
 
+import { DsButton } from "./elements/controls/button";
+import { KeyboardHandler } from "./elements/controls/keyboard-handler";
+import { Overlay } from "./elements/controls/overlay";
+import { SlideControls } from "./elements/controls/slide-controls";
+import { DsFlex } from "./elements/layout/flex";
+import { DsItem } from "./elements/layout/item";
+import { DsList } from "./elements/layout/list";
+import { DsListItem } from "./elements/layout/list-item";
+import { DsCounter } from "./elements/media/counter";
+import { DsImage } from "./elements/media/image";
+import { DsReference } from "./elements/media/reference";
+import { DsVideo } from "./elements/media/video";
+import { Loader } from "./elements/overlay/loader";
+import { Section } from "./elements/section";
+import { Slide } from "./elements/slide";
 // Import all custom elements - each triggers customElements.define()
-import { Slideshow } from "./elements/slideshow.js";
-import { Slide } from "./elements/slide.js";
-import { Step } from "./elements/step.js";
-import { Section } from "./elements/section.js";
-import { KeyboardHandler } from "./elements/controls/keyboard-handler.js";
-import { DsButton } from "./elements/controls/button.js";
-import { Overlay } from "./elements/controls/overlay.js";
-import { SlideControls } from "./elements/controls/slide-controls.js";
-import { Loader } from "./elements/overlay/loader.js";
-import { Progress } from "./elements/widgets/progress.js";
-import { CurrentSlide } from "./elements/widgets/current-slide.js";
-import { TotalSlides } from "./elements/widgets/total-slides.js";
-import { CurrentSection } from "./elements/widgets/current-section.js";
-import { DsFlex } from "./elements/layout/flex.js";
-import { DsItem } from "./elements/layout/item.js";
-import { DsList } from "./elements/layout/list.js";
-import { DsListItem } from "./elements/layout/list-item.js";
-import { DsImage } from "./elements/media/image.js";
-import { DsVideo } from "./elements/media/video.js";
-import { DsCounter } from "./elements/media/counter.js";
-import { DsReference } from "./elements/media/reference.js";
+import { Slideshow } from "./elements/slideshow";
+import { Step } from "./elements/step";
+import { CurrentSection } from "./elements/widgets/current-section";
+import { CurrentSlide } from "./elements/widgets/current-slide";
+import { Progress } from "./elements/widgets/progress";
+import { TotalSlides } from "./elements/widgets/total-slides";
 
-// Re-export elements
-export { Slideshow, Slide, Step, Section, DsFlex, DsItem, DsList, DsListItem, KeyboardHandler, DsButton, Overlay, SlideControls, Loader, Progress, CurrentSlide, TotalSlides, CurrentSection, DsImage, DsVideo, DsCounter, DsReference };
-
-// Re-export utilities for advanced usage
-export { injectStyles } from "./utils/styles.js";
-export { generateId, getDataTags } from "./utils/index.js";
-export { registerResource } from "./utils/resource.js";
-export { RESOURCE_REGISTER, RESOURCE_READY } from "./utils/events.js";
-
+export type {
+  NavigableContext,
+  NavigationMethods,
+  NavigationNode,
+} from "./store/context/navigation";
+export {
+  createNavigationMethods,
+  NavigationType,
+} from "./store/context/navigation";
+export type { SlideContext } from "./store/context/slide";
+export { createSlideContext, useSlideContext } from "./store/context/slide";
 // Re-export store types and context
-export type { SlideshowContext, SlideshowStore, CounterInfo, ResourceInfo, SlideshowPhase } from "./store/context/slideshow.js";
-export { useSlideshowContext, createSlideshowContext } from "./store/context/slideshow.js";
-export type { SlideContext } from "./store/context/slide.js";
-export { useSlideContext, createSlideContext } from "./store/context/slide.js";
-export type { NavigationNode, NavigableContext, NavigationMethods } from "./store/context/navigation.js";
-export { NavigationType, createNavigationMethods } from "./store/context/navigation.js";
-
+export type {
+  CounterInfo,
+  ResourceInfo,
+  SlideshowContext,
+  SlideshowPhase,
+  SlideshowStore,
+} from "./store/context/slideshow";
+export {
+  createSlideshowContext,
+  useSlideshowContext,
+} from "./store/context/slideshow";
 // Re-export section utilities and types
-export type { SectionInfo, SectionContext } from "./store/index.js";
-export { createSectionContext, useSectionContext } from "./store/index.js";
-export { buildSectionHierarchy, getCurrentSection, getSectionString, getSlidePositionInSection } from "./utils/section.js";
-export type { SlidePosition } from "./utils/section.js";
-
+export type { SectionContext, SectionInfo } from "./store/index";
+export { createSectionContext, useSectionContext } from "./store/index";
+export { RESOURCE_READY, RESOURCE_REGISTER } from "./utils/events";
+export { generateId, getDataTags } from "./utils/index";
 // Re-export navigation utilities
-export { buildNavigationSequence, updateSlideVisibility, updateStepVisibility } from "./utils/navigation.js";
+export {
+  buildNavigationSequence,
+  updateSlideVisibility,
+  updateStepVisibility,
+} from "./utils/navigation";
+export { registerResource } from "./utils/resource";
+export type { SlidePosition } from "./utils/section";
+export {
+  buildSectionHierarchy,
+  getCurrentSection,
+  getSectionString,
+  getSlidePositionInSection,
+} from "./utils/section";
+// Re-export utilities for advanced usage
+export { injectStyles } from "./utils/styles";
+// Re-export elements
+export {
+  CurrentSection,
+  CurrentSlide,
+  DsButton,
+  DsCounter,
+  DsFlex,
+  DsImage,
+  DsItem,
+  DsList,
+  DsListItem,
+  DsReference,
+  DsVideo,
+  KeyboardHandler,
+  Loader,
+  Overlay,
+  Progress,
+  Section,
+  Slide,
+  SlideControls,
+  Slideshow,
+  Step,
+  TotalSlides,
+};
 
 // DOM type augmentations
 declare global {
   interface HTMLElementTagNameMap {
-    "ds-slideshow": InstanceType<typeof Slideshow>;
-    "ds-slide": InstanceType<typeof Slide>;
-    "ds-step": InstanceType<typeof Step>;
-    "ds-section": InstanceType<typeof Section>;
-    "ds-keyboard-handler": InstanceType<typeof KeyboardHandler>;
-    "ds-button": InstanceType<typeof DsButton>;
-    "ds-overlay": InstanceType<typeof Overlay>;
-    "ds-slide-controls": InstanceType<typeof SlideControls>;
-    "ds-loader": InstanceType<typeof Loader>;
-    "ds-progress": InstanceType<typeof Progress>;
-    "ds-current-slide": InstanceType<typeof CurrentSlide>;
-    "ds-total-slides": InstanceType<typeof TotalSlides>;
-    "ds-current-section": InstanceType<typeof CurrentSection>;
+    "ds-slideshow": Slideshow;
+    "ds-slide": Slide;
+    "ds-step": Step;
+    "ds-section": Section;
+    "ds-keyboard-handler": KeyboardHandler;
+    "ds-button": DsButton;
+    "ds-overlay": Overlay;
+    "ds-slide-controls": SlideControls;
+    "ds-loader": Loader;
+    "ds-progress": Progress;
+    "ds-current-slide": CurrentSlide;
+    "ds-total-slides": TotalSlides;
+    "ds-current-section": CurrentSection;
     "ds-flex": DsFlex;
     "ds-item": DsItem;
     "ds-list": DsList;
