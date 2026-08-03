@@ -29,7 +29,7 @@ export { Slideshow, Slide, Step, Section, DsFlex, DsItem, DsList, DsListItem, Ke
 
 // Re-export utilities for advanced usage
 export { injectStyles } from "./utils/styles.js";
-export { generateId, getDataTags, logger } from "./utils/index.js";
+export { generateId, getDataTags } from "./utils/index.js";
 export { registerResource } from "./utils/resource.js";
 export { RESOURCE_REGISTER, RESOURCE_READY } from "./utils/events.js";
 

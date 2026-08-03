@@ -1,7 +1,6 @@
 import type { SectionInfo } from "../store";
 import { createSectionContext, useSectionContext } from "../store";
 import { useSlideshowContext } from "../store/context/slideshow";
-import { logger } from "./logger";
 
 /**
  * Build the section hierarchy from DOM elements.
@@ -107,14 +106,15 @@ export function getCurrentSection(
 ): SectionInfo | null {
   const sectionStore = useSectionContext(slideshowRoot);
   if (!sectionStore) {
-    logger.warn("Section context not found for slideshow root");
+    console.warn("[dotslide]", "Section context not found for slideshow root");
     return null;
   }
   const context = sectionStore.get();
   const slideshowContext = useSlideshowContext(slideshowRoot);
 
   if (!context.initialized) {
-    logger.warn(
+    console.warn(
+      "[dotslide]",
       "Section hierarchy not initialized. Call buildSectionHierarchy() first.",
     );
     return null;
@@ -131,7 +131,7 @@ export function getCurrentSection(
     // HTMLElement - get index from data attribute
     const indexAttr = slideIndexOrElement.getAttribute("data-slide-index");
     if (indexAttr === null) {
-      logger.warn("Slide element missing data-slide-index attribute");
+      console.warn("[dotslide]", "Slide element missing data-slide-index attribute");
       return null;
     }
     slideIndex = Number.parseInt(indexAttr, 10);

@@ -1,5 +1,4 @@
 import { createSlideContext } from "../store/context/slide";
-import { logger } from "../utils";
 import { injectStyles } from "../utils/styles";
 
 const css = `@layer dotslide {
@@ -32,7 +31,7 @@ export class Slide extends HTMLElement {
     queueMicrotask(() => {
       const slideshow = this.closest("ds-slideshow");
       if (!slideshow) {
-        logger.warn("Slide is not rendered inside a ds-slideshow");
+        console.warn("[dotslide]", "Slide is not rendered inside a ds-slideshow");
         return;
       }
 
@@ -42,7 +41,7 @@ export class Slide extends HTMLElement {
       const slideIndex = slides.indexOf(this);
 
       if (slideIndex === -1) {
-        logger.warn("Slide could not determine its index within the slideshow");
+        console.warn("[dotslide]", "Slide could not determine its index within the slideshow");
         return;
       }
 

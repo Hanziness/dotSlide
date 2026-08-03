@@ -1,6 +1,6 @@
 import type { NavigationNode } from "../store/context/navigation";
 import { createSlideshowContext } from "../store/context/slideshow";
-import { generateId, logger } from "../utils";
+import { generateId } from "../utils";
 import { RESOURCE_READY, RESOURCE_REGISTER } from "../utils/events";
 import {
   buildNavigationSequence,
@@ -134,7 +134,7 @@ export class Slideshow extends HTMLElement {
       const { resourceId, slideIndex } = (
         e as CustomEvent<ResourceRegistrationDetail>
       ).detail;
-      logger.debug(`Resource registered: ${resourceId} (slide ${slideIndex})`);
+      console.debug(`[dotslide] Resource registered: ${resourceId} (slide ${slideIndex})`);
 
       const current = slideshowContextRef.get();
 
@@ -152,7 +152,7 @@ export class Slideshow extends HTMLElement {
     this._onResourceReady = (e: Event) => {
       const { resourceId } = (e as CustomEvent<ResourceRegistrationDetail>)
         .detail;
-      logger.debug(`Resource ready: ${resourceId}`);
+      console.debug(`[dotslide] Resource ready: ${resourceId}`);
 
       const { [resourceId]: _, ...remaining } =
         slideshowContextRef.get().pending;

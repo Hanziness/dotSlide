@@ -35,7 +35,6 @@ export function getDataTags<T extends Record<string, unknown>>(
   }, {});
 }
 
-export { logger } from "./logger";
 export {
   type ResourceHandle,
   type ResourceRegistrationDetail,
