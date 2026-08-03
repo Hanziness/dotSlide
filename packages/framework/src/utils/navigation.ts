@@ -7,8 +7,8 @@ import { type NavigationNode, NavigationType } from "@dotslide/protocol";
 function getMaxStep(slide: Element): number {
   let max = 1;
   for (const step of slide.querySelectorAll<HTMLElement>("ds-step")) {
-    const from = step.dataset.stepFrom;
-    const to = step.dataset.stepTo;
+    const from = step.dataset.from;
+    const to = step.dataset.to;
     if (from) max = Math.max(max, Number(from));
     if (to) max = Math.max(max, Number(to));
   }
@@ -61,8 +61,8 @@ export function updateStepVisibility(
   activeStep: number,
 ): void {
   for (const step of slide.querySelectorAll<HTMLElement>("ds-step")) {
-    const from = step.dataset.stepFrom ? Number(step.dataset.stepFrom) : null;
-    const to = step.dataset.stepTo ? Number(step.dataset.stepTo) : null;
+    const from = step.dataset.from ? Number(step.dataset.from) : null;
+    const to = step.dataset.to ? Number(step.dataset.to) : null;
 
     const visible =
       (from === null || activeStep >= from) &&

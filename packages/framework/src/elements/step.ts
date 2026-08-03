@@ -18,13 +18,13 @@ export class Step extends HTMLElement {
 
   /** First step where this content is visible (inclusive, 1-based) */
   get from(): number | undefined {
-    const val = this.dataset.stepFrom
+    const val = this.dataset.from
     return val ? parseInt(val, 10) : undefined
   }
 
   /** Last step where this content is visible (inclusive, 1-based) */
   get to(): number | undefined {
-    const val = this.dataset.stepTo
+    const val = this.dataset.to
     return val ? parseInt(val, 10) : undefined
   }
 }
