@@ -1,5 +1,9 @@
+import {
+  type CounterInfo,
+  type SlideshowStore,
+  withSlideshowContext,
+} from "../../store/context/slideshow.js";
 import { injectStyles } from "../../utils/styles.js";
-import { type CounterInfo, useSlideshowContext } from "../../store/context/slideshow.js";
 
 const counterCss = `ds-counter { display: inline; }`;
 injectStyles(counterCss, "counter");
@@ -22,13 +26,9 @@ export class DsCounter extends HTMLElement {
       return;
     }
 
-    const slideshowCtx = useSlideshowContext(this);
-    if (!slideshowCtx) {
-      console.warn("ds-counter: no slideshow context found");
-      return;
-    }
-
-    this._registerCounter(slideshowCtx, type, id);
+    withSlideshowContext(this, (ctx) => {
+      this._registerCounter(ctx, type, id);
+    });
   }
 
   disconnectedCallback() {
@@ -36,7 +36,7 @@ export class DsCounter extends HTMLElement {
   }
 
   private _registerCounter(
-    slideshowCtx: ReturnType<typeof useSlideshowContext>,
+    slideshowCtx: SlideshowStore,
     type: string,
     id: string | undefined,
   ) {

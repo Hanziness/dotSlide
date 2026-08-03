@@ -1,5 +1,5 @@
+import { withSlideshowContext } from "../../store/context/slideshow.js";
 import { injectStyles } from "../../utils/styles.js";
-import { useSlideshowContext } from "../../store/context/slideshow.js";
 
 const buttonCss = `
 ds-button { display: contents; }
@@ -37,13 +37,14 @@ export class DsButton extends HTMLElement {
       | null;
     if (action === null) return;
 
-    const ctx = useSlideshowContext(this);
-    const btn = this.querySelector("button")!;
-    this._clickHandler = (e) => {
-      e.stopPropagation();
-      ctx[action]();
-    };
-    btn.addEventListener("click", this._clickHandler);
+    withSlideshowContext(this, (ctx) => {
+      const btn = this.querySelector("button")!;
+      this._clickHandler = (e) => {
+        e.stopPropagation();
+        ctx[action]();
+      };
+      btn.addEventListener("click", this._clickHandler);
+    });
   }
 
   disconnectedCallback() {

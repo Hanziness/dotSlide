@@ -1,6 +1,7 @@
 // dotslide - Vanilla Custom Elements Framework
 // Entry point for the CE bundle
 
+// Import all custom elements - each triggers customElements.define()
 import { DsButton } from "./elements/controls/button";
 import { KeyboardHandler } from "./elements/controls/keyboard-handler";
 import { Overlay } from "./elements/controls/overlay";
@@ -16,7 +17,6 @@ import { DsVideo } from "./elements/media/video";
 import { Loader } from "./elements/overlay/loader";
 import { Section } from "./elements/section";
 import { Slide } from "./elements/slide";
-// Import all custom elements - each triggers customElements.define()
 import { Slideshow } from "./elements/slideshow";
 import { Step } from "./elements/step";
 import { CurrentSection } from "./elements/widgets/current-section";
@@ -46,6 +46,7 @@ export type {
 export {
   createSlideshowContext,
   useSlideshowContext,
+  withSlideshowContext,
 } from "./store/context/slideshow";
 // Re-export section utilities and types
 export type { SectionContext, SectionInfo } from "./store/index";

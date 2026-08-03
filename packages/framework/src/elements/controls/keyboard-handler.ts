@@ -1,4 +1,4 @@
-import { useSlideshowContext } from "../../store/context/slideshow.js";
+import { withSlideshowContext } from "../../store/context/slideshow.js";
 
 type NavigationAction = "next" | "prev" | "first" | "last";
 
@@ -17,20 +17,21 @@ export class KeyboardHandler extends HTMLElement {
   private keydownHandler: ((e: KeyboardEvent) => void) | undefined;
 
   connectedCallback() {
-    const ctx = useSlideshowContext(this);
-    const root = ctx.get().root;
-    this.keydownHandler = (e: KeyboardEvent) => {
-      if (
-        !root.contains(document.activeElement) &&
-        document.activeElement !== document.body
-      )
-        return;
-      const action = KEY_MAP[e.key];
-      if (action === undefined) return;
-      e.preventDefault();
-      ctx[action]();
-    };
-    document.addEventListener("keydown", this.keydownHandler);
+    withSlideshowContext(this, (ctx) => {
+      const root = ctx.get().root;
+      this.keydownHandler = (e: KeyboardEvent) => {
+        if (
+          !root.contains(document.activeElement) &&
+          document.activeElement !== document.body
+        )
+          return;
+        const action = KEY_MAP[e.key];
+        if (action === undefined) return;
+        e.preventDefault();
+        ctx[action]();
+      };
+      document.addEventListener("keydown", this.keydownHandler);
+    });
   }
 
   disconnectedCallback() {

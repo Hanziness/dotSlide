@@ -157,3 +157,26 @@ export const useSlideshowContext = (child: HTMLElement): SlideshowStore => {
   // Safe: navigation methods were attached at creation time via Object.assign
   return ctx as SlideshowStore;
 };
+
+/**
+ * Executes a callback when the Slideshow context is available.
+ * Awaits `ds-slideshow`'s upgrade, then resolves the context synchronously.
+ * If the child is not inside a ds-slideshow, logs a warning and stops.
+ * Use this in connectedCallback() to avoid import-order dependencies.
+ */
+export const withSlideshowContext = (
+  child: HTMLElement,
+  callback: (ctx: SlideshowStore) => void,
+): void => {
+  void customElements.whenDefined("ds-slideshow").then(() => {
+    if (!child.isConnected) return;
+    const ctx = useContext<SlideshowContext>(child, "ds-slideshow");
+    if (ctx === undefined) {
+      console.warn(
+        `[dotslide] <${child.tagName.toLowerCase()}> is not inside a <ds-slideshow>. It will not be initialized.`,
+      );
+      return;
+    }
+    callback(ctx as SlideshowStore);
+  });
+};

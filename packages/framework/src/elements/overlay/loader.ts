@@ -1,4 +1,4 @@
-import { useSlideshowContext } from "../../store/context/slideshow.js";
+import { withSlideshowContext } from "../../store/context/slideshow.js";
 import { RESOURCE_READY } from "../../utils/events.js";
 import type { ResourceRegistrationResult } from "../../utils/resource.js";
 import { injectStyles } from "../../utils/styles.js";
@@ -90,32 +90,33 @@ export class Loader extends HTMLElement {
       `;
     }
 
-    const slideshowCtx = useSlideshowContext(this);
-    this._updateProgressBar(0);
+    withSlideshowContext(this, (ctx) => {
+      this._updateProgressBar(0);
 
-    if (slideshowCtx.get().phase === "ready") {
-      this._updateProgressBar(1);
-      setTimeout(() => {
-        this.setAttribute("state", "finished");
-      }, this.getAttribute("data-debug") === "true" ? 0 : 300);
-      return;
-    }
-
-    this.closest("ds-slideshow")?.addEventListener(RESOURCE_READY, this._onResourceReady);
-
-    this.store_unsubscribe = slideshowCtx.subscribe((store) => {
-      if (store.phase === "loading") {
-        this.setAttribute("state", "loading");
-        this._updateProgressBar();
-      } else if (store.phase === "registering") {
-        this.num_registered = Math.max(this.num_registered, Object.keys(store.pending).length);
-      } else if (store.phase === "ready") {
+      if (ctx.get().phase === "ready") {
         this._updateProgressBar(1);
         setTimeout(() => {
           this.setAttribute("state", "finished");
-          this.store_unsubscribe?.();
-        }, this.getAttribute("data-debug") === "true" ? 0 : 700);
+        }, this.getAttribute("data-debug") === "true" ? 0 : 300);
+        return;
       }
+
+      this.closest("ds-slideshow")?.addEventListener(RESOURCE_READY, this._onResourceReady);
+
+      this.store_unsubscribe = ctx.subscribe((store) => {
+        if (store.phase === "loading") {
+          this.setAttribute("state", "loading");
+          this._updateProgressBar();
+        } else if (store.phase === "registering") {
+          this.num_registered = Math.max(this.num_registered, Object.keys(store.pending).length);
+        } else if (store.phase === "ready") {
+          this._updateProgressBar(1);
+          setTimeout(() => {
+            this.setAttribute("state", "finished");
+            this.store_unsubscribe?.();
+          }, this.getAttribute("data-debug") === "true" ? 0 : 700);
+        }
+      });
     });
   }
 

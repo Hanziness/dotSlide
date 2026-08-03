@@ -12,7 +12,11 @@ export class TotalSlides extends HTMLElement {
   private _unsubscribe?: () => void;
 
   connectedCallback() {
-    queueMicrotask(() => {
+    void Promise.all([
+      customElements.whenDefined("ds-slideshow"),
+      customElements.whenDefined("ds-slide"),
+    ]).then(() => {
+      if (!this.isConnected) return;
       const slideCtx = useSlideContext(this);
       if (!slideCtx) return;
       const slideIndex = slideCtx.get().index;

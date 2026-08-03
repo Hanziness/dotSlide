@@ -25,7 +25,11 @@ export class Progress extends HTMLElement {
   private _unsubscribe?: () => void;
 
   connectedCallback() {
-    queueMicrotask(() => {
+    void Promise.all([
+      customElements.whenDefined("ds-slideshow"),
+      customElements.whenDefined("ds-slide"),
+    ]).then(() => {
+      if (!this.isConnected) return;
       const display = this.getAttribute("data-display") ?? "fraction";
       if (display === "bar") {
         if (!this.querySelector(".track")) {

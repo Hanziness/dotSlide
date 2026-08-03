@@ -1,5 +1,8 @@
+import {
+  type SlideshowStore,
+  withSlideshowContext,
+} from "../../store/context/slideshow.js";
 import { injectStyles } from "../../utils/styles.js";
-import { useSlideshowContext } from "../../store/context/slideshow.js";
 
 const referenceCss = `ds-reference { display: inline; }`;
 injectStyles(referenceCss, "reference");
@@ -25,15 +28,20 @@ export class DsReference extends HTMLElement {
       return;
     }
 
-    const slideshowCtx = useSlideshowContext(this);
-    this._unsubscribe = slideshowCtx.subscribe(() => {
-      this._syncCounter(slideshowCtx, id);
-    });
+    withSlideshowContext(this, (ctx) => {
+      this._unsubscribe = ctx.subscribe(() => {
+        this._syncCounter(ctx, id);
+      });
 
-    this._syncCounter(slideshowCtx, id);
+      this._syncCounter(ctx, id);
+    });
   }
 
-  attributeChangedCallback(name: typeof DsReference.observedAttributes[number], _oldValue: string, newValue: string) {
+  attributeChangedCallback(
+    name: (typeof DsReference.observedAttributes)[number],
+    _oldValue: string,
+    newValue: string,
+  ) {
     if (name === "prefix") {
       this._prefix = newValue;
     } else if (name === "suffix") {
@@ -45,10 +53,7 @@ export class DsReference extends HTMLElement {
     this._unsubscribe?.();
   }
 
-  private _syncCounter(
-    slideshowCtx: ReturnType<typeof useSlideshowContext>,
-    id: string,
-  ) {
+  private _syncCounter(slideshowCtx: SlideshowStore, id: string) {
     const counter = Object.values(slideshowCtx.get().counters)
       .flat()
       .find((entry) => entry.id === id);
@@ -63,7 +68,10 @@ export class DsReference extends HTMLElement {
       return;
     }
 
-    if (!this._warnedMissingCounter && slideshowCtx.get().phase !== "registering") {
+    if (
+      !this._warnedMissingCounter &&
+      slideshowCtx.get().phase !== "registering"
+    ) {
       console.warn(`ds-reference: counter not found for id="${id}"`);
       this._warnedMissingCounter = true;
     }
