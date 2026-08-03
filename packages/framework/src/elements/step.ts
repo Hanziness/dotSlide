@@ -6,7 +6,7 @@ const css = `@layer dotslide {
   }
 
   ds-step:not(.active) {
-    display: none;
+    visibility: hidden;
   }
 }`
 
