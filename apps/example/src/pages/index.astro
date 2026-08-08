@@ -1,79 +1,346 @@
 ---
 import "../global.css";
 import "@dotslide/framework/themes/default.css";
+import "@dotslide/framework/themes/transitions/default.css";
+import ContentSlide from "../components/ContentSlide.astro";
+import SectionDivider from "../components/SectionDivider.astro";
 ---
-
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>The Craft of the Slide</title>
+</head>
+<body>
 <ds-slideshow data-slideshow-width="1024" data-slideshow-height="768">
+	<!-- Slide 1: Title -->
+	<ContentSlide class="flex flex-col items-center justify-center w-full">
+		<ds-overlay data-location="top" data-alignment="left" data-padding>
+			<span class="tracking-[0.3em] uppercase text-sm font-semibold opacity-40">dotslide</span>
+		</ds-overlay>
+		<div class="flex flex-col items-center gap-6 px-16">
+			<h1 class="text-[72pt] font-black text-center leading-[0.95] tracking-tight text-[#1a1a2e]">
+				The Craft<br />of the Slide
+			</h1>
+			<div class="w-24 h-1 bg-[#D97757] rounded-full"></div>
+			<p class="text-[20pt] text-[#2A9D8F] font-medium tracking-wide">
+				What makes presentations unforgettable
+			</p>
+		</div>
+		<ds-overlay data-location="bottom" data-alignment="center" data-padding class="mb-8">
+			<span class="text-[14pt] opacity-40">2026</span>
+		</ds-overlay>
+	</ContentSlide>
+
+	<!-- Why dotslide Section -->
+	<ds-section level="1" title="Why dotslide"></ds-section>
+	<SectionDivider title="Why dotslide" caption="The problem we solve" />
+
+	<!-- Slide: The Problem -->
+	<ContentSlide title="The problem with presentations">
+		<ds-flex gap="2" mode="column" align="start" class="text-[20pt]">
+			<div class="card w-full">
+				<div class="text-[#D97757] font-bold mb-2">Every presentation reinvents the wheel</div>
+				<div class="text-[#6b7280]">Navigation, layout, theming, progress tracking — solved ad-hoc each time</div>
+			</div>
+			<div class="card w-full">
+				<div class="text-[#D97757] font-bold mb-2">LLMs burn context on mechanics</div>
+				<div class="text-[#6b7280]">Instead of focusing on content and design, they rebuild the infrastructure</div>
+			</div>
+			<div class="card w-full">
+				<div class="text-[#D97757] font-bold mb-2">Inconsistent results</div>
+				<div class="text-[#6b7280]">Different approaches, different bugs, different UX every time</div>
+			</div>
+		</ds-flex>
+	</ContentSlide>
+
+	<!-- Slide: The dotslide way -->
+	<ContentSlide title="The dotslide way">
+		<ds-flex gap="2" mode="row" align="start">
+			<ds-item>
+				<ds-flex gap="1" mode="column" align="start" class="text-[18pt]">
+					<div class="card w-full">
+						<div class="text-[#2A9D8F] font-bold mb-2">Building blocks</div>
+						<div class="text-[#6b7280]">Framework provides the foundation — slides, steps, sections, navigation, theming</div>
+					</div>
+					<div class="card w-full">
+						<div class="text-[#2A9D8F] font-bold mb-2">Focus on content</div>
+						<div class="text-[#6b7280]">LLMs design the presentation, not reinvent the mechanics</div>
+					</div>
+					<div class="card w-full">
+						<div class="text-[#2A9D8F] font-bold mb-2">Remote control</div>
+						<div class="text-[#6b7280]">Control your presentation from your phone — no clicker needed</div>
+					</div>
+				</ds-flex>
+			</ds-item>
+			<ds-item>
+				<div class="card text-center py-8">
+					<div class="text-[14pt] text-[#6b7280] uppercase tracking-widest mb-3">This presentation</div>
+					<div class="text-[48pt] font-black text-[#D97757] mb-2">Built with dotslide</div>
+					<div class="text-[16pt] text-[#6b7280]">Using the framework to demonstrate the framework</div>
+				</div>
+			</ds-item>
+		</ds-flex>
+	</ContentSlide>
+
+	<!-- Slide: What You'll See -->
+	<ContentSlide title="What you'll see">
+		<ds-list data-mode="ordered" class="text-[22pt] text-[#1a1a2e] space-y-3">
+			<ds-list-item>How <emph class="font-bold">dotSlide</emph> structures presentations with sections and slides</ds-list-item>
+			<ds-list-item>Layout system for composing content with flex containers</ds-list-item>
+			<ds-list-item>Progressive disclosure with the step component</ds-list-item>
+			<ds-list-item>Auto-numbered counters and cross-references</ds-list-item>
+			<ds-list-item>Navigation, progress tracking, and theming</ds-list-item>
+		</ds-list>
+	</ContentSlide>
+
+	<!-- Section 1: Structure -->
+	<ds-section level="1" title="Structure"></ds-section>
+	<SectionDivider title="Structure" caption="The foundation of every great slide deck" />
+
+	<!-- Slide 4: The Building Blocks -->
+	<ContentSlide title="The Building Blocks">
+		<ds-step data-from="1">
+			<ds-flex gap="1.5" mode="row">
+				<ds-item><div class="card flex-1 text-center"><div class="text-[#D97757] font-bold text-[20pt] mb-2">&lt;ds-slideshow&gt;</div><div class="text-[16pt] text-[#6b7280]">The stage</div></div></ds-item>
+				<ds-item><div class="card flex-1 text-center"><div class="text-[#D97757] font-bold text-[20pt] mb-2">&lt;ds-slide&gt;</div><div class="text-[16pt] text-[#6b7280]">The scene</div></div></ds-item>
+				<ds-item><div class="card flex-1 text-center"><div class="text-[#D97757] font-bold text-[20pt] mb-2">&lt;ds-step&gt;</div><div class="text-[16pt] text-[#6b7280]">The moment</div></div></ds-item>
+			</ds-flex>
+		</ds-step>
+		<ds-step data-from="2">
+			<p class="text-[18pt] text-[#6b7280] mt-4">
+				Every presentation is a <strong class="text-[#1a1a2e]">slideshow</strong> of
+				<strong class="text-[#1a1a2e]">slides</strong>, each with
+				<strong class="text-[#1a1a2e]">steps</strong> that build progressively.
+			</p>
+		</ds-step>
+	</ContentSlide>
+
+	<!-- Slide 5: Sections & Hierarchy -->
+	<ContentSlide title="Sections give your talk a backbone">
+		<ds-flex gap="3" mode="row" justify="space-between" align="fill">
+			<ds-item>
+				<ds-flex mode="column" gap="1" class="w-full">
+					<div class="card"><span class="text-[#D97757] font-bold">Level 1</span><span class="text-[#6b7280] ml-2">— Part</span></div>
+					<div class="card"><span class="text-[#D97757] font-bold">Level 2</span><span class="text-[#6b7280] ml-2">— Chapter</span></div>
+					<div class="card"><span class="text-[#D97757] font-bold">Level 3</span><span class="text-[#6b7280] ml-2">— Scene</span></div>
+				</ds-flex>
+			</ds-item>
+			<ds-item>
+				<div class="card w-80 text-center">
+					<div class="text-[14pt] text-[#6b7280] mb-2">You're currently here:</div>
+					<div class="text-[48pt] font-black text-[#D97757]"><ds-current-section data-display="numeric" data-separator="."></ds-current-section></div>
+					<div class="text-[16pt] text-[#6b7280]"><ds-current-section data-display="text"></ds-current-section></div>
+					<div class="text-[14pt] text-[#6b7280] mt-8">(these are smart references, not hardcoded numbers and text)</div>
+				</div>
+			</ds-item>
+		</ds-flex>
+		<p class="text-[16pt] text-[#6b7280]">Navigate between sections with arrow keys — the section indicator updates live.</p>
+	</ContentSlide>
+
+	<!-- Section 2: Layout -->
+	<ds-section level="1" title="Layout"></ds-section>
+	<SectionDivider title="Layout" caption="Composing content with intention" />
+
+	<!-- Slide 7: Flex Layout Deep Dive -->
+	<ContentSlide title="Flex: compose any layout">
+		<div>
+			<div class="text-[14pt] text-[#6b7280] uppercase tracking-widest mb-2">Row</div>
+			<ds-flex gap="1" mode="row">
+				<ds-item><div class="card w-48 text-center py-4"><span class="text-[#D97757] font-bold text-[28pt]">1</span></div></ds-item>
+				<ds-item><div class="card w-48 text-center py-4"><span class="text-[#D97757] font-bold text-[28pt]">2</span></div></ds-item>
+				<ds-item><div class="card w-48 text-center py-4"><span class="text-[#D97757] font-bold text-[28pt]">3</span></div></ds-item>
+			</ds-flex>
+		</div>
+		<div>
+			<div class="text-[14pt] text-[#6b7280] uppercase tracking-widest mb-2">Column</div>
+			<ds-flex gap="0.5" mode="column" align="start">
+				<div class="card w-full py-2 px-4">Item A</div>
+				<div class="card w-full py-2 px-4">Item B</div>
+				<div class="card w-full py-2 px-4">Item C</div>
+			</ds-flex>
+		</div>
+		<p class="text-[16pt] text-[#6b7280] mt-8">
+			Use <code class="code-block text-[14pt] py-0.5 px-2">gap</code>,
+			<code class="code-block text-[14pt] py-0.5 px-2">justify</code>, and
+			<code class="code-block text-[14pt] py-0.5 px-2">align</code> attributes to control spacing and alignment.
+		</p>
+	</ContentSlide>
+
+	<!-- Slide 8: Lists -->
+	<ContentSlide title="Lists, ordered and unordered">
+		<ds-flex gap="3" mode="row" align="start">
+			<ds-item>
+				<div>
+					<div class="text-[14pt] text-[#6b7280] uppercase tracking-widest mb-3">Unordered</div>
+					<ds-list data-mode="unordered" class="text-[20pt] text-[#1a1a2e] space-y-2">
+						<ds-list-item>Typography creates hierarchy</ds-list-item>
+						<ds-list-item>Whitespace is your friend</ds-list-item>
+						<ds-list-item>Restraint beats decoration</ds-list-item>
+					</ds-list>
+				</div>
+			</ds-item>
+			<ds-item>
+				<div>
+					<div class="text-[14pt] text-[#6b7280] uppercase tracking-widest mb-3">Ordered (starting at 3)</div>
+					<ds-list data-mode="ordered" style="--ds-list-start: 3" class="text-[20pt] text-[#1a1a2e] space-y-2">
+						<ds-list-item>Start with structure</ds-list-item>
+						<ds-list-item>Add content</ds-list-item>
+						<ds-list-item>Refine the details</ds-list-item>
+					</ds-list>
+				</div>
+			</ds-item>
+		</ds-flex>
+		<p class="text-[16pt] text-[#6b7280] mt-8">Use <code class="code-block text-[14pt] py-0.5 px-2">--ds-list-start</code> to begin numbering at any value.</p>
+	</ContentSlide>
+
+	<!-- Section 3: Content -->
+	<ds-section level="1" title="Content"></ds-section>
+	<SectionDivider title="Content" caption="Counters, references, and auto-numbering" />
+
+	<!-- Slide 10: Counters & Cross-References -->
+	<ContentSlide title="Auto-numbered counters">
+		<div class="card">
+			<p class="text-[20pt]"><strong class="text-[#D97757]">Figure <ds-counter data-type="figure" data-id="fig-1"></ds-counter>:</strong> The dotslide architecture</p>
+			<div class="mt-3 border-2 border-dashed border-[#e5e7eb] rounded-lg h-24 flex items-center justify-center text-[#6b7280] text-[16pt]">[ Architecture diagram ]</div>
+		</div>
+		<div class="card">
+			<p class="text-[20pt]"><strong class="text-[#D97757]">Table <ds-counter data-type="table" data-id="tbl-1"></ds-counter>:</strong> Component reference</p>
+			<ds-flex gap="0.5" mode="column" align="start" class="mt-3 text-[16pt]">
+				<div class="flex gap-4"><span class="text-[#D97757] font-bold">ds-slideshow</span><span class="text-[#6b7280]">Root container</span></div>
+				<div class="flex gap-4"><span class="text-[#D97757] font-bold">ds-slide</span><span class="text-[#6b7280]">Individual slide</span></div>
+				<div class="flex gap-4"><span class="text-[#D97757] font-bold">ds-step</span><span class="text-[#6b7280]">Progressive reveal</span></div>
+			</ds-flex>
+		</div>
+		<p class="text-[18pt] text-[#1a1a2e]">As shown in Figure <strong class="text-[#D97757]"><ds-reference data-id="fig-1"></ds-reference></strong>, the framework uses custom elements.</p>
+		<p class="text-[18pt] text-[#1a1a2e]">And Table <strong class="text-[#D97757]"><ds-reference data-id="tbl-1"></ds-reference></strong> lists every component.</p>
+	</ContentSlide>
+
+	<!-- Section 4: Navigation -->
+	<ds-section level="1" title="Navigation"></ds-section>
+	<SectionDivider title="Navigation" caption="Moving through your presentation" />
+
+	<!-- Slide 12: Keyboard & Controls -->
+	<ContentSlide title="Navigate with ease">
+		<ds-flex gap="1.5" mode="row" justify="center">
+			<ds-item><div class="card text-center w-44"><div class="key-badge mb-2">←</div><div class="text-[14pt] text-[#6b7280]">Previous</div></div></ds-item>
+			<ds-item><div class="card text-center w-44"><div class="key-badge mb-2">→</div><div class="text-[14pt] text-[#6b7280]">Next</div></div></ds-item>
+			<ds-item><div class="card text-center w-44"><div class="key-badge mb-2">Home</div><div class="text-[14pt] text-[#6b7280]">First slide</div></div></ds-item>
+			<ds-item><div class="card text-center w-44"><div class="key-badge mb-2">End</div><div class="text-[14pt] text-[#6b7280]">Last slide</div></div></ds-item>
+		</ds-flex>
+		<p class="text-[18pt] text-[#1a1a2e]">On-screen controls appear as an overlay — see the buttons at the bottom-left? Those are <code class="code-block text-[14pt] py-0.5 px-2">&lt;ds-slide-controls&gt;</code>.</p>
+		<p class="text-[18pt] text-[#1a1a2e]"><code class="code-block text-[14pt] py-0.5 px-2">&lt;ds-overlay&gt;</code> positions content anywhere: <span class="text-[#D97757] font-semibold">top, bottom, center</span> × <span class="text-[#2A9D8F] font-semibold">left, right, center</span>.</p>
+	</ContentSlide>
+
+	<!-- Slide 13: Progress & Widgets -->
+	<ContentSlide title="Know where you are">
+		<div class="card"><div class="text-[14pt] text-[#6b7280] uppercase tracking-widest mb-2">Progress bar</div><ds-progress data-display="bar"></ds-progress></div>
+		<ds-flex gap="2" mode="row">
+			<ds-item><div class="card text-center w-56"><div class="text-[14pt] text-[#6b7280] uppercase tracking-widest mb-2">Fraction</div><div class="text-[36pt] font-black text-[#D97757]"><ds-progress data-display="fraction"></ds-progress></div></div></ds-item>
+			<ds-item><div class="card text-center w-56"><div class="text-[14pt] text-[#6b7280] uppercase tracking-widest mb-2">Percentage</div><div class="text-[36pt] font-black text-[#2A9D8F]"><ds-progress data-display="percentage"></ds-progress></div></div></ds-item>
+		</ds-flex>
+		<p class="text-[20pt] text-[#1a1a2e]">You're on slide <strong class="text-[#D97757]"><ds-current-slide></ds-current-slide></strong> of <strong class="text-[#D97757]"><ds-total-slides></ds-total-slides></strong>.</p>
+		<div class="card">
+			<div class="text-[14pt] text-[#6b7280] uppercase tracking-widest mb-2">Section-scoped progress</div>
+			<ds-progress data-display="bar" data-within="1"></ds-progress>
+			<div class="text-[14pt] text-[#6b7280] mt-1">Within this section: <ds-current-slide data-within="1"></ds-current-slide>/<ds-total-slides data-within="1"></ds-total-slides></div>
+		</div>
+	</ContentSlide>
+
+	<!-- Section 5: Theming -->
+	<ds-section level="1" title="Theming"></ds-section>
+	<SectionDivider title="Theming" caption="Make it yours" />
+
+	<!-- Slide 15: CSS Custom Properties -->
+	<ContentSlide title="Theme with CSS custom properties">
+		<ds-flex gap="0.5" mode="column" align="start" class="text-[18pt]">
+			<div class="flex gap-4 items-baseline w-full"><code class="code-block text-[14pt] py-0.5 px-2 flex-shrink-0">--ds-font-family</code><span class="text-[#6b7280]">→</span><span class="text-[#1a1a2e]">Vollkorn Variable</span></div>
+			<div class="flex gap-4 items-baseline w-full"><code class="code-block text-[14pt] py-0.5 px-2 flex-shrink-0">--ds-accent</code><span class="text-[#6b7280]">→</span><span class="text-[#D97757] font-bold">#D97757</span></div>
+			<div class="flex gap-4 items-baseline w-full"><code class="code-block text-[14pt] py-0.5 px-2 flex-shrink-0">--ds-slide-bg</code><span class="text-[#6b7280]">→</span><span class="text-[#1a1a2e]">#FAF8F5</span></div>
+			<div class="flex gap-4 items-baseline w-full"><code class="code-block text-[14pt] py-0.5 px-2 flex-shrink-0">--ds-font-size-base</code><span class="text-[#6b7280]">→</span><span class="text-[#1a1a2e]">24pt</span></div>
+		</ds-flex>
+		<div>
+			<div class="text-[14pt] text-[#6b7280] uppercase tracking-widest mb-2">Import themes</div>
+			<ds-flex gap="0.5" mode="column" align="start">
+				<div class="code-block">@dotslide/framework/themes/default.css</div>
+				<div class="code-block">@dotslide/framework/themes/dark.css</div>
+			</ds-flex>
+		</div>
+		<p class="text-[18pt] text-[#6b7280]">Override any token to customize. This presentation uses <span class="text-[#D97757] font-semibold">warm cream</span> backgrounds and <span class="text-[#2A9D8F] font-semibold">teal</span> accents — all via CSS variables.</p>
+	</ContentSlide>
+
+	<!-- Slide 16: Hash-Based Deep Linking -->
+	<ContentSlide title="Share any moment">
+		<div>
+			<div class="text-[14pt] text-[#6b7280] uppercase tracking-widest mb-3">Every slide has a URL</div>
+			<ds-flex gap="0.75" mode="column" align="start" class="text-[18pt]">
+				<div class="flex gap-4 items-baseline"><code class="code-block text-[14pt] py-0.5 px-2">#/1</code><span class="text-[#6b7280]">— Title slide</span></div>
+				<div class="flex gap-4 items-baseline"><code class="code-block text-[14pt] py-0.5 px-2">#/5/2</code><span class="text-[#6b7280]">— Slide 5, step 2</span></div>
+				<div class="flex gap-4 items-baseline"><code class="code-block text-[14pt] py-0.5 px-2">#/13</code><span class="text-[#6b7280]">— Progress widgets</span></div>
+			</ds-flex>
+		</div>
+		<p class="text-[20pt] text-[#1a1a2e]">The URL updates as you navigate. Share a link to jump directly to any point in the presentation.</p>
+		<p class="text-[18pt] text-[#2A9D8F] font-medium">Try it: change the hash in your address bar.</p>
+	</ContentSlide>
+
+	<!-- Slide 17: Bringing It All Together -->
+	<ContentSlide title="One framework, endless possibilities">
+		<ds-step data-from="1"></ds-step>
+		<ds-step data-from="2">
+			<ds-flex gap="2" mode="row" align="start">
+				<ds-item>
+					<ds-list data-mode="unordered" class="text-[18pt] text-[#1a1a2e] space-y-1">
+						<ds-list-item>Progressive disclosure</ds-list-item>
+						<ds-list-item>Section hierarchy</ds-list-item>
+						<ds-list-item>Flex layouts</ds-list-item>
+						<ds-list-item>Auto-numbered counters</ds-list-item>
+						<ds-list-item>Live progress widgets</ds-list-item>
+					</ds-list>
+				</ds-item>
+				<ds-item>
+					<ds-list data-mode="unordered" class="text-[18pt] text-[#1a1a2e] space-y-1">
+						<ds-list-item>Keyboard navigation</ds-list-item>
+						<ds-list-item>Overlay positioning</ds-list-item>
+						<ds-list-item>CSS custom properties</ds-list-item>
+						<ds-list-item>Hash-based deep linking</ds-list-item>
+						<ds-list-item>Theme system</ds-list-item>
+					</ds-list>
+				</ds-item>
+			</ds-flex>
+		</ds-step>
+		<ds-step data-from="3">
+			<ds-flex gap="1" mode="row">
+				<ds-item><div class="card text-center px-6 py-3 w-48"><div class="text-[#D97757] font-bold text-[28pt]"><ds-counter data-type="feature" data-id="feat-1"></ds-counter></div><div class="text-[12pt] text-[#6b7280]">Core elements</div></div></ds-item>
+				<ds-item><div class="card text-center px-6 py-3 w-48"><div class="text-[#D97757] font-bold text-[28pt]"><ds-counter data-type="feature" data-id="feat-2"></ds-counter></div><div class="text-[12pt] text-[#6b7280]">Layout tools</div></div></ds-item>
+				<ds-item><div class="card text-center px-6 py-3 w-48"><div class="text-[#D97757] font-bold text-[28pt]"><ds-counter data-type="feature" data-id="feat-3"></ds-counter></div><div class="text-[12pt] text-[#6b7280]">Widgets</div></div></ds-item>
+				<ds-item><div class="card text-center px-6 py-3 w-48"><div class="text-[#D97757] font-bold text-[28pt]"><ds-counter data-type="feature" data-id="feat-4"></ds-counter></div><div class="text-[12pt] text-[#6b7280]">Controls</div></div></ds-item>
+			</ds-flex>
+		</ds-step>
+		<ds-step data-from="4">
+			<p class="text-[18pt] text-[#2A9D8F] font-medium">This slide uses 12 different components — all working together.</p>
+		</ds-step>
+	</ContentSlide>
+
+	<!-- Slide 18: Thank You -->
+	<ContentSlide class="flex flex-col items-center justify-center">
+		<ds-overlay data-location="top" data-alignment="left" data-padding>
+			<span class="tracking-[0.3em] uppercase text-sm font-semibold opacity-40">dotslide</span>
+		</ds-overlay>
+		<div class="flex flex-col items-center gap-6">
+			<h2 class="text-display font-black text-[#1a1a2e]">Thank you.</h2>
+			<div class="w-24 h-1 bg-[#D97757] rounded-full"></div>
+			<p class="text-[28pt] text-[#2A9D8F] font-medium">Questions?</p>
+		</div>
+	</ContentSlide>
+
 	<ds-keyboard-handler></ds-keyboard-handler>
 	<ds-slide-controls></ds-slide-controls>
 	<ds-loader></ds-loader>
-
-	<!-- Title Slide -->
-	<ds-slide class="flex flex-col items-center justify-center gap-4 bg-slate-100">
-		<h1 class="font-bold text-xl">A Guide to Today's AI</h1>
-		<div>John Doe</div>
-	</ds-slide>
-
-	<ds-slide>
-		<p>Hi there</p>
-	</ds-slide>
-
-	<!-- Section: The basics -->
-	<ds-section level="1" title="The basics"></ds-section>
-	<ds-slide class="bg-slate-100">
-		<div class="h-full px-16 flex flex-col items-center justify-center">
-			<div><ds-current-section data-display="numeric" data-separator="." data-suffix="."></ds-current-section></div>
-			<div class="w-full my-4 h-1 bg-black rounded-full" />
-			<h2 class="text-lg font-bold text-left">The basics</h2>
-		</div>
-	</ds-slide>
-
-	<ds-slide>
-		<p>Oh look, another slide!</p>
-		<p>Here's a test counter: <ds-counter data-type="test"></ds-counter></p>
-	</ds-slide>
-
-	<!-- Section: Introduction -->
-	<ds-section level="2" title="Introduction"></ds-section>
-	<ds-slide class="bg-slate-100">
-		<div class="h-full px-16 flex flex-col items-center justify-center">
-			<div><ds-current-section data-display="numeric" data-separator="." data-suffix="."></ds-current-section></div>
-			<div class="w-full my-4 h-1 bg-black rounded-full" />
-			<h2 class="text-lg font-bold text-left">Introduction</h2>
-		</div>
-	</ds-slide>
-
-	<ds-slide>
-		<p>The second test counter: <ds-counter data-type="test" data-id="test-2"></ds-counter>, but this one is a different one: <ds-counter data-type="table"></ds-counter></p>
-		<p>Here's a row:</p>
-		<ds-flex>
-			<ds-item>One</ds-item>
-			<ds-item>Two</ds-item>
-		</ds-flex>
-
-		<p>And these are two lists:</p>
-		<ds-list data-mode="unordered">
-			<ds-list-item>Item 1</ds-list-item>
-			<ds-list-item>Item 2</ds-list-item>
-		</ds-list>
-
-		<ds-list data-mode="ordered" style="--ds-list-start: 3">
-			<ds-list-item>Item 3</ds-list-item>
-			<ds-list-item>Item 4</ds-list-item>
-		</ds-list>
-
-		<p class="mt-8">And this is a column:</p>
-		<ds-flex mode="column">
-			<div>One</div>
-			<div>Two</div>
-		</ds-flex>
-	</ds-slide>
-
-	<ds-slide>
-		<p>Let's see if <ds-reference data-id="test-2"></ds-reference> exists.</p>
-	</ds-slide>
 </ds-slideshow>
 
 <script>
 	import "@dotslide/framework";
 </script>
+</body>
+</html>

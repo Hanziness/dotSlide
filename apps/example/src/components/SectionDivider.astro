@@ -1,0 +1,27 @@
+---
+/**
+ * SectionDivider — dark-themed slide for section breaks.
+ *
+ * Props:
+ *   title — section heading text
+ *   caption — subtitle text below the heading
+ *   class — extra classes merged onto the ds-slide
+ */
+export interface Props {
+	title: string;
+	caption: string;
+	class?: string;
+}
+const { title, caption, class: extraClass = "" } = Astro.props;
+---
+
+<ds-slide class:list={["section-divider", "flex", "flex-col", "items-center", "justify-center", extraClass]}>
+	<div class="flex flex-col items-center gap-4">
+		<div class="text-[120pt] font-black text-[#D97757] leading-none tracking-tight">
+			<ds-current-section data-display="numeric" data-level="1"></ds-current-section>
+		</div>
+		<div class="w-16 h-1 bg-[#D97757] rounded-full"></div>
+		<h2 class="text-[42pt] font-bold text-[#f1f5f9]">{title}</h2>
+		<p class="text-[18pt] text-[#94a3b8]">{caption}</p>
+	</div>
+</ds-slide>

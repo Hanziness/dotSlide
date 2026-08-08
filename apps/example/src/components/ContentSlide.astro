@@ -1,0 +1,41 @@
+---
+/**
+ * ContentSlide — standard light-themed slide with persistent overlays.
+ *
+ * Props:
+ *   title — slide title, rendered in a fixed top zone (omit for title-less slides)
+ *   class — extra classes merged onto the ds-slide (e.g. for special layouts)
+ *
+ * Includes top-right section/slide indicators and bottom progress bar.
+ * Slot content is vertically centered below the title zone.
+ */
+export interface Props {
+	title?: string;
+	class?: string;
+}
+const { title, class: extraClass = "" } = Astro.props;
+---
+
+<ds-slide class:list={["bg-[#FAF8F5]", "flex", "flex-col", extraClass]}>
+	<ds-overlay class="items-center" data-location="top" data-alignment="right" data-padding>
+		<span class="tracking-wide uppercase text-sm opacity-60">
+			<ds-current-section data-display="text"></ds-current-section>
+		</span>
+		<span class="opacity-40 ml-4">
+			<ds-current-slide></ds-current-slide>/<ds-total-slides></ds-total-slides>
+		</span>
+	</ds-overlay>
+	<ds-overlay data-location="bottom" data-alignment="center" data-padding>
+		<div class="w-[60%]">
+			<ds-progress data-display="bar"></ds-progress>
+		</div>
+	</ds-overlay>
+	{title && (
+		<div class="px-16 pt-12 shrink-0">
+			<h2 class="text-[42pt] font-bold text-[#1a1a2e]">{title}</h2>
+		</div>
+	)}
+	<div class="flex-1 flex flex-col justify-center px-16 gap-4 w-full pb-16">
+		<slot />
+	</div>
+</ds-slide>
