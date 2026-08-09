@@ -1,0 +1,7 @@
+ds-step {
+  display: contents;
+}
+
+ds-step:not(.active) {
+  visibility: hidden;
+}

@@ -1,11 +1,10 @@
-import { injectStyles } from "../../utils/styles.js";
-import { createSectionContext } from "../../store/index.js";
 import { useSlideContext } from "../../store/context/slide.js";
+import { createSectionContext } from "../../store/index.js";
 import { getSlidePositionInSection } from "../../utils/section.js";
+import { injectStyles } from "../../utils/styles.js";
+import currentSlideCss from "./current-slide.css?raw";
 
-const css = "ds-current-slide { display: inline; }";
-
-injectStyles(css, "current-slide");
+injectStyles(currentSlideCss, "current-slide");
 
 export class CurrentSlide extends HTMLElement {
   private _unsubscribe?: () => void;
@@ -31,7 +30,11 @@ export class CurrentSlide extends HTMLElement {
       this._unsubscribe = sectionStore.subscribe((ctx) => {
         if (!ctx.initialized) return;
         this._unsubscribe?.();
-        const pos = getSlidePositionInSection(slideshowRoot, slideIndex, within);
+        const pos = getSlidePositionInSection(
+          slideshowRoot,
+          slideIndex,
+          within,
+        );
         this.textContent = pos ? String(pos.position) : "?";
       });
     });
