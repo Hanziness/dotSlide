@@ -180,7 +180,7 @@ dotSlide uses CSS custom properties for theming:
 
 ```css
 ds-slideshow {
-  --ds-font-family: system-ui, sans-serif;
+  --ds-font-content: system-ui, sans-serif;
   --ds-slide-bg: white;
   --ds-control-bg: white;
   --ds-control-radius: 9999px;

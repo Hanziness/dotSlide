@@ -1,20 +1,7 @@
 import { withSlideshowContext } from "../../store/context/slideshow.js";
 import { injectStyles } from "../../utils/styles.js";
 
-const buttonCss = `
-ds-button { display: contents; }
-ds-button button {
-  border-radius: var(--ds-control-radius, 9999px);
-  background-color: var(--ds-control-bg, white);
-  padding: 0.75rem;
-  box-shadow: var(--ds-control-shadow, 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1));
-  border: none;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-`;
+import buttonCss from "./button.css?raw";
 
 injectStyles(buttonCss, "button");
 

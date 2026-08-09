@@ -1,0 +1,11 @@
+ds-video {
+  display: inline-block;
+  width: 100%;
+  height: 100%;
+}
+
+ds-video video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}

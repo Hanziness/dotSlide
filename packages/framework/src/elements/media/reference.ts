@@ -4,7 +4,8 @@ import {
 } from "../../store/context/slideshow.js";
 import { injectStyles } from "../../utils/styles.js";
 
-const referenceCss = `ds-reference { display: inline; }`;
+import referenceCss from "./reference.css?raw";
+
 injectStyles(referenceCss, "reference");
 
 export class DsReference extends HTMLElement {

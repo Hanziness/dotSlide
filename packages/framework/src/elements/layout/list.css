@@ -1,0 +1,10 @@
+ds-list {
+  display: block;
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+ds-list[data-mode="ordered"] {
+  counter-reset: ds-list calc(var(--ds-list-start, 1) - 1);
+}

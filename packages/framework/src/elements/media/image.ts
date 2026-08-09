@@ -1,12 +1,8 @@
 import { injectStyles } from "../../utils/styles.js";
 import { registerResource } from "../../utils/resource.js";
 
-const imageCss = `ds-image { display: contents; }
-ds-image img {
-  width: 100%;
-  display: block;
-  height: 100%;
-}`;
+import imageCss from "./image.css?raw";
+
 injectStyles(imageCss, "image");
 
 export class DsImage extends HTMLElement {

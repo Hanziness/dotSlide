@@ -10,30 +10,7 @@ import {
 import type { ResourceRegistrationDetail } from "../utils/resource";
 import { injectStyles } from "../utils/styles";
 
-const slideshowCss = `ds-slideshow {
-  --fit-scale: 1;
-
-  position: relative;
-  contain: layout style paint;
-
-  scale: var(--fit-scale);
-  width: 100%;
-  height: 100%;
-
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-
-  font-family: var(--ds-font-family, system-ui, sans-serif);
-  font-size: var(--ds-font-size-base, 1rem);
-}
-
-@layer dotslide {
-  ds-slideshow.loading {
-    opacity: 20%;
-  }
-}`;
+import slideshowCss from "./slideshow.css?raw";
 
 injectStyles(slideshowCss, "slideshow");
 

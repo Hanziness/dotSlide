@@ -1,28 +1,7 @@
 import { injectStyles } from "../../utils/styles.js";
 
-const listItemCss = `ds-list-item {
-  display: list-item;
-  list-style: none;
-}
+import listItemCss from "./list-item.css?raw";
 
-ds-list[data-mode="ordered"] > ds-list-item::before {
-  counter-increment: ds-list;
-  content: counter(ds-list) ".";
-  display: inline-block;
-  width: 1.5em;
-  text-align: right;
-  margin-right: 0.5em;
-  color: var(--ds-list-marker-color, currentColor);
-}
-
-ds-list[data-mode="unordered"] > ds-list-item::before {
-  content: "\\2022";
-  display: inline-block;
-  width: 1.5em;
-  text-align: right;
-  margin-right: 0.5em;
-  color: var(--ds-list-marker-color, currentColor);
-}`;
 injectStyles(listItemCss, "list-item");
 
 export class DsListItem extends HTMLElement {
