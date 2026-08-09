@@ -81,8 +81,7 @@ type DerivedFields =
   | "phase"
   | "pending"
   | "ready"
-  | "counters"
-  | "templates";
+  | "counters";
 
 export const createSlideshowContext = (
   root: HTMLElement,
