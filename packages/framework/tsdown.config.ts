@@ -18,6 +18,8 @@ const rawImportPlugin: TsdownPlugin = {
     const resolved = importer.startsWith("file://")
       ? fileURLToPath(new URL(file, importer))
       : resolve(dirname(importer), file);
+    // tell Rolldown to watch the file so changes trigger rebuild
+    this.addWatchFile(resolved);
     return `${resolved}${rawSuffix}`;
   },
   load(id) {
