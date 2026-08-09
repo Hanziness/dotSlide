@@ -2,6 +2,7 @@
   "name": "@dotslide/example",
   "type": "module",
   "version": "0.1.1",
+  "private": true,
   "author": {
     "name": "Imre Gera",
     "url": "https://github.com/Hanziness"
