@@ -3,23 +3,9 @@ import { useSlideshowContext } from "../../store/context/slideshow.js";
 import { createSectionContext } from "../../store/index.js";
 import { getSlidePositionInSection } from "../../utils/section.js";
 import { injectStyles } from "../../utils/styles.js";
+import progressCss from "./progress.css?raw";
 
-const css = `ds-progress { display: inline; }
-ds-progress .track {
-  display: inline-block;
-  width: 100%;
-  height: 0.4em;
-  background: color-mix(in srgb, currentColor 20%, transparent);
-  border-radius: 9999px;
-}
-ds-progress .fill {
-  height: 100%;
-  background: currentColor;
-  border-radius: inherit;
-  transition: width 0.2s;
-}`;
-
-injectStyles(css, "progress");
+injectStyles(progressCss, "progress");
 
 export class Progress extends HTMLElement {
   private _unsubscribe?: () => void;
@@ -43,9 +29,11 @@ export class Progress extends HTMLElement {
 
       const slideCtx = useSlideContext(this);
       if (!slideCtx) {
-        console.warn("<ds-progress> was place outside of a <ds-slide>. This is not supported.")
+        console.warn(
+          "<ds-progress> was place outside of a <ds-slide>. This is not supported.",
+        );
         return;
-      };
+      }
       const slideIndex = slideCtx.get().index;
 
       const slideshowRoot = this.closest("ds-slideshow");

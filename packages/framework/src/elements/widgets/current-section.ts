@@ -1,10 +1,9 @@
 import { useSlideContext } from "../../store/context/slide.js";
 import { createSectionContext } from "../../store/index.js";
 import { injectStyles } from "../../utils/styles.js";
+import currentSectionCss from "./current-section.css?raw";
 
-const css = "ds-current-section { display: inline; }";
-
-injectStyles(css, "current-section");
+injectStyles(currentSectionCss, "current-section");
 
 export class CurrentSection extends HTMLElement {
   private _unsubscribe?: () => void;

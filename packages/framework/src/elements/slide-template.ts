@@ -3,14 +3,9 @@ import {
   withSlideshowContext,
 } from "../store/context/slideshow";
 import { injectStyles } from "../utils/styles";
+import slideTemplateCss from "./slide-template.css?raw";
 
-const css = `@layer dotslide {
-  ds-slide-template {
-    display: none;
-  }
-}`;
-
-injectStyles(css, "slide-template");
+injectStyles(slideTemplateCss, "slide-template");
 
 /**
  * Apply a named template to a host element. Clones the template's content

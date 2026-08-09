@@ -1,12 +1,11 @@
-import { injectStyles } from "../../utils/styles.js";
-import { createSectionContext } from "../../store/index.js";
 import { useSlideContext } from "../../store/context/slide.js";
 import { useSlideshowContext } from "../../store/context/slideshow.js";
+import { createSectionContext } from "../../store/index.js";
 import { getSlidePositionInSection } from "../../utils/section.js";
+import { injectStyles } from "../../utils/styles.js";
+import totalSlidesCss from "./total-slides.css?raw";
 
-const css = "ds-total-slides { display: inline; }";
-
-injectStyles(css, "total-slides");
+injectStyles(totalSlidesCss, "total-slides");
 
 export class TotalSlides extends HTMLElement {
   private _unsubscribe?: () => void;
@@ -37,7 +36,11 @@ export class TotalSlides extends HTMLElement {
       this._unsubscribe = sectionStore.subscribe((ctx) => {
         if (!ctx.initialized) return;
         this._unsubscribe?.();
-        const pos = getSlidePositionInSection(slideshowRoot, slideIndex, within);
+        const pos = getSlidePositionInSection(
+          slideshowRoot,
+          slideIndex,
+          within,
+        );
         this.textContent = pos ? String(pos.total) : "?";
       });
     });
