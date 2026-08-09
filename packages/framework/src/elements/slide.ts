@@ -1,5 +1,6 @@
 import { createSlideContext } from "../store/context/slide";
 import { injectStyles } from "../utils/styles";
+import { applyTemplate } from "./slide-template";
 
 const css = `@layer dotslide {
   ds-slide {
@@ -33,13 +34,26 @@ export class Slide extends HTMLElement {
       return;
     }
 
+    // Apply template before index calculation so template-introduced
+    // ds-step elements are visible when the slideshow builds navigation
+    const templateName = this.getAttribute("template");
+    if (templateName && !applyTemplate(this, templateName)) {
+      console.warn(
+        "[dotslide]",
+        `Slide template "${templateName}" not found — define <ds-slide-template name="${templateName}"> before this slide`,
+      );
+    }
+
     const slides = Array.from(
       slideshow.querySelectorAll<HTMLElement>("ds-slide"),
     );
     const slideIndex = slides.indexOf(this);
 
     if (slideIndex === -1) {
-      console.warn("[dotslide]", "Slide could not determine its index within the slideshow");
+      console.warn(
+        "[dotslide]",
+        "Slide could not determine its index within the slideshow",
+      );
       return;
     }
 

@@ -19,6 +19,7 @@ export { DsVideo } from "./media/video.js";
 export { Loader } from "./overlay/loader.js";
 export { Section } from "./section.js";
 export { Slide } from "./slide.js";
+export { SlideTemplate } from "./slide-template.js";
 export { Slideshow } from "./slideshow.js";
 export { Step } from "./step.js";
 export { CurrentSection } from "./widgets/current-section.js";
