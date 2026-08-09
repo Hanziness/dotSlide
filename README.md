@@ -26,6 +26,8 @@ Focus on content, not configuration.
 - `<ds-image>` — Image with loading state.
 - `<ds-video>` — Video with slide-aware playback.
 - `<ds-overlay>` — Positioning container.
+- `<ds-slide-template>` — Reusable slide layout with named slots.
+- `<ds-slot>` — Content placeholder inside templates.
 
 ```html
 <!DOCTYPE html>
@@ -74,6 +76,21 @@ Focus on content, not configuration.
 ```html
 <ds-progress data-display="bar"></ds-progress>
 <p>Slide <ds-current-slide></ds-current-slide> of <ds-total-slides></ds-total-slides></p>
+```
+
+### 🧱 Slide templates
+
+Define reusable layouts once, apply them to any slide.
+
+```html
+<ds-slide-template name="title-content">
+  <h2><ds-slot name="title"></ds-slot></h2>
+  <div><ds-slot /></div>
+</ds-slide-template>
+
+<ds-slide template="title-content" ds-slot-title="Welcome">
+  <p>This is the body content.</p>
+</ds-slide>
 ```
 
 ## 🚀 Usage

@@ -17,6 +17,7 @@ import { DsVideo } from "./elements/media/video";
 import { Loader } from "./elements/overlay/loader";
 import { Section } from "./elements/section";
 import { Slide } from "./elements/slide";
+import { SlideTemplate } from "./elements/slide-template";
 import { Slideshow } from "./elements/slideshow";
 import { Step } from "./elements/step";
 import { CurrentSection } from "./elements/widgets/current-section";
@@ -90,6 +91,7 @@ export {
   Slide,
   SlideControls,
   Slideshow,
+  SlideTemplate,
   Step,
   TotalSlides,
 };
@@ -99,6 +101,7 @@ declare global {
   interface HTMLElementTagNameMap {
     "ds-slideshow": Slideshow;
     "ds-slide": Slide;
+    "ds-slide-template": SlideTemplate;
     "ds-step": Step;
     "ds-section": Section;
     "ds-keyboard-handler": KeyboardHandler;

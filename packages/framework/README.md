@@ -69,9 +69,11 @@ npm install @dotslide/framework
 | Element | Description | Key Attributes |
 |---------|-------------|----------------|
 | `<ds-slideshow>` | Root container for the presentation | `data-slideshow-width`, `data-slideshow-height` |
-| `<ds-slide>` | Individual slide | — |
+| `<ds-slide>` | Individual slide | `template` |
 | `<ds-step>` | Progressive disclosure within a slide | `data-from`, `data-to` |
 | `<ds-section>` | Groups slides into sections | `level`, `title` |
+| `<ds-slide-template>` | Reusable slide layout with named slots | `name` |
+| `<ds-slot>` | Content placeholder inside a template | `name` |
 
 ### Controls
 
@@ -171,6 +173,34 @@ Create custom counters and refer to them deterministically from other slides.
 <ds-slide>
   <p>See Figure <ds-counter data-type="figure" data-id="fig1"></ds-counter></p>
   <p>Later: As shown in Figure <ds-reference data-id="fig1"></ds-reference>...</p>
+</ds-slide>
+```
+
+### Slide Templates
+
+Define reusable layouts with `<ds-slide-template>` and `<ds-slot>`, then apply them to slides with the `template` attribute.
+
+Templates must appear before the slides that reference them in DOM order.
+
+```html
+<ds-slide-template name="main">
+  <div class="slide-header">
+    <h2><ds-slot name="title"></ds-slot></h2>
+  </div>
+  <div class="slide-body">
+    <ds-slot />
+  </div>
+</ds-slide-template>
+
+<!-- Text shorthand via ds-slot-* attributes -->
+<ds-slide template="main" ds-slot-title="Welcome">
+  <p>Body content goes into the unnamed slot.</p>
+</ds-slide>
+
+<!-- Rich content via slot attribute on children -->
+<ds-slide template="main">
+  <span slot="title">Custom <em>rich</em> title</span>
+  <p>Body content goes into the unnamed slot.</p>
 </ds-slide>
 ```
 
