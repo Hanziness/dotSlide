@@ -42,6 +42,9 @@ export type SlideshowContext = {
   /** Map of counter types to their instances. Each instance gets a sequential value. */
   counters: Record<string, CounterInfo[]>;
 
+  /** Registry of named slide templates keyed by their `name` attribute. */
+  templates: Record<string, HTMLTemplateElement>;
+
   // — Derived fields (auto-updated when navigationIndex changes) —
 
   /** Index of the currently visible slide */
@@ -78,7 +81,8 @@ type DerivedFields =
   | "phase"
   | "pending"
   | "ready"
-  | "counters";
+  | "counters"
+  | "templates";
 
 export const createSlideshowContext = (
   root: HTMLElement,
@@ -103,6 +107,8 @@ export const createSlideshowContext = (
     ready: false,
     // Counter state — starts empty, counters register themselves
     counters: {},
+    // Template registry — starts empty, templates register themselves
+    templates: {},
   });
 
   // Keep derived fields in sync when navigationIndex changes.

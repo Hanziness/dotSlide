@@ -27,7 +27,7 @@ const css = `@layer dotslide {
 injectStyles(css, "slide");
 
 export class Slide extends HTMLElement {
-  connectedCallback() {
+  async connectedCallback() {
     const slideshow = this.closest("ds-slideshow");
     if (!slideshow) {
       console.warn("[dotslide]", "Slide is not rendered inside a ds-slideshow");
@@ -37,7 +37,7 @@ export class Slide extends HTMLElement {
     // Apply template before index calculation so template-introduced
     // ds-step elements are visible when the slideshow builds navigation
     const templateName = this.getAttribute("template");
-    if (templateName && !applyTemplate(this, templateName)) {
+    if (templateName && (await applyTemplate(this, templateName) !== true)) {
       console.warn(
         "[dotslide]",
         `Slide template "${templateName}" not found — define <ds-slide-template name="${templateName}"> before this slide`,
