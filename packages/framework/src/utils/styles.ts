@@ -7,7 +7,7 @@ const injectedStyles = new Set<string>();
 
 /**
  * Inject CSS into the document head.
- * Uses @layer dotslide for specificity control.
+ * Uses `@layer dotslide` for specificity control.
  * Only injects once per unique CSS content.
  */
 export function injectStyles(css: string, id?: string): void {
