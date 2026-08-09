@@ -5,7 +5,8 @@ import {
 } from "../../store/context/slideshow.js";
 import { injectStyles } from "../../utils/styles.js";
 
-const counterCss = `ds-counter { display: inline; }`;
+import counterCss from "./counter.css?raw";
+
 injectStyles(counterCss, "counter");
 
 export class DsCounter extends HTMLElement {

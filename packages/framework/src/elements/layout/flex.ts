@@ -1,12 +1,7 @@
 import { injectStyles } from "../../utils/styles.js";
 
-const flexCss = `ds-flex {
-  display: flex;
-  flex-direction: var(--flex-direction, row);
-  justify-content: var(--justify, start);
-  align-items: var(--align, center);
-  gap: var(--gap, .5rem);
-}`;
+import flexCss from "./flex.css?raw";
+
 injectStyles(flexCss, "flex");
 
 export class DsFlex extends HTMLElement {

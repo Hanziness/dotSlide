@@ -1,6 +1,7 @@
 import { injectStyles } from "../../utils/styles.js";
 
-const itemCss = `ds-item { display: contents; }`;
+import itemCss from "./item.css?raw";
+
 injectStyles(itemCss, "item");
 
 export class DsItem extends HTMLElement {}

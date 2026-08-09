@@ -1,16 +1,7 @@
 import { injectStyles } from "../../utils/styles.js";
 
-const videoCss = `ds-video {
-  display: inline-block;
-  width: 100%;
-  height: 100%;
-}
+import videoCss from "./video.css?raw";
 
-ds-video video {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}`;
 injectStyles(videoCss, "video");
 
 export class DsVideo extends HTMLElement {

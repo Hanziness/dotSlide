@@ -1,20 +1,6 @@
 import { injectStyles } from "../../utils/styles.js";
 
-const overlayCss = `
-ds-overlay {
-  position: absolute;
-  display: flex;
-  flex-direction: row;
-  gap: 0.5rem;
-}
-ds-overlay.padded { padding: var(--ds-overlay-padding, 1rem); }
-ds-overlay.top { top: 0; }
-ds-overlay.bottom { bottom: 0; }
-ds-overlay.vcenter { height: 100%; align-items: center; }
-ds-overlay.left { left: 0; }
-ds-overlay.hcenter { width: 100%; justify-content: center; }
-ds-overlay.right { right: 0; }
-`;
+import overlayCss from "./overlay.css?raw";
 
 injectStyles(overlayCss, "overlay");
 
