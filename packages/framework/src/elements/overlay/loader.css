@@ -45,6 +45,7 @@ ds-loader .bar-inner {
 }
 
 .logo-text {
+  font-family: var(--ds-font-ui, system-ui, sans-serif);
   font-size: 3em;
   font-weight: 900;
   animation: pulse 2s ease-in-out infinite;

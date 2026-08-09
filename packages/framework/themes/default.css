@@ -2,14 +2,18 @@
 /* Default (light) theme for @dotslide/framework.
    Import this file once in your presentation's root layout:
      import "@dotslide/framework/themes/default.css";
-   Then override any token to customise: */
+   Then override any token to customise:
+
+   --ds-font-content: slide content font.
+   --ds-font-ui: framework UI chrome font (controls, loader, progress). */
 
 @layer dotslide;
 
 :root {
   --ds-body-bg: black;
   --ds-slide-bg: white;
-  --ds-font-family: system-ui, sans-serif;
+  --ds-font-content: system-ui, sans-serif;
+  --ds-font-ui: system-ui, sans-serif;
   --ds-font-size-base: 1rem;
   --ds-accent: #6366f1;
   --ds-loader-bg: black;

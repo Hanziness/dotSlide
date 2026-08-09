@@ -4,7 +4,8 @@
 :root {
   --ds-body-bg: #020617;
   --ds-slide-bg: #0f172a;
-  --ds-font-family: system-ui, sans-serif;
+  --ds-font-content: system-ui, sans-serif;
+  --ds-font-ui: system-ui, sans-serif;
   --ds-font-size-base: 1rem;
   --ds-accent: #818cf8;
   --ds-loader-bg: #020617;

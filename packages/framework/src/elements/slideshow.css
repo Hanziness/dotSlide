@@ -13,7 +13,7 @@ ds-slideshow {
   justify-content: center;
   align-items: center;
 
-  font-family: var(--ds-font-family, system-ui, sans-serif);
+  font-family: var(--ds-font-content, system-ui, sans-serif);
   font-size: var(--ds-font-size-base, 1rem);
 }
 
