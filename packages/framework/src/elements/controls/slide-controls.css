@@ -14,14 +14,18 @@
 }
 
 ds-slide-controls {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40%;  
   opacity: 0;
   transition: opacity 0.3s;
-  pointer-events: none;
 }
 
-ds-slide-controls[data-visible] {
+ds-slide-controls[data-visible],
+ds-slide-controls:hover {
   opacity: 1;
-  pointer-events: auto;
 }
 
 ds-slide-controls > ds-overlay {
@@ -35,6 +39,7 @@ ds-slide-controls > ds-overlay {
 
 @media (hover: none) {
   ds-slide-controls {
+    height: auto;
     opacity: 1;
     pointer-events: auto;
   }

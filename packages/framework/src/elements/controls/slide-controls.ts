@@ -6,16 +6,28 @@ import slideControlsCss from "./slide-controls.css?raw";
 injectStyles(slideControlsCss, "slide-controls");
 
 export class SlideControls extends HTMLElement {
+  private static readonly HIDE_DELAY_MS = 2000;
+
   private _hideTimeout?: number;
-  private _slideshowRoot?: HTMLElement;
-  private _onMouseMove?: () => void;
+  private _onMouseEnter?: () => void;
   private _onMouseLeave?: () => void;
   private _unsubscribeContext?: () => void;
 
   private _show = () => {
     this.setAttribute("data-visible", "");
+    if (this._hideTimeout) {
+      window.clearTimeout(this._hideTimeout);
+      this._hideTimeout = undefined;
+    }
+  };
+
+  private _startHideTimeout = () => {
     if (this._hideTimeout) window.clearTimeout(this._hideTimeout);
-    this._hideTimeout = window.setTimeout(this._hide, 2000);
+    this._hideTimeout = window.setTimeout(() => {
+      if (!this.matches(":hover")) {
+        this._hide();
+      }
+    }, SlideControls.HIDE_DELAY_MS);
   };
 
   private _hide = () => {
@@ -44,17 +56,15 @@ export class SlideControls extends HTMLElement {
     }
 
     // Hover-to-reveal on desktop
-    const slideshowRoot = this.closest("ds-slideshow");
-    if (slideshowRoot instanceof HTMLElement) {
-      this._slideshowRoot = slideshowRoot;
+    if (window.matchMedia("(hover: hover)").matches) {
+      this._onMouseEnter = this._show;
+      this._onMouseLeave = this._startHideTimeout;
 
-      if (window.matchMedia("(hover: hover)").matches) {
-        this._onMouseMove = this._show;
-        this._onMouseLeave = this._hide;
-
-        slideshowRoot.addEventListener("mousemove", this._onMouseMove);
-        slideshowRoot.addEventListener("mouseleave", this._onMouseLeave);
-      }
+      this.addEventListener("mouseenter", this._onMouseEnter);
+      this.addEventListener("mouseleave", this._onMouseLeave);
+    } else {
+      // Touch devices: always visible, no trigger zone needed
+      this._show();
     }
 
     // Slide number rendering
@@ -73,13 +83,12 @@ export class SlideControls extends HTMLElement {
   }
 
   disconnectedCallback() {
-    if (this._slideshowRoot) {
-      if (this._onMouseMove) {
-        this._slideshowRoot.removeEventListener("mousemove", this._onMouseMove);
-      }
-      if (this._onMouseLeave) {
-        this._slideshowRoot.removeEventListener("mouseleave", this._onMouseLeave);
-      }
+    if (this._onMouseEnter) {
+      this.removeEventListener("mouseenter", this._onMouseEnter);
+    }
+
+    if (this._onMouseLeave) {
+      this.removeEventListener("mouseleave", this._onMouseLeave);
     }
 
     if (this._hideTimeout) {
