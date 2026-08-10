@@ -2,10 +2,19 @@
   "name": "@dotslide/controller",
   "private": true,
   "version": "0.1.0",
+  "description": "Svelte-based controller web app for dotSlide presentations",
   "author": {
     "name": "Imre Gera",
     "url": "https://github.com/Hanziness"
   },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Hanziness/dotslide",
+    "directory": "apps/controller"
+  },
+  "bugs": "https://github.com/Hanziness/dotslide/issues",
+  "homepage": "https://github.com/Hanziness/dotslide#readme",
   "type": "module",
   "scripts": {
     "dev": "vite dev",

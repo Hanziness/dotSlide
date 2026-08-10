@@ -1,11 +1,19 @@
 {
   "name": "@dotslide/protocol",
   "version": "0.1.0",
+  "description": "Shared protocol and types for dotSlide",
   "author": {
     "name": "Imre Gera",
     "url": "https://github.com/Hanziness"
   },
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Hanziness/dotslide",
+    "directory": "packages/protocol"
+  },
+  "bugs": "https://github.com/Hanziness/dotslide/issues",
+  "homepage": "https://github.com/Hanziness/dotslide#readme",
   "type": "module",
   "scripts": {
     "build": "tsdown",

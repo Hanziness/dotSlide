@@ -1,6 +1,18 @@
 {
   "name": "dotslide",
   "private": true,
+  "description": "Modern, framework-agnostic slideshow framework built for both humans and agents",
+  "author": {
+    "name": "Imre Gera",
+    "url": "https://github.com/Hanziness"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Hanziness/dotslide"
+  },
+  "bugs": "https://github.com/Hanziness/dotslide/issues",
+  "homepage": "https://github.com/Hanziness/dotslide#readme",
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev"

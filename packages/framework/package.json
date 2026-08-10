@@ -1,12 +1,20 @@
 {
   "name": "@dotslide/framework",
   "version": "0.2.0",
+  "description": "Modern, framework-agnostic slideshow framework built for both humans and agents",
   "author": {
     "name": "Imre Gera",
     "url": "https://github.com/Hanziness"
   },
-  "type": "module",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Hanziness/dotslide",
+    "directory": "packages/framework"
+  },
+  "bugs": "https://github.com/Hanziness/dotslide/issues",
+  "homepage": "https://github.com/Hanziness/dotslide#readme",
+  "type": "module",
   "exports": {
     ".": {
       "import": "./dist/index.js",

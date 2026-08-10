@@ -1,12 +1,21 @@
 {
   "name": "@dotslide/server",
   "version": "0.1.0",
+  "description": "Controller server component for dotSlide presentations",
   "private": true,
   "type": "module",
   "author": {
     "name": "Imre Gera",
     "url": "https://github.com/Hanziness"
   },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Hanziness/dotslide",
+    "directory": "apps/server"
+  },
+  "bugs": "https://github.com/Hanziness/dotslide/issues",
+  "homepage": "https://github.com/Hanziness/dotslide#readme",
   "scripts": {
     "dev": "bun run --hot src/index.ts",
     "build": "bun run build.ts",
