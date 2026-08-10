@@ -6,6 +6,7 @@
     "url": "https://github.com/Hanziness"
   },
   "type": "module",
+  "license": "MIT",
   "exports": {
     ".": {
       "import": "./dist/index.js",
