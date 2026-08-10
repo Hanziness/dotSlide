@@ -1,5 +1,14 @@
 # @dotslide/example
 
+## 0.1.2
+
+### Patch Changes
+
+- Updated dependencies [cc5904d]
+- Updated dependencies [bda3b1e]
+  - @dotslide/framework@0.2.1
+  - @dotslide/remote@1.0.1
+
 ## 0.1.1
 
 ### Patch Changes

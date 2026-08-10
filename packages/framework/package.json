@@ -1,6 +1,6 @@
 {
   "name": "@dotslide/framework",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Modern, framework-agnostic slideshow framework built for both humans and agents",
   "author": {
     "name": "Imre Gera",

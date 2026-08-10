@@ -1,5 +1,15 @@
 # @dotslide/framework
 
+## 0.2.1
+
+### Patch Changes
+
+- cc5904d: Add MIT license to published packages
+- bda3b1e: Update package.json files
+- Updated dependencies [cc5904d]
+- Updated dependencies [bda3b1e]
+  - @dotslide/protocol@0.1.1
+
 ## 0.2.0
 
 ### Minor Changes
