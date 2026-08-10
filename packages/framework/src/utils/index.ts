@@ -19,8 +19,9 @@ export function getSelector(identifier: string) {
  * It transforms the input object's given keys to `data-(prefix)-(value)` tags.
  *
  * @example In order to use it, just spread the returned object:
- * ```astro
- * <div {...getDataTags(Astro.props, 'component', ['attr1', 'attr2'])} />
+ * ```ts
+ * const attrs = getDataTags({ id: 'slide-1', title: 'Intro' }, 'component', ['id', 'title']);
+ * // Result: { 'data-component-id': 'slide-1', 'data-component-title': 'Intro' }
  * ```
  *  */
 export function getDataTags<T extends Record<string, unknown>>(
