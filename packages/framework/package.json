@@ -22,7 +22,10 @@
   ],
   "keywords": [
     "dotslide",
-    "astro-component"
+    "presentation",
+    "slides",
+    "web-components",
+    "framework-agnostic"
   ],
   "scripts": {
     "build": "tsdown",
