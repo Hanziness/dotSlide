@@ -9,7 +9,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Hanziness/dotslide"
+    "url": "git+https://github.com/Hanziness/dotslide.git"
   },
   "bugs": "https://github.com/Hanziness/dotslide/issues",
   "homepage": "https://github.com/Hanziness/dotslide#readme",
@@ -30,5 +30,6 @@
   "workspaces": [
     "apps/*",
     "packages/*"
-  ]
+  ],
+  "version": ""
 }
