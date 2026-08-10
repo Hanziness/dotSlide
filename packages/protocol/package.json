@@ -5,6 +5,7 @@
     "name": "Imre Gera",
     "url": "https://github.com/Hanziness"
   },
+  "license": "MIT",
   "type": "module",
   "scripts": {
     "build": "tsdown",
