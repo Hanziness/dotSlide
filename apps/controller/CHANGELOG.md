@@ -1,5 +1,15 @@
 # @dotslide/controller
 
+## 0.1.1
+
+### Patch Changes
+
+- bda3b1e: Update package.json files
+- Updated dependencies [cc5904d]
+- Updated dependencies [bda3b1e]
+  - @dotslide/protocol@0.1.1
+  - @dotslide/server@0.1.1
+
 ## 0.1.0
 
 ### Minor Changes

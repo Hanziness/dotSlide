@@ -1,6 +1,6 @@
 {
   "name": "@dotslide/protocol",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Shared protocol and types for dotSlide",
   "author": {
     "name": "Imre Gera",
