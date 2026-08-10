@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-dotslide is an Astro-based slideshow/presentation framework. Its goal is to enable creating fast and portable, yet modern presentations using Astro, and presenting those with the help of a mobile controller. It is a **TypeScript monorepo** managed by **Bun** and **Turborepo**.
+dotslide is a framework-agnostic slideshow framework built with Web Components. Its goal is to enable creating fast and portable, yet modern presentations using custom elements, and presenting those with the help of a mobile controller. It is a **TypeScript monorepo** managed by **Bun** and **Turborepo**.
 
 ### Monorepo Structure
 
@@ -14,13 +14,18 @@ apps/
 packages/
   framework/        # Core framework package (@dotslide/framework)
     src/
-      components/   # Reusable Astro components (Section, Image, Progress)
-      dev/          # Development-only controls (SlideControls, Prev, Next)
-      overlay/      # Overlay positioning components
+      elements/     # Vanilla Web Components (custom elements, ds-* prefix)
+        controls/   # SlideControls, Overlay, Button, KeyboardHandler
+        layout/     # Flex, Item, List, ListItem
+        media/      # Image, Video, Counter, Reference
+        overlay/    # Loader
+        widgets/    # Progress, CurrentSlide, TotalSlides, CurrentSection
       store/        # Nanostores-based state management
-      utils/        # Utility functions (generateId, getDataTags)
-    index.ts        # Main package entry - re-exports public components
-    controls.ts     # Secondary entry point for dev controls
+      styles/       # Shared CSS consumed via ?raw imports
+      utils/        # Utility functions (generateId, getDataTags, injectStyles)
+    index.ts        # Main package entry - registers and re-exports all elements
+    themes/         # Prebuilt CSS themes
+    dotslide.html-data.json  # Custom element metadata (for IDE tooling)
 ```
 
 ## Build, Dev, and Lint Commands
@@ -38,11 +43,10 @@ packages/
 
 ### Framework Package (`packages/framework`)
 
-| Command             | Description                                 |
-| ------------------- | ------------------------------------------- |
-| `bun run build:css` | Build UnoCSS styles (minified)              |
-| `bun run dev`       | Watch mode for UnoCSS                       |
-| `bun run dev:setup` | Wait for CSS build before dev server starts |
+| Command       | Description                 |
+| ------------- | --------------------------- |
+| `bun run build` | Bundle via tsdown           |
+| `bun run dev`   | Watch mode via `tsdown --watch` |
 
 ### Example App (`apps/example`)
 
@@ -76,7 +80,7 @@ bunx biome check --write .
 turbo run check-types
 ```
 
-TypeScript extends `astro/tsconfigs/strict` in both the framework and example app.
+The framework package uses a plain TypeScript config (`tsdown` handles bundling). The example app extends `astro/tsconfigs/strict`.
 
 ### Tests
 
@@ -95,98 +99,103 @@ There are **no tests** currently. No test framework (Vitest, Jest, Playwright) i
 ### Imports
 
 - **Organize imports**: Biome auto-organizes imports (`organizeImports: "on"`)
-- **Named exports preferred**: Components are re-exported as named exports from barrel files
+- **Elements import their own CSS** as `?raw` string modules and inject it via `injectStyles`:
   ```ts
-  export { default as Root } from "./src/Root.astro";
+  import progressCss from "./progress.css?raw";
+  import { injectStyles } from "../../utils/styles.js";
+  injectStyles(progressCss, "progress");
   ```
 - **Relative paths** within the same package; workspace references across packages:
   ```ts
-  import { slideshowContext } from "../store"; // within package
-  import { Root, Slide } from "@dotslide/framework"; // cross-package
+  import { useSlideshowContext } from "../store/context/slideshow.js"; // within package
+  import { Slideshow, Slide } from "@dotslide/framework"; // cross-package
   ```
-- **Secondary entry points** for feature groups:
+- **`.js` extensions** on relative import specifiers (ESM/tsdown convention):
   ```ts
-  import { SlideControls } from "@dotslide/framework/controls";
+  import { getDataTags } from "../../utils/index.js";
   ```
 
 ### TypeScript
 
-- **Strict mode**: `astro/tsconfigs/strict` is used everywhere
-- **Explicit return types** on exported utility functions
-- **`interface Props`** for simple Astro component props (Astro convention)
-- **Zod schemas** (`PropSchema`) for components needing runtime validation:
-
-  ```ts
-  import { z } from "astro/zod";
-
-  export const PropSchema = z.object({
-    level: z.number().int().min(0).max(6),
-    title: z.string().optional(),
-  });
-
-  type Props = z.output<typeof PropSchema>;
-  PropSchema.parse(Astro.props); // throws on invalid props
-  ```
-
+- **Strict mode** in both packages
+- **Explicit return types** on exported functions and class methods
+- **Custom element classes** extend `HTMLElement` and expose typed attributes/props
+- **Store context** via nanostores `mapCreator`-style factories, typed with generics
 - **JSDoc comments** on types, exported functions, and complex logic
 - Avoid `any`; use proper types or `unknown` with narrowing
+- **Register elements in `HTMLElementTagNameMap`** so `document.querySelector("ds-slide")` is typed
 
 ### Naming Conventions
 
 | Element          | Convention             | Example                               |
 | ---------------- | ---------------------- | ------------------------------------- |
-| Astro components | PascalCase files       | `Root.astro`, `SlideControls.astro`   |
-| TypeScript files | camelCase              | `index.ts`, `controls.ts`             |
-| Directories      | camelCase/lowercase    | `store/`, `utils/`, `dev/`            |
+| Custom Elements  | ds-* prefix (kebab-case) | `ds-slideshow`, `ds-slide`, `ds-button` |
+| TypeScript files | camelCase              | `slideshow.ts`, `button.ts`            |
+| Directories      | camelCase/lowercase    | `store/`, `utils/`, `elements/`        |
+| Classes          | PascalCase             | `Slideshow`, `SlideControls`, `DsButton` |
 | Functions        | camelCase              | `generateId()`, `getDataTags()`       |
-| Types/Interfaces | PascalCase             | `SlideshowContext`, `OverlayLocation` |
+| Types/Interfaces | PascalCase             | `SlideshowContext`, `NavigationNode`  |
 | Constants        | camelCase              | `slideshowContext`                    |
 | CSS variables    | kebab-case with prefix | `--slide-width`, `--slideshow-root`   |
 | Data attributes  | kebab-case             | `data-slide`, `data-slideshow-root`   |
 
-### Astro Components
+### Web Components
 
-- **Frontmatter** (between `---` fences): imports, types, props validation, server-side logic
-- **Template**: HTML with Astro expressions, UnoCSS utility classes
-- **`<style>`**: Scoped CSS by default; use `is:global` only when necessary
-- **`<script>`**: Client-side interactivity; imports from store/utils
-- CSS variables (`--slide-width`, `--slide-scale`) are used for dynamic sizing
-- Use `class:list` for conditional class application
+- **Custom element classes** extend `HTMLElement`, with a `connectedCallback` (and other lifecycle hooks) for setup:
+  ```ts
+  export class Slideshow extends HTMLElement {
+    private _unsubscribe?: () => void;
+
+    connectedCallback() {
+      // subscribe to stores, resolve nested elements, wire attributes
+    }
+    disconnectedCallback() {
+      this._unsubscribe?.();
+    }
+  }
+  customElements.define("ds-slideshow", Slideshow);
+  ```
+- **Lifecycle methods**: `connectedCallback()`, `disconnectedCallback()`, `attributeChangedCallback()`, `adoptedCallback()`. Static `observedAttributes` for reactive attributes.
+- **Attribute handling**: read via `getAttribute()`, observe with `observedAttributes`; use `data-*` attributes (`data-display`, `data-within`) for configuration.
+- **Event handling**: dispatch custom events (`new CustomEvent`) for component communication; listen with `addEventListener`.
+- **CSS scoping**: per-element CSS files imported as `?raw` and injected via `injectStyles(css, id)` (scoped by a shared id, not Shadow DOM by default). CSS variables (`--slide-width`, `--slide-scale`) are used for dynamic sizing.
+- **Composition**: elements resolve related elements via `customElements.whenDefined(...)` + `.closest("ds-slideshow")` queries.
 
 ### State Management
 
 - **Nanostores** with `mapCreator` pattern for shared state
-- Single `slideshowContext` store holds presentation state
+- Context stores (`createSlideshowContext`, `createSlideContext`, `createSectionContext`) created per element root and exposed via `use*Context`
 - Subscribe with `.subscribe()`, read with `.get()`, update with `.setKey()`
-- Store lives in `packages/framework/src/store/index.ts`
+- Store lives in `packages/framework/src/store/`
 
 ### Error Handling
 
-- **Zod `.parse()`** for prop validation (throws `ZodError` on invalid input)
 - **Early returns with guards** for null DOM queries (`if (element === null) return`)
-- **`console.warn()`** for non-fatal issues (missing DOM elements)
+- **`console.warn()`** for non-fatal issues (element used outside its supported parent)
 - **`console.debug()`** for development logging
 
 ### Biome Overrides for Framework Files
 
-In `.astro`, `.svelte`, and `.vue` files, these rules are disabled for Biome compatibility (as per the Biome recommendations):
+In `.astro`, `.svelte`, and `.vue` files (the example and controller apps only), these rules are disabled for Biome compatibility (as per the Biome recommendations):
 
 - `style/useConst` - Astro frontmatter requires `let` for reactive assignments
 - `style/useImportType` - Not compatible with Astro/Svelte compilation
 - `correctness/noUnusedVariables` - Astro frontmatter exports appear unused
 - `correctness/noUnusedImports` - Same reason as above
 
+The framework package itself is plain TypeScript, so these overrides do not apply there.
+
 ### CSS / Styling
 
-- **UnoCSS** with `presetWind4` (Tailwind-like utilities) and `presetIcons` (Lucide icons)
-- Icon syntax: `class="i-lucide:chevron-right"`
-- Framework CSS is built separately via `unocss --minify` to `dist/styles.css`
-- CSS reset is applied via UnoCSS (`preflights.reset: true`)
+- **Plain CSS** bundled by tsdown; per-element stylesheets live alongside their element and are imported as `?raw`
+- Injected at runtime via `injectStyles(css, id)` from `utils/styles.ts`
+- CSS variables (`--slide-width`, `--slide-scale`) are used for dynamic sizing
+- The example app uses Astro + UnoCSS for its own demo styling (framework-agnostic)
 
 ## Key Patterns to Follow
 
-1. **New components**: Place in `packages/framework/src/components/` and re-export from `index.ts` or `controls.ts`
-2. **Data attributes**: Use `getDataTags()` utility for component identification in the DOM
-3. **Prop validation**: Use Zod schemas for components with complex or constrained props
-4. **Client interactivity**: Use `<script>` blocks with nanostores subscriptions; query DOM with `data-*` attribute selectors
-5. **Package exports**: The framework exposes two entry points - `"."` (main components) and `"./controls"` (dev tools)
+1. **New elements**: Place in `packages/framework/src/elements/` under the matching subdirectory, export the class from `index.ts`, and call `customElements.define("ds-*", Element)` there so importing the package registers everything
+2. **Custom element registration**: `customElements.define()` in `src/index.ts`; augment `HTMLElementTagNameMap` for typed queries
+3. **Attribute-based API**: expose configuration through `data-*` attributes, read in `connectedCallback`
+4. **Event-driven communication**: dispatch and listen for CustomEvents; use nanostore context for shared slideshow state
+5. **Package exports**: The framework exposes `"."` (main bundle) plus `"./themes/*"` and `"./dotslide.html-data.json"`
