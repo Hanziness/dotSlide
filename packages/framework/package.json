@@ -20,8 +20,52 @@
       "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
     },
-    "./dotslide.html-data.json": "./dotslide.html-data.json",
-    "./themes/*": "./themes/*"
+    "./core": {
+      "import": "./dist/core.js",
+      "types": "./dist/core.d.ts"
+    },
+    "./controls/*": {
+      "import": "./dist/controls/*.js",
+      "types": "./dist/controls/*.d.ts"
+    },
+    "./layout/*": {
+      "import": "./dist/layout/*.js",
+      "types": "./dist/layout/*.d.ts"
+    },
+    "./media/*": {
+      "import": "./dist/media/*.js",
+      "types": "./dist/media/*.d.ts"
+    },
+    "./overlay/*": {
+      "import": "./dist/overlay/*.js",
+      "types": "./dist/overlay/*.d.ts"
+    },
+    "./widgets/*": {
+      "import": "./dist/widgets/*.js",
+      "types": "./dist/widgets/*.d.ts"
+    },
+    "./slideshow": {
+      "import": "./dist/slideshow.js",
+      "types": "./dist/slideshow.d.ts"
+    },
+    "./slide": {
+      "import": "./dist/slide.js",
+      "types": "./dist/slide.d.ts"
+    },
+    "./slide-template": {
+      "import": "./dist/slide-template.js",
+      "types": "./dist/slide-template.d.ts"
+    },
+    "./step": {
+      "import": "./dist/step.js",
+      "types": "./dist/step.d.ts"
+    },
+    "./section": {
+      "import": "./dist/section.js",
+      "types": "./dist/section.d.ts"
+    },
+    "./themes/*": "./themes/*",
+    "./dotslide.html-data.json": "./dotslide.html-data.json"
   },
   "files": [
     "dist",
@@ -40,8 +84,9 @@
     "dev": "tsdown --watch"
   },
   "devDependencies": {
-    "tsdown": "^0.22.4",
-    "@types/node": "^26.2.0"
+    "@types/node": "^26.2.0",
+    "lightningcss": "^1.33.0",
+    "tsdown": "^0.22.4"
   },
   "peerDependencies": {
     "zod": "^3.0.0 || ^4.0.0"
