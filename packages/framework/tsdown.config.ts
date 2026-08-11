@@ -1,14 +1,16 @@
 import { readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { transform } from "lightningcss";
 import { defineConfig, type TsdownPlugin } from "tsdown";
 
 const rawSuffix = "?raw";
 
 /**
- * Resolves `?raw` imports (e.g. `./button.css?raw`) to the raw file text.
+ * Resolves `?raw` imports (e.g. `./button.css?raw`) to the minified CSS text.
  * Rolldown's built-in moduleTypes key by extension, so `.css?raw` won't
  * match `.css` — a small plugin is the reliable route.
+ * Uses lightningcss for proper CSS minification (whitespace removal, shortening).
  */
 const rawImportPlugin: TsdownPlugin = {
   name: "dotslide:raw-import",
@@ -25,15 +27,22 @@ const rawImportPlugin: TsdownPlugin = {
   load(id) {
     if (!id.endsWith(rawSuffix)) return null;
     const css = readFileSync(id.slice(0, -rawSuffix.length), "utf8");
+    const minified = transform({
+      filename: id,
+      code: Buffer.from(css),
+      minify: true,
+    }).code.toString();
     return {
-      code: `export default ${JSON.stringify(css)};`,
+      code: `export default ${JSON.stringify(minified)};`,
       moduleSideEffects: false,
     };
   },
 };
 
 export default defineConfig({
-  entry: ["src/index.ts"],
+  entry: {
+    index: "src/index.ts",
+  },
   format: "esm",
   outDir: "dist",
   dts: true,

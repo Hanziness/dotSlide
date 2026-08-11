@@ -20,8 +20,8 @@
       "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
     },
-    "./dotslide.html-data.json": "./dotslide.html-data.json",
-    "./themes/*": "./themes/*"
+    "./themes/*": "./themes/*",
+    "./dotslide.html-data.json": "./dotslide.html-data.json"
   },
   "files": [
     "dist",
@@ -40,8 +40,9 @@
     "dev": "tsdown --watch"
   },
   "devDependencies": {
-    "tsdown": "^0.22.4",
-    "@types/node": "^26.2.0"
+    "@types/node": "^26.2.0",
+    "lightningcss": "^1.33.0",
+    "tsdown": "^0.22.4"
   },
   "peerDependencies": {
     "zod": "^3.0.0 || ^4.0.0"
