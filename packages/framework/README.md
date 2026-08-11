@@ -233,58 +233,6 @@ const slideshow = document.querySelector('ds-slideshow');
 
 HTML custom data included for editor autocomplete in VS Code and other editors.
 
-## 📦 Tree Shaking
-
-Import only what you need for smaller bundle sizes. You can still do the following:
-
-```js
-// include all components
-import "@dotslide/framework";
-
-// include only what's necessary
-import { Slideshow, Slide } from "@dotslide/framework";
-```
-
-### Core Bundle
-
-The `core` entry includes all necessary structural elements (slideshow, slide, step, section, slide-template):
-
-```javascript
-import '@dotslide/framework/core';
-
-// Now you can use <ds-slideshow>, <ds-slide>, <ds-step>, <ds-section>, <ds-slide-template>
-```
-
-### Individual Components
-
-Import specific elements separately:
-
-```javascript
-import '@dotslide/framework/slideshow';
-import '@dotslide/framework/slide';
-import '@dotslide/framework/widgets/progress';
-```
-
-### By Category
-
-Group imports by component type:
-
-```javascript
-import '@dotslide/framework/core';
-import '@dotslide/framework/controls/keyboard-handler';
-import '@dotslide/framework/controls/slide-controls';
-import '@dotslide/framework/widgets/progress';
-import '@dotslide/framework/widgets/current-slide';
-import '@dotslide/framework/widgets/total-slides';
-```
-
-Available categories:
-- `controls/*` — button, keyboard-handler, overlay, slide-controls
-- `layout/*` — flex, item, list, list-item
-- `media/*` — counter, image, reference, video
-- `overlay/*` — loader
-- `widgets/*` — current-section, current-slide, progress, total-slides
-
 ## 🛠 Development
 
 ```bash

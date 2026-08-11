@@ -144,20 +144,6 @@ npm install @dotslide/framework
 
 Or use the `example` app in this repo as a starting point.
 
-### 📦 Tree Shaking
-
-Import only what you need for smaller bundles:
-
-```html
-<script type="module">
-  import '@dotslide/framework/core';
-  import '@dotslide/framework/controls/keyboard-handler';
-  import '@dotslide/framework/widgets/progress';
-</script>
-```
-
-The `core` bundle includes structural elements (slideshow, slide, step, section, slide-template). Import individual components from `@dotslide/framework/controls/*`, `@dotslide/framework/layout/*`, `@dotslide/framework/media/*`, `@dotslide/framework/overlay/*`, or `@dotslide/framework/widgets/*`.
-
 ## 💬 Found it useful?
 
 If you like this project, consider [**☕ buying a coffee**](https://buymeacoffee.com/imreg).
