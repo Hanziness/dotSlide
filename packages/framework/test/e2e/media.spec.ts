@@ -7,6 +7,7 @@ test.describe("media elements", () => {
     await page.waitForFunction(
       () => customElements.get("ds-slideshow") !== undefined,
     );
+    await page.waitForLoadState("networkidle");
   });
 
   test("renders image with loaded placeholder", async ({ page }) => {

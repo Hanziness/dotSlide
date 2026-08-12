@@ -1,20 +1,17 @@
 import { expect, test } from "@playwright/test";
 
-async function waitForDefined(
-  page: import("@playwright/test").Page,
-  name: string,
-) {
-  await page.waitForFunction(
-    (tag) => customElements.get(tag) !== undefined,
-    name,
-  );
+async function waitForDefined(page: import("@playwright/test").Page) {
+  await page.waitForFunction(() => {
+    const flex = document.querySelector("ds-flex");
+    return flex && flex.children.length > 0;
+  });
 }
 
 test.describe("layout elements", () => {
   test.beforeEach(async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 720 });
     await page.goto("/test/fixtures/layout.html");
-    await waitForDefined(page, "ds-flex");
+    await waitForDefined(page);
   });
 
   test("renders ds-flex children", async ({ page }) => {

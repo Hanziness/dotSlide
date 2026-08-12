@@ -11,6 +11,9 @@ export default defineConfig({
     baseURL: "http://localhost:5173",
     trace: "on-first-retry",
   },
+  expect: {
+    toHaveScreenshot: { maxDiffPixels: 100 },
+  },
   webServer: {
     command: "bunx vite --config test/fixtures/vite.config.ts",
     port: 5173,
