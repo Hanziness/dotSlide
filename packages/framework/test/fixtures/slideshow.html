@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Slideshow</title>
+  <script type="module" src="../../src/index.ts"></script>
+  <style>
+    html,
+    body {
+      margin: 0;
+      height: 100%;
+      background: #222;
+    }
+    ds-slideshow {
+      width: 100%;
+      height: 100%;
+    }
+    ds-slide {
+      padding: 4rem;
+      box-sizing: border-box;
+      font-family: system-ui, sans-serif;
+      color: #222;
+    }
+    ds-slide h1,
+    ds-slide h2 {
+      margin: 0 0 1rem;
+    }
+    ds-slide p {
+      font-size: 1.25rem;
+    }
+    ds-progress {
+      display: block;
+      margin-top: 2rem;
+      color: #0d6efd;
+    }
+  </style>
+</head>
+<body>
+  <ds-slideshow data-slideshow-width="1280" data-slideshow-height="720">
+    <ds-section level="1" title="Introduction"></ds-section>
+
+    <ds-slide>
+      <h1>Welcome to dotslide</h1>
+      <p>A framework-agnostic slideshow framework built on Web Components.</p>
+      <ds-progress data-display="fraction"></ds-progress>
+    </ds-slide>
+
+    <ds-slide>
+      <h2>Why Web Components?</h2>
+      <p>Build portable, modern presentations with native custom elements.</p>
+      <ds-step data-from="1" data-to="2">Step 1: Portable</ds-step>
+      <ds-step data-from="2" data-to="2">Step 2: Framework-agnostic</ds-step>
+    </ds-slide>
+
+    <ds-section level="1" title="Getting Started"></ds-section>
+    <ds-section level="2" title="Installation"></ds-section>
+
+    <ds-slide>
+      <h2>Install</h2>
+      <p><code>bun add @dotslide/framework</code></p>
+    </ds-slide>
+
+    <ds-slide>
+      <h2>Slide numbers</h2>
+      <p>
+        <ds-current-slide></ds-current-slide> / <ds-total-slides></ds-total-slides>
+      </p>
+      <ds-progress data-display="percentage"></ds-progress>
+    </ds-slide>
+
+    <ds-section level="1" title="End"></ds-section>
+
+    <ds-slide>
+      <h1>Thank you!</h1>
+      <p>Any questions?</p>
+      <ds-progress data-display="bar"></ds-progress>
+    </ds-slide>
+
+    <ds-keyboard-handler></ds-keyboard-handler>
+    <ds-slide-controls></ds-slide-controls>
+  </ds-slideshow>
+</body>
+</html>
