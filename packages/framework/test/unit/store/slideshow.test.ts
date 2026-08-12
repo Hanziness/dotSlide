@@ -1,12 +1,28 @@
 // @vitest-environment jsdom
+
+import { type NavigationNode, NavigationType } from "@dotslide/protocol";
 import { beforeEach, describe, expect, it } from "vitest";
-import { NavigationType, type NavigationNode } from "@dotslide/protocol";
 import { createSlideshowContext } from "../../../src/store/context/slideshow";
 
 const sequence: NavigationNode[] = [
-  { type: NavigationType.slide, slideIndex: 0, stepIndex: 1, slideId: "slide-0" },
-  { type: NavigationType.step, slideIndex: 0, stepIndex: 2, slideId: "slide-0" },
-  { type: NavigationType.slide, slideIndex: 1, stepIndex: 1, slideId: "slide-1" },
+  {
+    type: NavigationType.slide,
+    slideIndex: 0,
+    stepIndex: 1,
+    slideId: "slide-0",
+  },
+  {
+    type: NavigationType.step,
+    slideIndex: 0,
+    stepIndex: 2,
+    slideId: "slide-0",
+  },
+  {
+    type: NavigationType.slide,
+    slideIndex: 1,
+    stepIndex: 1,
+    slideId: "slide-1",
+  },
 ];
 
 describe("createSlideshowContext", () => {

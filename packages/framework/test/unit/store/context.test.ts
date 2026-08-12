@@ -23,7 +23,10 @@ describe("provideContext / useContext", () => {
   });
 
   it("returns the same store when called twice on the same element", () => {
-    const first = provideContext<TestValue>(container, { label: "a", count: 1 });
+    const first = provideContext<TestValue>(container, {
+      label: "a",
+      count: 1,
+    });
     const second = provideContext<TestValue>(container, {
       label: "b",
       count: 2,

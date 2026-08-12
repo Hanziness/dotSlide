@@ -1,16 +1,14 @@
 // @vitest-environment jsdom
+
+import { NavigationType } from "@dotslide/protocol";
 import { type MapStore, map } from "nanostores";
 import { describe, expect, it } from "vitest";
-import { NavigationType } from "@dotslide/protocol";
 import {
   createNavigationMethods,
   type NavigableContext,
 } from "../../../src/store/context/navigation";
 
-const makeStore = (
-  index: number,
-  length: number,
-): MapStore<NavigableContext> =>
+const makeStore = (index: number, length: number): MapStore<NavigableContext> =>
   map<NavigableContext>({
     navigationIndex: index,
     navigationSequence: Array.from({ length }, (_, i) => ({

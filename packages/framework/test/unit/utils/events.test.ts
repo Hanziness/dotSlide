@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { RESOURCE_READY, RESOURCE_REGISTER } from "../../../src/utils/events.js";
+import {
+  RESOURCE_READY,
+  RESOURCE_REGISTER,
+} from "../../../src/utils/events.js";
 
 describe("resource event constants", () => {
   it("RESOURCE_REGISTER equals ds:resource-register", () => {
