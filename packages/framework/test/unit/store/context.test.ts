@@ -32,6 +32,7 @@ describe("provideContext / useContext", () => {
       count: 2,
     });
     expect(second).toBe(first);
+    
     // Second call's initial value is ignored; first store is preserved.
     expect(second.get()).toEqual({ label: "a", count: 1 });
   });

@@ -156,7 +156,9 @@ describe("updateSlideVisibility", () => {
   });
 
   it("falls back to iterating all slides when prevIdx equals activeIdx", () => {
-    slides[1].classList.add("inactive");
+    slides[0].classList.add("active");
+    slides[1].classList.add("active");
+    slides[2].classList.add("active");
 
     updateSlideVisibility(slides, 1, 1);
 
@@ -167,6 +169,10 @@ describe("updateSlideVisibility", () => {
   });
 
   it("falls back to iterating all slides when prevIdx is out of range", () => {
+    slides[0].classList.add("active");
+    slides[1].classList.add("active");
+    slides[2].classList.add("active");
+
     updateSlideVisibility(slides, 1, 99);
 
     expect(slides[1].classList.contains("active")).toBe(true);

@@ -7,8 +7,8 @@ describe("generateId", () => {
   });
 
   it("returns different values on each call", () => {
-    const ids = new Set(Array.from({ length: 100 }, () => generateId()));
-    expect(ids.size).toBeGreaterThan(1);
+    const ids = new Set(Array.from({ length: 10 }, () => generateId()));
+    expect(ids.size).toBeGreaterThan(8);
   });
 });
 

@@ -11,25 +11,24 @@ import {
 
 /** Build a ds-slideshow with section markers and slides for integration tests. */
 function buildSlideshowDom(root: HTMLElement): void {
-  const marker = (level: number, title?: string): HTMLElement => {
+  const section = (level: number, title?: string): HTMLElement => {
     const el = document.createElement("section");
     el.dataset.sectionLevel = String(level);
     if (title !== undefined) el.dataset.sectionTitle = title;
     return el;
   };
-  const slide = (index: number): HTMLElement => {
+  const slide = (): HTMLElement => {
     const el = document.createElement("ds-slide");
-    el.dataset.slideIndex = String(index);
     return el;
   };
 
-  root.appendChild(marker(1, "Intro"));
-  root.appendChild(slide(0));
-  root.appendChild(marker(2, "Body"));
-  root.appendChild(slide(1));
-  root.appendChild(slide(2));
-  root.appendChild(marker(1, "Outro"));
-  root.appendChild(slide(3));
+  root.appendChild(section(1, "Intro"));
+  root.appendChild(slide());
+  root.appendChild(section(2, "Body"));
+  root.appendChild(slide());
+  root.appendChild(slide());
+  root.appendChild(section(1, "Outro"));
+  root.appendChild(slide());
 }
 
 describe("section utilities (integration)", () => {
@@ -39,6 +38,7 @@ describe("section utilities (integration)", () => {
     root = document.createElement("ds-slideshow");
     buildSlideshowDom(root);
     buildSectionHierarchy(root);
+    
     // getCurrentSection always resolves the slideshow context, so seed it.
     const sequence: NavigationNode[] = [0, 1, 2, 3].map((slideIndex) => ({
       type: NavigationType.slide,
