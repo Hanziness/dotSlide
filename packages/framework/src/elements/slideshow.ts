@@ -104,6 +104,7 @@ export class Slideshow extends HTMLElement {
       height: this.slideshowSize.height,
       navigationIndex: initialNavigationIndex,
       navigationSequence,
+      templates: {}
     });
 
     // Resource readiness event listeners
