@@ -37,12 +37,19 @@
   ],
   "scripts": {
     "build": "tsdown",
-    "dev": "tsdown --watch"
+    "dev": "tsdown --watch",
+    "test": "bun run test:unit && bun run test:e2e",
+    "test:unit": "vitest run",
+    "test:e2e": "playwright test"
   },
   "devDependencies": {
+    "@playwright/test": "^1.62.1",
     "@types/node": "^26.2.0",
+    "jsdom": "^30.0.1",
     "lightningcss": "^1.33.0",
-    "tsdown": "^0.22.4"
+    "tsdown": "^0.22.4",
+    "vite": "^8.2.1",
+    "vitest": "^4.1.10"
   },
   "peerDependencies": {
     "zod": "^3.0.0 || ^4.0.0"
