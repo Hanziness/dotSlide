@@ -7,4 +7,6 @@ injectStyles(listItemCss, "list-item");
 export class DsListItem extends HTMLElement {
   // Empty CE — styling via CSS pseudo-elements
 }
-customElements.define("ds-list-item", DsListItem);
+if (!customElements.get("ds-list-item")) {
+  customElements.define("ds-list-item", DsListItem);
+}

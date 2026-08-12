@@ -20,4 +20,6 @@ export class DsImage extends HTMLElement {
     }
   }
 }
-customElements.define("ds-image", DsImage);
+if (!customElements.get("ds-image")) {
+  customElements.define("ds-image", DsImage);
+}

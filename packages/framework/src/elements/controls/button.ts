@@ -43,4 +43,6 @@ export class DsButton extends HTMLElement {
   }
 }
 
-customElements.define("ds-button", DsButton);
+if (!customElements.get("ds-button")) {
+  customElements.define("ds-button", DsButton);
+}

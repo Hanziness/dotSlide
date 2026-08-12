@@ -42,4 +42,6 @@ export class KeyboardHandler extends HTMLElement {
   }
 }
 
-customElements.define("ds-keyboard-handler", KeyboardHandler);
+if (!customElements.get("ds-keyboard-handler")) {
+  customElements.define("ds-keyboard-handler", KeyboardHandler);
+}

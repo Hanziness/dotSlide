@@ -207,4 +207,6 @@ export class Slideshow extends HTMLElement {
   }
 }
 
-customElements.define("ds-slideshow", Slideshow);
+if (!customElements.get("ds-slideshow")) {
+  customElements.define("ds-slideshow", Slideshow);
+}

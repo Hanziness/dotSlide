@@ -111,4 +111,6 @@ export class SlideTemplate extends HTMLElement {
   }
 }
 
-customElements.define("ds-slide-template", SlideTemplate);
+if (!customElements.get("ds-slide-template")) {
+  customElements.define("ds-slide-template", SlideTemplate);
+}
