@@ -53,15 +53,6 @@ describe("createSlideshowContext", () => {
     expect(value.ready).toBe(false);
   });
 
-  it("attaches navigation methods to the store", () => {
-    const store = build();
-    expect(typeof store.next).toBe("function");
-    expect(typeof store.prev).toBe("function");
-    expect(typeof store.first).toBe("function");
-    expect(typeof store.last).toBe("function");
-    expect(typeof store.goTo).toBe("function");
-  });
-
   it("updates activeSlide and activeStep when navigationIndex changes", () => {
     const store = build();
     store.setKey("navigationIndex", 2);

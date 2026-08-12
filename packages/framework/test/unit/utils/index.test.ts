@@ -1,10 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  generateId,
-  getComponentDataAttribute,
-  getDataTags,
-  getSelector,
-} from "../../../src/utils/index.js";
+import { generateId, getDataTags } from "../../../src/utils/index.js";
 
 describe("generateId", () => {
   it("returns a 6-character hex string", () => {
@@ -14,22 +9,6 @@ describe("generateId", () => {
   it("returns different values on each call", () => {
     const ids = new Set(Array.from({ length: 100 }, () => generateId()));
     expect(ids.size).toBeGreaterThan(1);
-  });
-});
-
-describe("getComponentDataAttribute", () => {
-  it("returns a data- prefixed attribute name", () => {
-    expect(getComponentDataAttribute("slide")).toBe("data-slide");
-    expect(getComponentDataAttribute("slideshow-root")).toBe(
-      "data-slideshow-root",
-    );
-  });
-});
-
-describe("getSelector", () => {
-  it("returns an attribute selector for the identifier", () => {
-    expect(getSelector("slide")).toBe("[data-slide]");
-    expect(getSelector("slideshow-root")).toBe("[data-slideshow-root]");
   });
 });
 

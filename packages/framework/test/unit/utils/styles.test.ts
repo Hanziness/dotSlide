@@ -1,15 +1,14 @@
 // @vitest-environment jsdom
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
+import {
+  injectStyles,
+  resetInjectedStyles,
+} from "../../../src/utils/styles.js";
 
 describe("injectStyles", () => {
-  let injectStyles: (css: string, id?: string) => void;
-
-  beforeEach(async () => {
+  beforeEach(() => {
     document.head.innerHTML = "";
-    // The module keeps a module-level Set<string> for dedup that is not
-    // exported. Reset modules between tests to get a fresh instance.
-    vi.resetModules();
-    injectStyles = (await import("../../../src/utils/styles.js")).injectStyles;
+    resetInjectedStyles();
   });
 
   const styleElements = () => document.head.querySelectorAll("style");
@@ -45,20 +44,14 @@ describe("injectStyles", () => {
     expect(styleElements()[0].hasAttribute("data-dotslide")).toBe(false);
   });
 
-  it("only injects once per unique id", () => {
+  it("dedups by id across different CSS", () => {
     injectStyles(".a { color: red; }", "dup");
     injectStyles(".b { color: blue; }", "dup");
-    expect(styleElements()).toHaveLength(1);
-  });
-
-  it("uses id as the dedup key when provided", () => {
-    injectStyles(".a { color: red; }", "same-id");
-    injectStyles(".different { color: blue; }", "same-id");
     expect(styleElements()).toHaveLength(1);
     expect(styleElements()[0].textContent).toContain(".a");
   });
 
-  it("uses the raw CSS string as the dedup key when no id is provided", () => {
+  it("dedups by raw CSS when no id is provided", () => {
     injectStyles(".a { color: red; }");
     injectStyles(".a { color: red; }");
     expect(styleElements()).toHaveLength(1);

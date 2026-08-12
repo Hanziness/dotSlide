@@ -7,7 +7,6 @@ import {
   getCurrentSection,
   getSectionString,
   getSlidePositionInSection,
-  type SlidePosition,
 } from "../../../src/utils/section.js";
 
 /** Build a ds-slideshow with section markers and slides for integration tests. */
@@ -32,14 +31,6 @@ function buildSlideshowDom(root: HTMLElement): void {
   root.appendChild(marker(1, "Outro"));
   root.appendChild(slide(3));
 }
-
-describe("SlidePosition type", () => {
-  it("has a 1-based position and a total", () => {
-    const position: SlidePosition = { position: 2, total: 5 };
-    expect(position.position).toBe(2);
-    expect(position.total).toBe(5);
-  });
-});
 
 describe("section utilities (integration)", () => {
   let root: HTMLElement;
