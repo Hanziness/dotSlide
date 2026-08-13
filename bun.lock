@@ -13,7 +13,7 @@
     },
     "apps/controller": {
       "name": "@dotslide/controller",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "dependencies": {
         "@dotslide/protocol": "workspace:*",
         "@dotslide/server": "workspace:*",
@@ -49,7 +49,7 @@
     },
     "apps/example": {
       "name": "@dotslide/example",
-      "version": "0.1.2",
+      "version": "0.1.3",
       "dependencies": {
         "@dotslide/framework": "workspace:*",
         "@dotslide/remote": "workspace:*",
@@ -61,7 +61,7 @@
     },
     "apps/server": {
       "name": "@dotslide/server",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "dependencies": {
         "@better-auth/drizzle-adapter": "1.5.3",
         "@dotslide/protocol": "workspace:*",
@@ -80,7 +80,7 @@
     },
     "packages/framework": {
       "name": "@dotslide/framework",
-      "version": "0.2.1",
+      "version": "0.2.2",
       "dependencies": {
         "@dotslide/protocol": "workspace:*",
         "nanostores": "^1.1.0",
@@ -100,7 +100,7 @@
     },
     "packages/protocol": {
       "name": "@dotslide/protocol",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "dependencies": {
         "zod": "^4.4.3",
       },
@@ -110,7 +110,7 @@
     },
     "packages/remote": {
       "name": "@dotslide/remote",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "dependencies": {
         "@dotslide/protocol": "workspace:*",
         "@dotslide/server": "workspace:*",
