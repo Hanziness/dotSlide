@@ -26,7 +26,7 @@ Focus on content, not configuration.
   </style>
 </head>
 <body>
-  <ds-slideshow data-slideshow-width="1920" data-slideshow-height="1080">
+  <ds-slideshow slide-width="1920" slide-height="1080">
     <ds-keyboard-handler></ds-keyboard-handler>
     <ds-slide-controls></ds-slide-controls>
     
@@ -55,7 +55,7 @@ npm install @dotslide/framework
   import '@dotslide/framework';
 </script>
 
-<ds-slideshow data-slideshow-width="1920" data-slideshow-height="1080">
+<ds-slideshow slide-width="1920" slide-height="1080">
   <ds-slide>
     <h1>Hello, dotSlide!</h1>
   </ds-slide>
@@ -68,9 +68,9 @@ npm install @dotslide/framework
 
 | Element | Description | Key Attributes |
 |---------|-------------|----------------|
-| `<ds-slideshow>` | Root container for the presentation | `data-slideshow-width`, `data-slideshow-height` |
+| `<ds-slideshow>` | Root container for the presentation | `slide-width`, `slide-height` |
 | `<ds-slide>` | Individual slide | `template` |
-| `<ds-step>` | Progressive disclosure within a slide | `data-from`, `data-to` |
+| `<ds-step>` | Progressive disclosure within a slide | `from`, `to` |
 | `<ds-section>` | Groups slides into sections | `level`, `title` |
 | `<ds-slide-template>` | Reusable slide layout with named slots | `name` |
 | `<ds-slot>` | Content placeholder inside a template | `name` |
@@ -88,10 +88,10 @@ npm install @dotslide/framework
 
 | Element | Description | Key Attributes |
 |---------|-------------|----------------|
-| `<ds-progress>` | Shows presentation progress | `data-display` (bar/fraction/percentage), `data-within` |
-| `<ds-current-slide>` | Current slide number | `data-within` |
-| `<ds-total-slides>` | Total slide count | `data-within` |
-| `<ds-current-section>` | Current section info | `data-display` (numeric/text), `data-level` |
+| `<ds-progress>` | Shows presentation progress | `display` (bar/fraction/percentage), `within` |
+| `<ds-current-slide>` | Current slide number | `within` |
+| `<ds-total-slides>` | Total slide count | `within` |
+| `<ds-current-section>` | Current section info | `display` (numeric/text), `level` |
 
 ### Layout
 
@@ -99,7 +99,7 @@ npm install @dotslide/framework
 |---------|-------------|----------------|
 | `<ds-flex>` | Flexbox container | `gap`, `mode` (row/column), `justify`, `align` |
 | `<ds-item>` | Flex item | — |
-| `<ds-list>` | List container | `data-mode` (ordered/unordered), `style="--ds-list-start: N"` |
+| `<ds-list>` | List container | `mode` (ordered/unordered), `start` |
 | `<ds-list-item>` | List item | — |
 
 ### Media
@@ -108,8 +108,8 @@ npm install @dotslide/framework
 |---------|-------------|----------------|
 | `<ds-image>` | Image with loading state | Standard `<img>` attributes |
 | `<ds-video>` | Video with slide-aware playback | Standard `<video>` attributes |
-| `<ds-counter>` | Numbered counter (figures, tables) | `data-type`, `data-id` |
-| `<ds-reference>` | Reference to a counter | `data-id` |
+| `<ds-counter>` | Numbered counter (figures, tables) | `type`, `ref` |
+| `<ds-reference>` | Reference to a counter | `ref` |
 
 ## 📖 Examples
 
@@ -120,9 +120,9 @@ Gradually reveal elements on slides to direct attention.
 ```html
 <ds-slide>
   <h2>Key Points</h2>
-  <ds-step data-from="1"><p>First point</p></ds-step>
-  <ds-step data-from="2"><p>Second point</p></ds-step>
-  <ds-step data-from="3"><p>Third point</p></ds-step>
+  <ds-step from="1"><p>First point</p></ds-step>
+  <ds-step from="2"><p>Second point</p></ds-step>
+  <ds-step from="3"><p>Third point</p></ds-step>
 </ds-slide>
 ```
 
@@ -160,8 +160,8 @@ Helper objects that read dynamic data from the presentation. Useful for showing 
 ```html
 <ds-slide>
   <p>Slide <ds-current-slide></ds-current-slide> of <ds-total-slides></ds-total-slides></p>
-  <ds-progress data-display="bar"></ds-progress>
-  <p>Section: <ds-current-section data-display="text"></ds-current-section></p>
+  <ds-progress display="bar"></ds-progress>
+  <p>Section: <ds-current-section display="text"></ds-current-section></p>
 </ds-slide>
 ```
 
@@ -171,8 +171,8 @@ Create custom counters and refer to them deterministically from other slides.
 
 ```html
 <ds-slide>
-  <p>See Figure <ds-counter data-type="figure" data-id="fig1"></ds-counter></p>
-  <p>Later: As shown in Figure <ds-reference data-id="fig1"></ds-reference>...</p>
+  <p>See Figure <ds-counter type="figure" ref="fig1"></ds-counter></p>
+  <p>Later: As shown in Figure <ds-reference ref="fig1"></ds-reference>...</p>
 </ds-slide>
 ```
 
@@ -267,7 +267,7 @@ import { Slideshow, Slide } from "@dotslide/framework";
 
 **After (Custom Elements):**
 ```html
-<ds-slideshow data-slideshow-width="1920" data-slideshow-height="1080">
+<ds-slideshow slide-width="1920" slide-height="1080">
   <ds-slide>Content</ds-slide>
 </ds-slideshow>
 
