@@ -1,5 +1,15 @@
 # @dotslide/framework
 
+## 0.2.2
+
+### Patch Changes
+
+- e369122: Minify component CSS via lightningcss
+- c89c80c: Add unit and UI testing via Vitest and Playwright
+- d831a2f: Fix scaling, use stacked grid for slide positioning
+- Updated dependencies [e9de65f]
+  - @dotslide/protocol@0.1.2
+
 ## 0.2.1
 
 ### Patch Changes

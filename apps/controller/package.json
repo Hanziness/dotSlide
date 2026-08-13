@@ -1,7 +1,7 @@
 {
   "name": "@dotslide/controller",
   "private": true,
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Svelte-based controller web app for dotSlide presentations",
   "author": {
     "name": "Imre Gera",
