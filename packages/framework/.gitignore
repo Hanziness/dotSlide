@@ -26,3 +26,6 @@ pnpm-debug.log*
 # test
 test-results/
 playwright-report/
+
+# custom elements manifest
+custom-elements.json
