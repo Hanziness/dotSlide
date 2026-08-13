@@ -1,5 +1,12 @@
 # @dotslide/server
 
+## 0.1.2
+
+### Patch Changes
+
+- Updated dependencies [e9de65f]
+  - @dotslide/protocol@0.1.2
+
 ## 0.1.1
 
 ### Patch Changes

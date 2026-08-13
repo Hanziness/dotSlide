@@ -1,5 +1,11 @@
 # @dotslide/protocol
 
+## 0.1.2
+
+### Patch Changes
+
+- e9de65f: Move tsdown to devDependencies, update dependencies
+
 ## 0.1.1
 
 ### Patch Changes

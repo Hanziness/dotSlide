@@ -1,5 +1,17 @@
 # @dotslide/remote
 
+## 1.0.2
+
+### Patch Changes
+
+- Updated dependencies [e369122]
+- Updated dependencies [e9de65f]
+- Updated dependencies [c89c80c]
+- Updated dependencies [d831a2f]
+  - @dotslide/framework@0.2.2
+  - @dotslide/protocol@0.1.2
+  - @dotslide/server@0.1.2
+
 ## 1.0.1
 
 ### Patch Changes
