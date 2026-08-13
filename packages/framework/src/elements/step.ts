@@ -19,4 +19,6 @@ export class Step extends HTMLElement {
   }
 }
 
-customElements.define("ds-step", Step);
+if (!customElements.get("ds-step")) {
+  customElements.define("ds-step", Step);
+}

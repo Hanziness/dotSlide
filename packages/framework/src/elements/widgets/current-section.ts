@@ -58,4 +58,6 @@ export class CurrentSection extends HTMLElement {
   }
 }
 
-customElements.define("ds-current-section", CurrentSection);
+if (!customElements.get("ds-current-section")) {
+  customElements.define("ds-current-section", CurrentSection);
+}

@@ -51,4 +51,6 @@ export class TotalSlides extends HTMLElement {
   }
 }
 
-customElements.define("ds-total-slides", TotalSlides);
+if (!customElements.get("ds-total-slides")) {
+  customElements.define("ds-total-slides", TotalSlides);
+}

@@ -45,4 +45,6 @@ export class CurrentSlide extends HTMLElement {
   }
 }
 
-customElements.define("ds-current-slide", CurrentSlide);
+if (!customElements.get("ds-current-slide")) {
+  customElements.define("ds-current-slide", CurrentSlide);
+}

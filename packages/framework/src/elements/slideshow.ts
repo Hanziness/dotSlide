@@ -104,6 +104,7 @@ export class Slideshow extends HTMLElement {
       height: this.slideshowSize.height,
       navigationIndex: initialNavigationIndex,
       navigationSequence,
+      templates: {}
     });
 
     // Resource readiness event listeners
@@ -206,4 +207,6 @@ export class Slideshow extends HTMLElement {
   }
 }
 
-customElements.define("ds-slideshow", Slideshow);
+if (!customElements.get("ds-slideshow")) {
+  customElements.define("ds-slideshow", Slideshow);
+}

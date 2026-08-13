@@ -57,4 +57,6 @@ export class DsVideo extends HTMLElement {
     }
   }
 }
-customElements.define("ds-video", DsVideo);
+if (!customElements.get("ds-video")) {
+  customElements.define("ds-video", DsVideo);
+}

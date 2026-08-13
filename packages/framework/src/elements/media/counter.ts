@@ -60,4 +60,6 @@ export class DsCounter extends HTMLElement {
     }
   }
 }
-customElements.define("ds-counter", DsCounter);
+if (!customElements.get("ds-counter")) {
+  customElements.define("ds-counter", DsCounter);
+}

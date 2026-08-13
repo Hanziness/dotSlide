@@ -32,4 +32,6 @@ export class Overlay extends HTMLElement {
   }
 }
 
-customElements.define("ds-overlay", Overlay);
+if (!customElements.get("ds-overlay")) {
+  customElements.define("ds-overlay", Overlay);
+}

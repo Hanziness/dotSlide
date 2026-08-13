@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Layout</title>
+  <script type="module" src="../../src/index.ts"></script>
+  <style>
+    html,
+    body {
+      margin: 0;
+      padding: 2rem;
+      background: #f5f5f5;
+      font-family: "Courier New", monospace;
+      color: #222;
+    }
+    main {
+      max-width: 720px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 8px;
+      padding: 2rem;
+      box-shadow: 0 2px 12px rgb(0 0 0 / 0.08);
+    }
+    h2 {
+      font-size: 1.1rem;
+      margin: 1.5rem 0 0.5rem;
+    }
+    h2:first-child {
+      margin-top: 0;
+    }
+    ds-item,
+    ds-list-item {
+      background: #e3f2fd;
+      border-radius: 4px;
+      padding: 0.5rem 0.75rem;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h2>Row flex</h2>
+    <ds-flex gap="1" justify="center" align="center" mode="row">
+      <ds-item>A</ds-item>
+      <ds-item>B</ds-item>
+      <ds-item>C</ds-item>
+    </ds-flex>
+
+    <h2>Column flex</h2>
+    <ds-flex gap="0.5" justify="start" align="stretch" mode="column">
+      <ds-item>One</ds-item>
+      <ds-item>Two</ds-item>
+      <ds-item>Three</ds-item>
+    </ds-flex>
+
+    <h2>Unordered list</h2>
+    <ds-list>
+      <ds-list-item>Item one</ds-list-item>
+      <ds-list-item>Item two</ds-list-item>
+      <ds-list-item>Item three</ds-list-item>
+    </ds-list>
+
+    <h2>Ordered list</h2>
+    <ds-list data-mode="ordered">
+      <ds-list-item>First</ds-list-item>
+      <ds-list-item>Second</ds-list-item>
+      <ds-list-item>Third</ds-list-item>
+    </ds-list>
+  </main>
+</body>
+</html>

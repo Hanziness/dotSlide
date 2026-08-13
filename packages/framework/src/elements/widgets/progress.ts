@@ -88,4 +88,6 @@ export class Progress extends HTMLElement {
   }
 }
 
-customElements.define("ds-progress", Progress);
+if (!customElements.get("ds-progress")) {
+  customElements.define("ds-progress", Progress);
+}

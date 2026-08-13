@@ -24,4 +24,6 @@ export class DsFlex extends HTMLElement {
     }
   }
 }
-customElements.define("ds-flex", DsFlex);
+if (!customElements.get("ds-flex")) {
+  customElements.define("ds-flex", DsFlex);
+}

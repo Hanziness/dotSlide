@@ -78,4 +78,6 @@ export class DsReference extends HTMLElement {
     }
   }
 }
-customElements.define("ds-reference", DsReference);
+if (!customElements.get("ds-reference")) {
+  customElements.define("ds-reference", DsReference);
+}

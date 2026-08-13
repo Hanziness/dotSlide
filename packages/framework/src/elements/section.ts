@@ -54,6 +54,8 @@ class Section extends HTMLElement {
   }
 }
 
-customElements.define("ds-section", Section);
+if (!customElements.get("ds-section")) {
+  customElements.define("ds-section", Section);
+}
 
 export { Section };

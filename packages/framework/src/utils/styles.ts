@@ -32,3 +32,10 @@ export function injectStyles(css: string, id?: string): void {
   document.head.appendChild(style);
   injectedStyles.add(key);
 }
+
+/**
+ * Clear the module-level dedup set so styles can be re-injected in tests.
+ */
+export function resetInjectedStyles(): void {
+  injectedStyles.clear();
+}

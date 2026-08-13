@@ -76,4 +76,6 @@ export class Loader extends HTMLElement {
   }
 }
 
-customElements.define("ds-loader", Loader);
+if (!customElements.get("ds-loader")) {
+  customElements.define("ds-loader", Loader);
+}

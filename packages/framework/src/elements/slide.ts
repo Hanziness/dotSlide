@@ -44,4 +44,6 @@ export class Slide extends HTMLElement {
   }
 }
 
-customElements.define("ds-slide", Slide);
+if (!customElements.get("ds-slide")) {
+  customElements.define("ds-slide", Slide);
+}

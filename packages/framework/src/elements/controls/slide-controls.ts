@@ -128,4 +128,6 @@ export class SlideControls extends HTMLElement {
   }
 }
 
-customElements.define("ds-slide-controls", SlideControls);
+if (!customElements.get("ds-slide-controls")) {
+  customElements.define("ds-slide-controls", SlideControls);
+}
