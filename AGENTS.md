@@ -137,7 +137,8 @@ There are **no tests** currently. No test framework (Vitest, Jest, Playwright) i
 | Types/Interfaces | PascalCase             | `SlideshowContext`, `NavigationNode`  |
 | Constants        | camelCase              | `slideshowContext`                    |
 | CSS variables    | kebab-case with prefix | `--slide-width`, `--slideshow-root`   |
-| Data attributes  | kebab-case             | `data-slide`, `data-slideshow-root`   |
+| Public attributes | bare kebab-case      | `level`, `template`, `action`, `display` |
+| Internal attributes | data-* prefix      | `data-slide-index`, `data-section-level` |
 
 ### Web Components
 
@@ -156,7 +157,7 @@ There are **no tests** currently. No test framework (Vitest, Jest, Playwright) i
   customElements.define("ds-slideshow", Slideshow);
   ```
 - **Lifecycle methods**: `connectedCallback()`, `disconnectedCallback()`, `attributeChangedCallback()`, `adoptedCallback()`. Static `observedAttributes` for reactive attributes.
-- **Attribute handling**: read via `getAttribute()`, observe with `observedAttributes`; use `data-*` attributes (`data-display`, `data-within`) for configuration.
+- **Attribute handling**: read via `getAttribute()`, observe with `observedAttributes`; use **bare attributes** for public API (e.g. `level`, `display`, `within`), `data-*` attributes for internal/state (e.g. `data-slide-index`, `data-section-level`).
 - **Event handling**: dispatch custom events (`new CustomEvent`) for component communication; listen with `addEventListener`.
 - **CSS scoping**: per-element CSS files imported as `?raw` and injected via `injectStyles(css, id)` (scoped by a shared id, not Shadow DOM by default). CSS variables (`--slide-width`, `--slide-scale`) are used for dynamic sizing.
 - **Composition**: elements resolve related elements via `customElements.whenDefined(...)` + `.closest("ds-slideshow")` queries.
@@ -196,6 +197,6 @@ The framework package itself is plain TypeScript, so these overrides do not appl
 
 1. **New elements**: Place in `packages/framework/src/elements/` under the matching subdirectory, export the class from `index.ts`, and call `customElements.define("ds-*", Element)` there so importing the package registers everything
 2. **Custom element registration**: `customElements.define()` in `src/index.ts`; augment `HTMLElementTagNameMap` for typed queries
-3. **Attribute-based API**: expose configuration through `data-*` attributes, read in `connectedCallback`
+3. **Attribute-based API**: expose configuration through bare attributes (e.g. `level`, `display`), read in `connectedCallback`; use `data-*` only for internal/state attributes
 4. **Event-driven communication**: dispatch and listen for CustomEvents; use nanostore context for shared slideshow state
 5. **Package exports**: The framework exposes `"."` (main bundle) plus `"./themes/*"` and `"./dotslide.html-data.json"`
