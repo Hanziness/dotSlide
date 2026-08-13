@@ -62,8 +62,8 @@ export class Slideshow extends HTMLElement {
     if (this._initialized) return;
     this._initialized = true;
 
-    const slideWidth = this.getAttribute("data-slideshow-width");
-    const slideHeight = this.getAttribute("data-slideshow-height");
+    const slideWidth = this.getAttribute("slide-width");
+    const slideHeight = this.getAttribute("slide-height");
 
     if (slideWidth === null || slideHeight === null) {
       throw new Error("Slideshow width or height is undefined");

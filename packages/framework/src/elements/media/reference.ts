@@ -22,19 +22,19 @@ export class DsReference extends HTMLElement {
       this.innerHTML = '<span class="value"></span>';
     }
 
-    const id = this.getAttribute("data-id");
+    const ref = this.getAttribute("ref");
 
-    if (!id) {
-      console.warn("ds-reference: missing data-id attribute");
+    if (!ref) {
+      console.warn("ds-reference: missing ref attribute");
       return;
     }
 
     withSlideshowContext(this, (ctx) => {
       this._unsubscribe = ctx.subscribe(() => {
-        this._syncCounter(ctx, id);
+        this._syncCounter(ctx, ref);
       });
 
-      this._syncCounter(ctx, id);
+      this._syncCounter(ctx, ref);
     });
   }
 
@@ -54,10 +54,10 @@ export class DsReference extends HTMLElement {
     this._unsubscribe?.();
   }
 
-  private _syncCounter(slideshowCtx: SlideshowStore, id: string) {
+  private _syncCounter(slideshowCtx: SlideshowStore, ref: string) {
     const counter = Object.values(slideshowCtx.get().counters)
       .flat()
-      .find((entry) => entry.id === id);
+      .find((entry) => entry.id === ref);
 
     if (counter) {
       const valueElement = this.querySelector<HTMLElement>(".value");
@@ -73,7 +73,7 @@ export class DsReference extends HTMLElement {
       !this._warnedMissingCounter &&
       slideshowCtx.get().phase !== "registering"
     ) {
-      console.warn(`ds-reference: counter not found for id="${id}"`);
+      console.warn(`ds-reference: counter not found for ref="${ref}"`);
       this._warnedMissingCounter = true;
     }
   }

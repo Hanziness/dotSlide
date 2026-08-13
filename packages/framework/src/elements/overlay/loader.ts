@@ -47,7 +47,7 @@ export class Loader extends HTMLElement {
         this._updateProgressBar(1);
         setTimeout(() => {
           this.setAttribute("state", "finished");
-        }, this.getAttribute("data-debug") === "true" ? 0 : 300);
+        }, this.getAttribute("debug") === "true" ? 0 : 300);
         return;
       }
 
@@ -64,7 +64,7 @@ export class Loader extends HTMLElement {
           setTimeout(() => {
             this.setAttribute("state", "finished");
             this.store_unsubscribe?.();
-          }, this.getAttribute("data-debug") === "true" ? 0 : 700);
+          }, this.getAttribute("debug") === "true" ? 0 : 700);
         }
       });
     });

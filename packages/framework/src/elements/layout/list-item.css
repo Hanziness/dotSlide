@@ -3,7 +3,7 @@ ds-list-item {
   list-style: none;
 }
 
-ds-list[data-mode="ordered"] > ds-list-item::before {
+ds-list[mode="ordered"] > ds-list-item::before {
   counter-increment: ds-list;
   content: counter(ds-list) ".";
   display: inline-block;
@@ -13,7 +13,7 @@ ds-list[data-mode="ordered"] > ds-list-item::before {
   color: var(--ds-list-marker-color, currentColor);
 }
 
-ds-list[data-mode="unordered"] > ds-list-item::before {
+ds-list[mode="unordered"] > ds-list-item::before {
   content: "\2022";
   display: inline-block;
   width: 1.5em;

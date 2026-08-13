@@ -19,16 +19,16 @@ export class DsCounter extends HTMLElement {
     }
 
     this.valueElement = this.querySelector(".value");
-    const type = this.getAttribute("data-type");
-    const id = this.getAttribute("data-id") ?? undefined;
+    const type = this.getAttribute("type");
+    const ref = this.getAttribute("ref") ?? undefined;
 
     if (!type) {
-      console.warn("ds-counter: missing data-type attribute");
+      console.warn("ds-counter: missing type attribute");
       return;
     }
 
     withSlideshowContext(this, (ctx) => {
-      this._registerCounter(ctx, type, id);
+      this._registerCounter(ctx, type, ref);
     });
   }
 
@@ -39,15 +39,15 @@ export class DsCounter extends HTMLElement {
   private _registerCounter(
     slideshowCtx: SlideshowStore,
     type: string,
-    id: string | undefined,
+    ref: string | undefined,
   ) {
     const ctx = slideshowCtx.get();
     const instances = ctx.counters[type] ?? [];
     const newValue = instances.length + 1;
 
     const counterInfo: CounterInfo = { value: newValue };
-    if (id) {
-      counterInfo.id = id;
+    if (ref) {
+      counterInfo.id = ref;
     }
 
     slideshowCtx.setKey("counters", {

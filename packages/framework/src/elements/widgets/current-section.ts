@@ -27,12 +27,12 @@ export class CurrentSection extends HTMLElement {
         const sectionInfo = ctx.sectionsBySlide[slideIndex];
         if (!sectionInfo) return;
 
-        const display = this.getAttribute("data-display") ?? "numeric";
-        const levelAttr = this.getAttribute("data-level");
+        const display = this.getAttribute("display") ?? "numeric";
+        const levelAttr = this.getAttribute("level");
         const level = levelAttr ? parseInt(levelAttr, 10) : undefined;
-        const separator = this.getAttribute("data-separator") ?? ".";
-        const prefix = this.getAttribute("data-prefix") ?? "";
-        const suffix = this.getAttribute("data-suffix") ?? "";
+        const separator = this.getAttribute("separator") ?? ".";
+        const prefix = this.getAttribute("prefix") ?? "";
+        const suffix = this.getAttribute("suffix") ?? "";
 
         if (display === "numeric") {
           this.textContent =

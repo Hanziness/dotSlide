@@ -16,7 +16,7 @@ export class DsButton extends HTMLElement {
       this.appendChild(btn);
     }
 
-    const action = this.getAttribute("data-action") as
+    const action = this.getAttribute("action") as
       | "next"
       | "prev"
       | "first"

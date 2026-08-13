@@ -18,9 +18,9 @@ const ALIGNMENT_MAP: Record<string, string> = {
 
 export class Overlay extends HTMLElement {
   connectedCallback() {
-    const location = this.getAttribute("data-location") ?? "bottom";
-    const alignment = this.getAttribute("data-alignment") ?? "left";
-    const padding = this.getAttribute("data-padding") !== null;
+    const location = this.getAttribute("location") ?? "bottom";
+    const alignment = this.getAttribute("alignment") ?? "left";
+    const padding = this.getAttribute("padding") !== null;
 
     const locClass = LOCATION_MAP[location];
     if (locClass) this.classList.add(locClass);

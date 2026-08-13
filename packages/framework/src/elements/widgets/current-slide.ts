@@ -14,7 +14,7 @@ export class CurrentSlide extends HTMLElement {
       const slideCtx = useSlideContext(this);
       if (!slideCtx) return;
       const slideIndex = slideCtx.get().index;
-      const withinAttr = this.getAttribute("data-within");
+      const withinAttr = this.getAttribute("within");
       const within = withinAttr ? parseInt(withinAttr, 10) : undefined;
 
       if (within === undefined) {
