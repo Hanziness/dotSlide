@@ -80,6 +80,51 @@ test.describe("base slideshow", () => {
     await expect(slides.nth(2)).toHaveClass(/\bactive\b/);
     await expect(slides.nth(2)).toHaveCount(1);
   });
+
+  test("scales slide content proportionally to viewport", async ({ page }) => {
+    async function measure() {
+      return page.evaluate(() => {
+        const slide = document.querySelector(
+          "ds-slide.active",
+        ) as HTMLElement;
+        const textNode = slide.childNodes[0];
+        const range = document.createRange();
+        range.selectNodeContents(textNode);
+        const textRect = range.getBoundingClientRect();
+        const slideRect = slide.getBoundingClientRect();
+        return {
+          textWidth: textRect.width,
+          textHeight: textRect.height,
+          slideWidth: slideRect.width,
+          slideHeight: slideRect.height,
+        };
+      });
+    }
+
+    const atFull = await measure();
+    const ratioXFull = atFull.textWidth / atFull.slideWidth;
+    const ratioYFull = atFull.textHeight / atFull.slideHeight;
+
+    await page.setViewportSize({ width: 640, height: 360 });
+    await page.waitForFunction(
+      () => {
+        const el = document.querySelector("ds-slideshow");
+        const scale = getComputedStyle(el!)
+          .getPropertyValue("--slide-scale")
+          .trim();
+        return scale !== "" && Math.abs(parseFloat(scale) - 0.5) < 0.01;
+      },
+      undefined,
+      { timeout: 5000 },
+    );
+
+    const atHalf = await measure();
+    const ratioXHalf = atHalf.textWidth / atHalf.slideWidth;
+    const ratioYHalf = atHalf.textHeight / atHalf.slideHeight;
+
+    expect(ratioXHalf).toBeCloseTo(ratioXFull, 2);
+    expect(ratioYHalf).toBeCloseTo(ratioYFull, 2);
+  });
 });
 
 test.describe("step navigation", () => {
