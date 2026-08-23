@@ -4,6 +4,14 @@ import videoCss from "./video.css?raw";
 
 injectStyles(videoCss, "video");
 
+/**
+ * Video wrapper that synchronizes playback with the enclosing slide. Plays
+ * (muted) when its parent slide becomes active, pauses otherwise.
+ *
+ * Must be a child of a `ds-slide`.
+ *
+ * @tag ds-video
+ */
 export class DsVideo extends HTMLElement {
   private video: HTMLVideoElement | null = null;
   private observer: MutationObserver | null = null;

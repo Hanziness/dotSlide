@@ -5,6 +5,19 @@ import slideControlsCss from "./slide-controls.css?raw";
 
 injectStyles(slideControlsCss, "slide-controls");
 
+/**
+ * On-screen presentation controls. Renders prev/next buttons, a slide number,
+ * and a fullscreen toggle inside a `ds-overlay`.
+ *
+ * On devices with a hover capability the overlay hides after 2 seconds of
+ * inactivity; on touch devices it stays visible.
+ *
+ * Requires a `ds-slideshow` ancestor.
+ *
+ * @tag ds-slide-controls
+ * @attr data-visible - Set by the element while controls are shown
+ * @cssprop --ds-font-ui - Font family used for control labels
+ */
 export class SlideControls extends HTMLElement {
   private static readonly HIDE_DELAY_MS = 2000;
 

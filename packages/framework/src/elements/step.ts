@@ -3,6 +3,16 @@ import stepCss from "./step.css?raw";
 
 injectStyles(stepCss, "step");
 
+/**
+ * Progressive disclosure wrapper inside a slide. Visible only while the
+ * current slide step falls within the `[data-from, data-to]` range.
+ *
+ * Steps are 1-based; a step with `data-from="2"` first appears on step 2.
+ *
+ * @tag ds-step
+ * @attr data-from - First step where content is visible (inclusive, 1-based)
+ * @attr data-to - Last step where content is visible (inclusive, 1-based)
+ */
 export class Step extends HTMLElement {
   connectedCallback() {}
 

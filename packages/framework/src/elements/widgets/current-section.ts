@@ -5,6 +5,20 @@ import currentSectionCss from "./current-section.css?raw";
 
 injectStyles(currentSectionCss, "current-section");
 
+/**
+ * Displays information about the section that contains the enclosing slide.
+ * Renders a numeric position (e.g. `1.2`) or the section title, optionally
+ * prefixed/suffixed and scoped to a single `level`.
+ *
+ * Must be placed inside a `ds-slide` so it can resolve its position.
+ *
+ * @tag ds-current-section
+ * @attr data-display - Output mode: `numeric` (default) | `text`
+ * @attr data-level - Limit output to a single section level (1-based)
+ * @attr data-separator - Separator between numeric levels (default `.`)
+ * @attr data-prefix - Text prepended to the output
+ * @attr data-suffix - Text appended to the output
+ */
 export class CurrentSection extends HTMLElement {
   private _unsubscribe?: () => void;
 

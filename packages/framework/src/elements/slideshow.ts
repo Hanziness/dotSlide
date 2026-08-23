@@ -41,6 +41,25 @@ function findNavigationIndex(
   );
 }
 
+/**
+ * Root container of a dotSlide presentation. Coordinates navigation, scaling,
+ * resource registration, and exposes shared state to descendant elements.
+ *
+ * Must contain `ds-slide` children. Place control elements (`ds-keyboard-handler`,
+ * `ds-slide-controls`, `ds-loader`) as direct children after the slides.
+ *
+ * @tag ds-slideshow
+ * @attr data-slideshow-width - Logical slide width in pixels (required)
+ * @attr data-slideshow-height - Logical slide height in pixels (required)
+ * @attr data-slideshow-id - Override the auto-generated slideshow id
+ * @cssprop --ds-font-content - Font family used inside slides
+ * @cssprop --ds-font-size-base - Base font size used inside slides
+ * @cssprop --slide-width - Set programmatically; logical slide width
+ * @cssprop --slide-height - Set programmatically; logical slide height
+ * @cssprop --slide-scale - Set programmatically; current scale factor
+ * @fires ds:resource-register - Bubbles. Fired when a resource registers.
+ * @fires ds:resource-ready - Bubbles. Fired when a resource signals readiness.
+ */
 export class Slideshow extends HTMLElement {
   /** Unique identifier of this Slideshow */
   slideshowId: string;

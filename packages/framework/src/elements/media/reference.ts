@@ -8,6 +8,18 @@ import referenceCss from "./reference.css?raw";
 
 injectStyles(referenceCss, "reference");
 
+/**
+ * Renders the value of a counter registered with a matching `data-id`. Useful
+ * for cross-referencing figures and tables across slides.
+ *
+ * The element renders `prefix + value + suffix` once the referenced counter
+ * is found.
+ *
+ * @tag ds-reference
+ * @attr data-id - Id of the `ds-counter` to look up
+ * @attr prefix - Text prepended to the counter value
+ * @attr suffix - Text appended to the counter value
+ */
 export class DsReference extends HTMLElement {
   static observedAttributes = ["prefix", "suffix"] as const;
 

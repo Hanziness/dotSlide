@@ -7,6 +7,22 @@ import loaderCss from "./loader.css?raw";
 
 injectStyles(loaderCss, "loader");
 
+/**
+ * Loading overlay with a progress bar. Subscribes to the parent slideshow
+ * store and updates as registered resources signal readiness; hides itself
+ * when the slideshow transitions to the `ready` phase.
+ *
+ * @tag ds-loader
+ * @attr state - Set by the element: `loading` while resources are pending,
+ *   `finished` once the slideshow is ready.
+ * @attr data-debug - When `"true"`, skip the fade-out delay.
+ * @cssprop --ds-loader-bg - Background color of the overlay
+ * @cssprop --ds-loader-fg - Text color of the logo
+ * @cssprop --ds-loader-track - Track color behind the progress bar
+ * @cssprop --ds-loader-bar - Fill color of the progress bar
+ * @cssprop --ds-radius - Border radius of the progress bar
+ * @cssprop --ds-font-ui - Font family for the logo text
+ */
 export class Loader extends HTMLElement {
   num_registered: number = 0;
   num_success: number = 0;

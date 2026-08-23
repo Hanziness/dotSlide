@@ -16,6 +16,17 @@ const ALIGNMENT_MAP: Record<string, string> = {
   center: "hcenter",
 };
 
+/**
+ * Positioning container for floating UI (controls, captions, etc.). Maps
+ * `data-location` and `data-alignment` attributes to CSS classes that anchor
+ * the overlay to a corner of the parent.
+ *
+ * @tag ds-overlay
+ * @attr data-location - Vertical location: `top` | `bottom` | `center` (default `bottom`)
+ * @attr data-alignment - Horizontal alignment: `left` | `right` | `center` (default `left`)
+ * @attr data-padding - Presence adds padding via `--ds-overlay-padding`
+ * @cssprop --ds-overlay-padding - Inner padding when `data-padding` is present
+ */
 export class Overlay extends HTMLElement {
   connectedCallback() {
     const location = this.getAttribute("data-location") ?? "bottom";
