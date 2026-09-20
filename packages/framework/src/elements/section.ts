@@ -2,11 +2,14 @@ import { createSectionContext } from "../store";
 import { buildSectionHierarchy } from "../utils/section";
 
 /**
- * Custom element `<ds-section>` that marks a section boundary in the presentation.
+ * Marks a section boundary in the presentation. Sections are invisible
+ * markers used by `ds-current-section` to display headings and numbering.
  *
- * Reads `level` and `title` attributes, sets `data-section-level` and
- * `data-section-title` on itself, and triggers `buildSectionHierarchy()` once
- * when the DOM is ready.
+ * Place before the slides that belong to the section.
+ *
+ * @tag ds-section
+ * @attr level - Section depth (1-based, defaults to `1`)
+ * @attr title - Human-readable section title
  */
 class Section extends HTMLElement {
   connectedCallback(): void {

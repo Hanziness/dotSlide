@@ -7,6 +7,18 @@ import progressCss from "./progress.css?raw";
 
 injectStyles(progressCss, "progress");
 
+/**
+ * Displays presentation progress. Without `data-within` the values reflect the
+ * whole slideshow; with `data-within` they are scoped to the enclosing section.
+ *
+ * Must be placed inside a `ds-slide`.
+ *
+ * @tag ds-progress
+ * @attr data-display - Output mode: `fraction` (default) | `percentage` | `bar`
+ * @attr data-within - Section level to scope the count to (1-based)
+ * @csspart track - The background track (rendered only when `data-display="bar"`)
+ * @csspart fill - The filled portion (rendered only when `data-display="bar"`)
+ */
 export class Progress extends HTMLElement {
   private _unsubscribe?: () => void;
 

@@ -231,7 +231,10 @@ const slideshow = document.querySelector('ds-slideshow');
 // Type: Slideshow | null
 ```
 
-HTML custom data included for editor autocomplete in VS Code and other editors.
+## 🧠 Editor Autocomplete
+
+dotSlide ships a Custom Elements Manifest (`custom-elements.json`).
+For IDE support (including tagged templates in `.ts`/`.js`), install the [Custom Elements Manifest Language Server](https://marketplace.visualstudio.com/items?itemName=pwrs.cem-language-server-vscode) extension - it auto-detects the manifest from the `customElements` field in `package.json`.
 
 ## 🛠 Development
 

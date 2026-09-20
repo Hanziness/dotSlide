@@ -13,6 +13,15 @@ const KEY_MAP: Record<string, NavigationAction> = {
   End: "last",
 };
 
+/**
+ * Enables keyboard navigation between slides. Maps `ArrowRight`/`ArrowDown`/
+ * `PageDown` to next, `ArrowLeft`/`ArrowUp`/`PageUp` to prev, `Home` to first,
+ * `End` to last. Ignores key events when focus is inside an input element.
+ *
+ * Requires a `ds-slideshow` ancestor.
+ *
+ * @tag ds-keyboard-handler
+ */
 export class KeyboardHandler extends HTMLElement {
   private keydownHandler: ((e: KeyboardEvent) => void) | undefined;
 

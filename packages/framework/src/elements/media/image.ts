@@ -5,6 +5,12 @@ import imageCss from "./image.css?raw";
 
 injectStyles(imageCss, "image");
 
+/**
+ * Image wrapper that registers its `<img>` child as a slideshow resource.
+ * Blocks the slideshow-ready transition until the image loads or errors.
+ *
+ * @tag ds-image
+ */
 export class DsImage extends HTMLElement {
   connectedCallback() {
     const img = this.querySelector("img");

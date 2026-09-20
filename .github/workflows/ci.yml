@@ -29,6 +29,6 @@ jobs:
           key: ${{ runner.os }}-turbo-${{ github.sha }}
           restore-keys: ${{ runner.os }}-turbo-
 
-      - run: bunx playwright install --with-deps chromium
+      - run: bun run --filter @dotslide/framework test:e2e:install
 
       - run: bun run test

@@ -6,6 +6,12 @@ import { applyTemplate } from "./slide-template";
 
 injectStyles(slideCss, "slide");
 
+/**
+ * Individual slide inside a `ds-slideshow`, scaled to fit the slideshow container.
+ *
+ * @tag ds-slide
+ * @attr template - Name of a `ds-slide-template` to apply to this slide
+ */
 export class Slide extends HTMLElement {
   connectedCallback() {
     const slideshow = this.closest("ds-slideshow");

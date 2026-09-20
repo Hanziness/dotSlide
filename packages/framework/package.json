@@ -20,13 +20,12 @@
       "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
     },
-    "./themes/*": "./themes/*",
-    "./dotslide.html-data.json": "./dotslide.html-data.json"
+    "./themes/*": "./themes/*"
   },
   "files": [
     "dist",
     "themes",
-    "dotslide.html-data.json"
+    "custom-elements.json"
   ],
   "keywords": [
     "dotslide",
@@ -35,14 +34,18 @@
     "web-components",
     "framework-agnostic"
   ],
+  "customElements": "custom-elements.json",
   "scripts": {
     "build": "tsdown",
     "dev": "tsdown --watch",
+    "generate-ce-manifest": "cem analyze",
     "test": "bun run test:unit && bun run test:e2e",
     "test:unit": "vitest run",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "test:e2e:install": "playwright install --with-deps chromium"
   },
   "devDependencies": {
+    "@custom-elements-manifest/analyzer": "^0.11.0",
     "@playwright/test": "^1.62.1",
     "@types/node": "^26.2.0",
     "jsdom": "^30.0.1",
