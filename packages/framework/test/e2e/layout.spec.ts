@@ -30,7 +30,7 @@ test.describe("layout elements", () => {
     await expect(
       page.locator("ds-list").first().locator("ds-list-item"),
     ).toHaveCount(3);
-    await expect(page.locator("ds-list[data-mode='ordered']")).toHaveCount(1);
+    await expect(page.locator("ds-list[mode='ordered']")).toHaveCount(1);
   });
 
   test("visual snapshot of layout", async ({ page }) => {

@@ -64,9 +64,7 @@ export function updateStepVisibility(
     const from = step.getAttribute("from")
       ? Number(step.getAttribute("from"))
       : null;
-    const to = step.getAttribute("to")
-      ? Number(step.getAttribute("to"))
-      : null;
+    const to = step.getAttribute("to") ? Number(step.getAttribute("to")) : null;
 
     const visible =
       (from === null || activeStep >= from) &&

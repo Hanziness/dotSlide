@@ -16,7 +16,7 @@ export function buildSectionHierarchy(slideshowRoot: HTMLElement): void {
 
   // Get all slides and sections in DOM order
   const elements = slideshowRoot.querySelectorAll<HTMLElement>(
-    "ds-slide, [data-section-level]",
+    "ds-slide, ds-section",
   );
 
   // Counters for auto-increment (one per level 0-6)
@@ -33,13 +33,10 @@ export function buildSectionHierarchy(slideshowRoot: HTMLElement): void {
   let slideIndex = 0;
 
   elements.forEach((element) => {
-    if (element.hasAttribute("data-section-level")) {
+    if (element.matches("ds-section")) {
       // This is a section marker
-      const level = Number.parseInt(
-        element.getAttribute("data-section-level") ?? "1",
-        10,
-      );
-      const title = element.getAttribute("data-section-title") ?? undefined;
+      const level = Number.parseInt(element.getAttribute("level") ?? "1", 10);
+      const title = element.getAttribute("title") ?? undefined;
 
       // Increment current level counter
       counters[level]++;
@@ -131,7 +128,10 @@ export function getCurrentSection(
     // HTMLElement - get index from data attribute
     const indexAttr = slideIndexOrElement.getAttribute("data-slide-index");
     if (indexAttr === null) {
-      console.warn("[dotslide]", "Slide element missing data-slide-index attribute");
+      console.warn(
+        "[dotslide]",
+        "Slide element missing data-slide-index attribute",
+      );
       return null;
     }
     slideIndex = Number.parseInt(indexAttr, 10);

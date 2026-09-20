@@ -13,14 +13,6 @@ import { buildSectionHierarchy } from "../utils/section";
  */
 class Section extends HTMLElement {
   connectedCallback(): void {
-    const level = this.getAttribute("level") ?? "1";
-    const title = this.getAttribute("title");
-
-    this.dataset.sectionLevel = level;
-    if (title !== null) {
-      this.dataset.sectionTitle = title;
-    }
-
     const slideshowRoot = this.closest("ds-slideshow");
     if (!(slideshowRoot instanceof HTMLElement)) return;
 
@@ -33,26 +25,6 @@ class Section extends HTMLElement {
           buildSectionHierarchy(slideshowRoot);
         }
       });
-    }
-  }
-
-  static get observedAttributes(): string[] {
-    return ["level", "title"];
-  }
-
-  attributeChangedCallback(
-    name: string,
-    _oldValue: string | null,
-    newValue: string | null,
-  ): void {
-    if (name === "level" && newValue !== null) {
-      this.dataset.sectionLevel = newValue;
-    } else if (name === "title") {
-      if (newValue !== null) {
-        this.dataset.sectionTitle = newValue;
-      } else {
-        delete this.dataset.sectionTitle;
-      }
     }
   }
 }

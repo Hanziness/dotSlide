@@ -11,14 +11,14 @@ injectStyles(counterCss, "counter");
 
 /**
  * Numbered counter for figures, tables, equations, etc. Each counter is
- * scoped by `data-type` and assigned a sequential value as instances are
- * registered. `data-id` lets other slides refer back via `ds-reference`.
+ * scoped by `type` and assigned a sequential value as instances are
+ * registered. `ref` lets other slides refer back via `ds-reference`.
  *
  * Requires a `ds-slideshow` ancestor.
  *
  * @tag ds-counter
- * @attr data-type - Counter category (e.g. `figure`, `table`); required
- * @attr data-id - Optional stable id used by `ds-reference` to look up this counter
+ * @attr type - Counter category (e.g. `figure`, `table`); required
+ * @attr ref - Optional stable id used by `ds-reference` to look up this counter
  */
 export class DsCounter extends HTMLElement {
   private valueElement: HTMLElement | null = null;

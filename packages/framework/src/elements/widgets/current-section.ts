@@ -13,11 +13,11 @@ injectStyles(currentSectionCss, "current-section");
  * Must be placed inside a `ds-slide` so it can resolve its position.
  *
  * @tag ds-current-section
- * @attr data-display - Output mode: `numeric` (default) | `text`
- * @attr data-level - Limit output to a single section level (1-based)
- * @attr data-separator - Separator between numeric levels (default `.`)
- * @attr data-prefix - Text prepended to the output
- * @attr data-suffix - Text appended to the output
+ * @attr display - Output mode: `numeric` (default) | `text`
+ * @attr level - Limit output to a single section level (1-based)
+ * @attr separator - Separator between numeric levels (default `.`)
+ * @attr prefix - Text prepended to the output
+ * @attr suffix - Text appended to the output
  */
 export class CurrentSection extends HTMLElement {
   private _unsubscribe?: () => void;

@@ -22,10 +22,10 @@ packages/
         widgets/    # Progress, CurrentSlide, TotalSlides, CurrentSection
       store/        # Nanostores-based state management
       styles/       # Shared CSS consumed via ?raw imports
-      utils/        # Utility functions (generateId, getDataTags, injectStyles)
+      utils/        # Utility functions (generateId, injectStyles)
     index.ts        # Main package entry - registers and re-exports all elements
     themes/         # Prebuilt CSS themes
-    dotslide.html-data.json  # Custom element metadata (for IDE tooling)
+    custom-elements.json  # Custom element metadata (generated, for IDE tooling)
 ```
 
 ## Build, Dev, and Lint Commands
@@ -112,7 +112,7 @@ There are **no tests** currently. No test framework (Vitest, Jest, Playwright) i
   ```
 - **`.js` extensions** on relative import specifiers (ESM/tsdown convention):
   ```ts
-  import { getDataTags } from "../../utils/index.js";
+  import { generateId } from "../../utils/index.js";
   ```
 
 ### TypeScript
@@ -133,12 +133,12 @@ There are **no tests** currently. No test framework (Vitest, Jest, Playwright) i
 | TypeScript files | camelCase              | `slideshow.ts`, `button.ts`            |
 | Directories      | camelCase/lowercase    | `store/`, `utils/`, `elements/`        |
 | Classes          | PascalCase             | `Slideshow`, `SlideControls`, `DsButton` |
-| Functions        | camelCase              | `generateId()`, `getDataTags()`       |
+| Functions        | camelCase              | `generateId()`, `injectStyles()`      |
 | Types/Interfaces | PascalCase             | `SlideshowContext`, `NavigationNode`  |
 | Constants        | camelCase              | `slideshowContext`                    |
 | CSS variables    | kebab-case with prefix | `--slide-width`, `--slideshow-root`   |
 | Public attributes | bare kebab-case      | `level`, `template`, `action`, `display` |
-| Internal attributes | data-* prefix      | `data-slide-index`, `data-section-level` |
+| Internal attributes | data-* prefix      | `data-slide-index`, `data-state`        |
 
 ### Web Components
 
@@ -157,7 +157,7 @@ There are **no tests** currently. No test framework (Vitest, Jest, Playwright) i
   customElements.define("ds-slideshow", Slideshow);
   ```
 - **Lifecycle methods**: `connectedCallback()`, `disconnectedCallback()`, `attributeChangedCallback()`, `adoptedCallback()`. Static `observedAttributes` for reactive attributes.
-- **Attribute handling**: read via `getAttribute()`, observe with `observedAttributes`; use **bare attributes** for public API (e.g. `level`, `display`, `within`), `data-*` attributes for internal/state (e.g. `data-slide-index`, `data-section-level`).
+- **Attribute handling**: read via `getAttribute()`, observe with `observedAttributes`; use **bare attributes** for public API (e.g. `level`, `display`, `within`), `data-*` only for state the element emits (e.g. `data-slide-index`, `data-state`). Components must never *accept* a `data-` attribute as input.
 - **Event handling**: dispatch custom events (`new CustomEvent`) for component communication; listen with `addEventListener`.
 - **CSS scoping**: per-element CSS files imported as `?raw` and injected via `injectStyles(css, id)` (scoped by a shared id, not Shadow DOM by default). CSS variables (`--slide-width`, `--slide-scale`) are used for dynamic sizing.
 - **Composition**: elements resolve related elements via `customElements.whenDefined(...)` + `.closest("ds-slideshow")` queries.
@@ -199,4 +199,4 @@ The framework package itself is plain TypeScript, so these overrides do not appl
 2. **Custom element registration**: `customElements.define()` in `src/index.ts`; augment `HTMLElementTagNameMap` for typed queries
 3. **Attribute-based API**: expose configuration through bare attributes (e.g. `level`, `display`), read in `connectedCallback`; use `data-*` only for internal/state attributes
 4. **Event-driven communication**: dispatch and listen for CustomEvents; use nanostore context for shared slideshow state
-5. **Package exports**: The framework exposes `"."` (main bundle) plus `"./themes/*"` and `"./dotslide.html-data.json"`
+5. **Package exports**: The framework exposes `"."` (main bundle) plus `"./themes/*"`; `custom-elements.json` is generated via `bun run generate-ce-manifest` and shipped as package metadata

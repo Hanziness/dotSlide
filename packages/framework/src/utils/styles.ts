@@ -12,23 +12,23 @@ const injectedStyles = new Set<string>();
  */
 export function injectStyles(css: string, id?: string): void {
   const key = id ?? css;
-  
+
   if (injectedStyles.has(key)) {
     return;
   }
-  
+
   // Wrap in @layer if not already wrapped
   const wrappedCss = css.includes("@layer dotslide")
     ? css
     : `@layer dotslide {\n${css}\n}`;
-  
+
   const style = document.createElement("style");
   style.textContent = wrappedCss;
-  
+
   if (id) {
     style.setAttribute("data-dotslide", id);
   }
-  
+
   document.head.appendChild(style);
   injectedStyles.add(key);
 }

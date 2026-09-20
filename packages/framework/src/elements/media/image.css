@@ -1,4 +1,6 @@
-ds-image { display: contents; }
+ds-image {
+  display: contents;
+}
 ds-image img {
   width: 100%;
   display: block;

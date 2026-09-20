@@ -27,7 +27,7 @@ export function createSectionContext(
 ): MapStore<SectionContext> {
   if (!sectionContexts.has(root)) {
     const store = map<SectionContext>({
-      id: root.dataset.slideshowId ?? "default",
+      id: root.getAttribute("id") ?? "default",
       sectionsBySlide: {},
       initialized: false,
     });

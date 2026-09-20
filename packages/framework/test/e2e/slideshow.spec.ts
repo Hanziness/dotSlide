@@ -19,8 +19,8 @@ test.describe("base slideshow", () => {
 
   test("renders at 1280x720 with three slides", async ({ page }) => {
     const slideshow = page.locator("ds-slideshow");
-    await expect(slideshow).toHaveAttribute("data-slideshow-width", "1280");
-    await expect(slideshow).toHaveAttribute("data-slideshow-height", "720");
+    await expect(slideshow).toHaveAttribute("slide-width", "1280");
+    await expect(slideshow).toHaveAttribute("slide-height", "720");
     await expect(page.locator("ds-slide")).toHaveCount(3);
   });
 
@@ -47,10 +47,10 @@ test.describe("base slideshow", () => {
 
   test("navigates with next/prev buttons", async ({ page }) => {
     const slides = page.locator("ds-slide");
-    await page.locator('ds-button[data-action="next"]').click();
+    await page.locator('ds-button[action="next"]').click();
     await expect(slides.nth(1)).toHaveClass(/\bactive\b/);
 
-    await page.locator('ds-button[data-action="prev"]').click();
+    await page.locator('ds-button[action="prev"]').click();
     await expect(slides.nth(0)).toHaveClass(/\bactive\b/);
   });
 
@@ -84,9 +84,7 @@ test.describe("base slideshow", () => {
   test("scales slide content proportionally to viewport", async ({ page }) => {
     async function measure() {
       return page.evaluate(() => {
-        const slide = document.querySelector(
-          "ds-slide.active",
-        ) as HTMLElement;
+        const slide = document.querySelector("ds-slide.active") as HTMLElement;
         const textNode = slide.childNodes[0];
         const range = document.createRange();
         range.selectNodeContents(textNode);

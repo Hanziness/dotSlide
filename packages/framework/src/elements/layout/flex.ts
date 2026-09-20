@@ -24,7 +24,10 @@ export class DsFlex extends HTMLElement {
   ) {
     if (name === "gap") {
       const parsed = Number(newValue);
-      this.style.setProperty("--gap", `${Number.isNaN(parsed) ? 0.5 : parsed}rem`);
+      this.style.setProperty(
+        "--gap",
+        `${Number.isNaN(parsed) ? 0.5 : parsed}rem`,
+      );
     } else if (name === "justify") {
       this.style.setProperty("--justify", newValue ?? "start");
     } else if (name === "align") {
