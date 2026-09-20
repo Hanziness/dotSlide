@@ -6,6 +6,16 @@ import currentSlideCss from "./current-slide.css?raw";
 
 injectStyles(currentSlideCss, "current-slide");
 
+/**
+ * Displays the current slide number. Without `data-within` shows the
+ * global 1-based slide index; with `data-within` shows the position within
+ * the enclosing section of the given level.
+ *
+ * Must be placed inside a `ds-slide`.
+ *
+ * @tag ds-current-slide
+ * @attr data-within - Section level to scope the count to (1-based)
+ */
 export class CurrentSlide extends HTMLElement {
   private _unsubscribe?: () => void;
 

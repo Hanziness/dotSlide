@@ -7,6 +7,15 @@ import totalSlidesCss from "./total-slides.css?raw";
 
 injectStyles(totalSlidesCss, "total-slides");
 
+/**
+ * Displays the total slide count. Without `data-within` shows the global total;
+ * with `data-within` shows the total of the enclosing section at the given level.
+ *
+ * Must be placed inside a `ds-slide`.
+ *
+ * @tag ds-total-slides
+ * @attr data-within - Section level to scope the count to (1-based)
+ */
 export class TotalSlides extends HTMLElement {
   private _unsubscribe?: () => void;
 

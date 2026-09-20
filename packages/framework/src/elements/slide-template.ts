@@ -86,7 +86,8 @@ export function applyTemplate(
 }
 
 /**
- * Custom element `<ds-slide-template>` that registers a named slide template.
+ * Reusable slide layout. Define once with a unique `name` and apply to slides
+ * via `<ds-slide template="name">`.
  *
  * Define templates with `<ds-slot>` markers; apply them with
  * `<ds-slide template="name">`. The template's children are moved into an
@@ -94,6 +95,11 @@ export function applyTemplate(
  *
  * Templates must appear before the slides that reference them in DOM order
  * so they register before the slide's `connectedCallback` runs.
+ *
+ * @tag ds-slide-template
+ * @attr name - Template identifier referenced by `<ds-slide template="...">`
+ * @slot - Default slot content distributed to the unnamed `<ds-slot>` marker
+ * @slot name - Content with matching `slot="name"` or `ds-slot-name="text"`
  */
 export class SlideTemplate extends HTMLElement {
   connectedCallback(): void {
