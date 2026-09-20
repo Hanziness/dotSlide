@@ -49,9 +49,9 @@ function findNavigationIndex(
  * `ds-slide-controls`, `ds-loader`) as direct children after the slides.
  *
  * @tag ds-slideshow
- * @attr data-slideshow-width - Logical slide width in pixels (required)
- * @attr data-slideshow-height - Logical slide height in pixels (required)
- * @attr data-slideshow-id - Override the auto-generated slideshow id
+ * @attr slide-width - Logical slide width in pixels (required)
+ * @attr slide-height - Logical slide height in pixels (required)
+ * @attr id - Override the auto-generated slideshow id
  * @cssprop --ds-font-content - Font family used inside slides
  * @cssprop --ds-font-size-base - Base font size used inside slides
  * @cssprop --slide-width - Set programmatically; logical slide width
@@ -74,15 +74,15 @@ export class Slideshow extends HTMLElement {
 
   constructor() {
     super();
-    this.slideshowId = this.dataset.slideshowId ?? generateId();
+    this.slideshowId = this.getAttribute("id") ?? generateId();
   }
 
   connectedCallback() {
     if (this._initialized) return;
     this._initialized = true;
 
-    const slideWidth = this.getAttribute("data-slideshow-width");
-    const slideHeight = this.getAttribute("data-slideshow-height");
+    const slideWidth = this.getAttribute("slide-width");
+    const slideHeight = this.getAttribute("slide-height");
 
     if (slideWidth === null || slideHeight === null) {
       throw new Error("Slideshow width or height is undefined");
@@ -123,7 +123,7 @@ export class Slideshow extends HTMLElement {
       height: this.slideshowSize.height,
       navigationIndex: initialNavigationIndex,
       navigationSequence,
-      templates: {}
+      templates: {},
     });
 
     // Resource readiness event listeners
@@ -131,7 +131,9 @@ export class Slideshow extends HTMLElement {
       const { resourceId, slideIndex } = (
         e as CustomEvent<ResourceRegistrationDetail>
       ).detail;
-      console.debug(`[dotslide] Resource registered: ${resourceId} (slide ${slideIndex})`);
+      console.debug(
+        `[dotslide] Resource registered: ${resourceId} (slide ${slideIndex})`,
+      );
 
       const current = slideshowContextRef.get();
 

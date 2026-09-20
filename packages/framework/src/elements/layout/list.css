@@ -5,6 +5,6 @@ ds-list {
   margin: 0;
 }
 
-ds-list[data-mode="ordered"] {
+ds-list[mode="ordered"] {
   counter-reset: ds-list calc(var(--ds-list-start, 1) - 1);
 }

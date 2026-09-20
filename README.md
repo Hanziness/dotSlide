@@ -36,7 +36,7 @@ Focus on content, not configuration.
   <title>My Presentation</title>
 </head>
 <body>
-  <ds-slideshow data-slideshow-width="1920" data-slideshow-height="1080">
+  <ds-slideshow slide-width="1920" slide-height="1080">
     <ds-slide>
       <ds-image src="/cover.png" alt="Cover image"></ds-image>
     </ds-slide>
@@ -60,7 +60,7 @@ Focus on content, not configuration.
   <ds-item>Right</ds-item>
 </ds-flex>
 
-<ds-list data-mode="unordered">
+<ds-list mode="unordered">
   <ds-list-item>One</ds-list-item>
   <ds-list-item>Two</ds-list-item>
 </ds-list>
@@ -74,7 +74,7 @@ Focus on content, not configuration.
 - `<ds-total-slides>` — Reports the number of slides in the deck.
 
 ```html
-<ds-progress data-display="bar"></ds-progress>
+<ds-progress display="bar"></ds-progress>
 <p>Slide <ds-current-slide></ds-current-slide> of <ds-total-slides></ds-total-slides></p>
 ```
 
@@ -109,7 +109,7 @@ The simplest way to get started:
   </style>
 </head>
 <body>
-  <ds-slideshow data-slideshow-width="1920" data-slideshow-height="1080">
+  <ds-slideshow slide-width="1920" slide-height="1080">
     <ds-keyboard-handler></ds-keyboard-handler>
     <ds-slide-controls></ds-slide-controls>
 
@@ -135,7 +135,7 @@ npm install @dotslide/framework
   import '@dotslide/framework';
 </script>
 
-<ds-slideshow data-slideshow-width="1920" data-slideshow-height="1080">
+<ds-slideshow slide-width="1920" slide-height="1080">
   <ds-slide>
     <h1>Hello, dotSlide</h1>
   </ds-slide>

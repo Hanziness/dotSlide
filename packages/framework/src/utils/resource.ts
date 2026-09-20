@@ -18,12 +18,16 @@ export type ResourceRegistrationDetail = ResourceInfo & {
   resourceId: string;
 };
 
-export type ResourceRegistrationResult = ResourceRegistrationDetail & ({
-  success: true
-} | {
-  success: false,
-  error: Error
-})
+export type ResourceRegistrationResult = ResourceRegistrationDetail &
+  (
+    | {
+        success: true;
+      }
+    | {
+        success: false;
+        error: Error;
+      }
+  );
 
 /**
  * Registers a resource with the readiness system.
@@ -68,16 +72,17 @@ export function registerResource(
       return;
     }
     signaled = true;
-    const success = error === undefined
-    const result: ResourceRegistrationResult = success ? {
-      ...detail,
-      success: true
-    } : {
-      ...detail,
-      success: false,
-      error
-    }
-
+    const success = error === undefined;
+    const result: ResourceRegistrationResult = success
+      ? {
+          ...detail,
+          success: true,
+        }
+      : {
+          ...detail,
+          success: false,
+          error,
+        };
 
     element.dispatchEvent(
       new CustomEvent<ResourceRegistrationResult>(RESOURCE_READY, {

@@ -8,16 +8,16 @@ import progressCss from "./progress.css?raw";
 injectStyles(progressCss, "progress");
 
 /**
- * Displays presentation progress. Without `data-within` the values reflect the
- * whole slideshow; with `data-within` they are scoped to the enclosing section.
+ * Displays presentation progress. Without `within` the values reflect the
+ * whole slideshow; with `within` they are scoped to the enclosing section.
  *
  * Must be placed inside a `ds-slide`.
  *
  * @tag ds-progress
- * @attr data-display - Output mode: `fraction` (default) | `percentage` | `bar`
- * @attr data-within - Section level to scope the count to (1-based)
- * @csspart track - The background track (rendered only when `data-display="bar"`)
- * @csspart fill - The filled portion (rendered only when `data-display="bar"`)
+ * @attr display - Output mode: `fraction` (default) | `percentage` | `bar`
+ * @attr within - Section level to scope the count to (1-based)
+ * @csspart track - The background track (rendered only when `display="bar"`)
+ * @csspart fill - The filled portion (rendered only when `display="bar"`)
  */
 export class Progress extends HTMLElement {
   private _unsubscribe?: () => void;
@@ -28,7 +28,7 @@ export class Progress extends HTMLElement {
       customElements.whenDefined("ds-slide"),
     ]).then(() => {
       if (!this.isConnected) return;
-      const display = this.getAttribute("data-display") ?? "fraction";
+      const display = this.getAttribute("display") ?? "fraction";
       if (display === "bar") {
         if (!this.querySelector(".track")) {
           this.innerHTML = '<div class="track"><div class="fill"></div></div>';
@@ -57,9 +57,9 @@ export class Progress extends HTMLElement {
         if (!ctx.initialized) return;
         this._unsubscribe?.();
 
-        const withinAttr = this.getAttribute("data-within");
+        const withinAttr = this.getAttribute("within");
         const within = withinAttr ? parseInt(withinAttr, 10) : undefined;
-        const display = this.getAttribute("data-display") ?? "fraction";
+        const display = this.getAttribute("display") ?? "fraction";
 
         let position: number;
         let total: number;

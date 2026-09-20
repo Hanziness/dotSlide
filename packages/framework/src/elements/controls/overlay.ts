@@ -18,20 +18,20 @@ const ALIGNMENT_MAP: Record<string, string> = {
 
 /**
  * Positioning container for floating UI (controls, captions, etc.). Maps
- * `data-location` and `data-alignment` attributes to CSS classes that anchor
+ * `location` and `alignment` attributes to CSS classes that anchor
  * the overlay to a corner of the parent.
  *
  * @tag ds-overlay
- * @attr data-location - Vertical location: `top` | `bottom` | `center` (default `bottom`)
- * @attr data-alignment - Horizontal alignment: `left` | `right` | `center` (default `left`)
- * @attr data-padding - Presence adds padding via `--ds-overlay-padding`
- * @cssprop --ds-overlay-padding - Inner padding when `data-padding` is present
+ * @attr location - Vertical location: `top` | `bottom` | `center` (default `bottom`)
+ * @attr alignment - Horizontal alignment: `left` | `right` | `center` (default `left`)
+ * @attr padding - Presence adds padding via `--ds-overlay-padding`
+ * @cssprop --ds-overlay-padding - Inner padding when `padding` is present
  */
 export class Overlay extends HTMLElement {
   connectedCallback() {
-    const location = this.getAttribute("data-location") ?? "bottom";
-    const alignment = this.getAttribute("data-alignment") ?? "left";
-    const padding = this.getAttribute("data-padding") !== null;
+    const location = this.getAttribute("location") ?? "bottom";
+    const alignment = this.getAttribute("alignment") ?? "left";
+    const padding = this.getAttribute("padding") !== null;
 
     const locClass = LOCATION_MAP[location];
     if (locClass) this.classList.add(locClass);

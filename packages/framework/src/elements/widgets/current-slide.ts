@@ -7,14 +7,14 @@ import currentSlideCss from "./current-slide.css?raw";
 injectStyles(currentSlideCss, "current-slide");
 
 /**
- * Displays the current slide number. Without `data-within` shows the
- * global 1-based slide index; with `data-within` shows the position within
+ * Displays the current slide number. Without `within` shows the
+ * global 1-based slide index; with `within` shows the position within
  * the enclosing section of the given level.
  *
  * Must be placed inside a `ds-slide`.
  *
  * @tag ds-current-slide
- * @attr data-within - Section level to scope the count to (1-based)
+ * @attr within - Section level to scope the count to (1-based)
  */
 export class CurrentSlide extends HTMLElement {
   private _unsubscribe?: () => void;
@@ -24,7 +24,7 @@ export class CurrentSlide extends HTMLElement {
       const slideCtx = useSlideContext(this);
       if (!slideCtx) return;
       const slideIndex = slideCtx.get().index;
-      const withinAttr = this.getAttribute("data-within");
+      const withinAttr = this.getAttribute("within");
       const within = withinAttr ? parseInt(withinAttr, 10) : undefined;
 
       if (within === undefined) {

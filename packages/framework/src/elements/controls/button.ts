@@ -13,7 +13,7 @@ injectStyles(buttonCss, "button");
  * Requires a `ds-slideshow` ancestor; otherwise the action is ignored.
  *
  * @tag ds-button
- * @attr data-action - Action to dispatch on click: `next` | `prev` | `first` | `last`
+ * @attr action - Action to dispatch on click: `next` | `prev` | `first` | `last`
  * @cssprop --ds-control-bg - Button background color
  * @cssprop --ds-control-radius - Button border radius
  * @cssprop --ds-control-shadow - Button box-shadow
@@ -29,7 +29,7 @@ export class DsButton extends HTMLElement {
       this.appendChild(btn);
     }
 
-    const action = this.getAttribute("data-action") as
+    const action = this.getAttribute("action") as
       | "next"
       | "prev"
       | "first"

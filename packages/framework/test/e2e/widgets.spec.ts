@@ -19,21 +19,21 @@ test.describe("widgets", () => {
 
   test("shows fraction and percentage progress", async ({ page }) => {
     await expect(
-      page.locator('ds-progress[data-display="fraction"] .text'),
+      page.locator('ds-progress[display="fraction"] .text'),
     ).toHaveText("1/3");
 
     await page.keyboard.press("ArrowRight");
     await expect(
       page
         .locator("ds-slide.active")
-        .locator('ds-progress[data-display="percentage"] .text'),
+        .locator('ds-progress[display="percentage"] .text'),
     ).toHaveText("67%");
 
     await page.keyboard.press("ArrowRight");
     await expect(
       page
         .locator("ds-slide.active")
-        .locator('ds-progress[data-display="bar"] .fill'),
+        .locator('ds-progress[display="bar"] .fill'),
     ).toBeVisible();
   });
 

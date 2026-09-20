@@ -13,8 +13,8 @@ function createSlideWithSteps(
   const slide = document.createElement("ds-slide");
   for (const { from, to } of steps) {
     const step = document.createElement("ds-step");
-    if (from !== undefined) step.dataset.from = from;
-    if (to !== undefined) step.dataset.to = to;
+    if (from !== undefined) step.setAttribute("from", from);
+    if (to !== undefined) step.setAttribute("to", to);
     slide.appendChild(step);
   }
   return slide;
@@ -64,7 +64,7 @@ describe("buildNavigationSequence", () => {
     expect(sequence.map((n) => n.stepIndex)).toEqual([1, 2, 3]);
   });
 
-  it("determines max step from data-from and data-to attributes", () => {
+  it("determines max step from from and to attributes", () => {
     root.appendChild(
       createSlideWithSteps([{ from: "2", to: "4" }, { from: "1" }]),
     );
@@ -93,7 +93,7 @@ describe("buildNavigationSequence", () => {
 });
 
 describe("updateStepVisibility", () => {
-  it("toggles the active class based on data-from/data-to and activeStep", () => {
+  it("toggles the active class based on from/to and activeStep", () => {
     const slide = createSlideWithSteps([
       { from: "1", to: "2" },
       { from: "2", to: "3" },
@@ -107,7 +107,7 @@ describe("updateStepVisibility", () => {
     expect(steps[2].classList.contains("active")).toBe(false);
   });
 
-  it("keeps a step without data-from/data-to always visible", () => {
+  it("keeps a step without from/to always visible", () => {
     const slide = createSlideWithSteps([{}]);
     const step = slide.querySelector<HTMLElement>("ds-step");
     if (step === null) throw new Error("expected a ds-step element");

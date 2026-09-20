@@ -53,7 +53,7 @@ export {
 export type { SectionContext, SectionInfo } from "./store/index";
 export { createSectionContext, useSectionContext } from "./store/index";
 export { RESOURCE_READY, RESOURCE_REGISTER } from "./utils/events";
-export { generateId, getDataTags } from "./utils/index";
+export { generateId } from "./utils/index";
 // Re-export navigation utilities
 export {
   buildNavigationSequence,

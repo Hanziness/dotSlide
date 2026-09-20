@@ -1,5 +1,5 @@
-import { injectStyles } from "../../utils/styles.js";
 import { registerResource } from "../../utils/resource.js";
+import { injectStyles } from "../../utils/styles.js";
 
 import imageCss from "./image.css?raw";
 
@@ -22,7 +22,11 @@ export class DsImage extends HTMLElement {
       handle.ready();
     } else {
       img.addEventListener("load", () => handle.ready(), { once: true });
-      img.addEventListener("error", (e) => handle.error({ ...e, name: "Image loading error" } as Error), { once: true });
+      img.addEventListener(
+        "error",
+        (e) => handle.error({ ...e, name: "Image loading error" } as Error),
+        { once: true },
+      );
     }
   }
 }

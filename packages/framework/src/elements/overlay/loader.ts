@@ -13,9 +13,8 @@ injectStyles(loaderCss, "loader");
  * when the slideshow transitions to the `ready` phase.
  *
  * @tag ds-loader
- * @attr state - Set by the element: `loading` while resources are pending,
- *   `finished` once the slideshow is ready.
- * @attr data-debug - When `"true"`, skip the fade-out delay.
+ * @attr data-state - Emitted state: `loading` | `finished`
+ * @attr debug - When `"true"`, skip the fade-out delay.
  * @cssprop --ds-loader-bg - Background color of the overlay
  * @cssprop --ds-loader-fg - Text color of the logo
  * @cssprop --ds-loader-track - Track color behind the progress bar
@@ -32,7 +31,7 @@ export class Loader extends HTMLElement {
   private _updateProgressBar = (progress?: number) => {
     const bar = this.querySelector("div.bar-inner") as HTMLDivElement;
     if (!bar) return;
-    bar.style.width = `${(progress ?? (this.num_success / (this.num_registered || 1))) * 100}%`;
+    bar.style.width = `${(progress ?? this.num_success / (this.num_registered || 1)) * 100}%`;
   };
 
   private _onResourceReady = (e: Event) => {
@@ -61,33 +60,48 @@ export class Loader extends HTMLElement {
 
       if (ctx.get().phase === "ready") {
         this._updateProgressBar(1);
-        setTimeout(() => {
-          this.setAttribute("state", "finished");
-        }, this.getAttribute("data-debug") === "true" ? 0 : 300);
+        setTimeout(
+          () => {
+            this.setAttribute("data-state", "finished");
+          },
+          this.getAttribute("debug") === "true" ? 0 : 300,
+        );
         return;
       }
 
-      this.closest("ds-slideshow")?.addEventListener(RESOURCE_READY, this._onResourceReady);
+      this.closest("ds-slideshow")?.addEventListener(
+        RESOURCE_READY,
+        this._onResourceReady,
+      );
 
       this.store_unsubscribe = ctx.subscribe((store) => {
         if (store.phase === "loading") {
-          this.setAttribute("state", "loading");
+          this.setAttribute("data-state", "loading");
           this._updateProgressBar();
         } else if (store.phase === "registering") {
-          this.num_registered = Math.max(this.num_registered, Object.keys(store.pending).length);
+          this.num_registered = Math.max(
+            this.num_registered,
+            Object.keys(store.pending).length,
+          );
         } else if (store.phase === "ready") {
           this._updateProgressBar(1);
-          setTimeout(() => {
-            this.setAttribute("state", "finished");
-            this.store_unsubscribe?.();
-          }, this.getAttribute("data-debug") === "true" ? 0 : 700);
+          setTimeout(
+            () => {
+              this.setAttribute("data-state", "finished");
+              this.store_unsubscribe?.();
+            },
+            this.getAttribute("debug") === "true" ? 0 : 700,
+          );
         }
       });
     });
   }
 
   disconnectedCallback() {
-    this.closest("ds-slideshow")?.removeEventListener(RESOURCE_READY, this._onResourceReady);
+    this.closest("ds-slideshow")?.removeEventListener(
+      RESOURCE_READY,
+      this._onResourceReady,
+    );
     this.store_unsubscribe?.();
   }
 }

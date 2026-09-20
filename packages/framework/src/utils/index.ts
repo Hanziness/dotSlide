@@ -5,37 +5,6 @@ export function generateId(): string {
     .join("");
 }
 
-/** Return the identifier `data-` attribute name for a component */
-export function getComponentDataAttribute(prefix: string) {
-  return `data-${prefix}`;
-}
-
-/** Returns a query selector for the given identifier (`[data-${identifier}]`) */
-export function getSelector(identifier: string) {
-  return `[data-${identifier}]`;
-}
-
-/** Export an embeddable set of `data-` attributes for a particular component.
- * It transforms the input object's given keys to `data-(prefix)-(value)` tags.
- *
- * @example In order to use it, just spread the returned object:
- * ```ts
- * const attrs = getDataTags({ id: 'slide-1', title: 'Intro' }, 'component', ['id', 'title']);
- * // Result: { 'data-component-id': 'slide-1', 'data-component-title': 'Intro' }
- * ```
- *  */
-export function getDataTags<T extends Record<string, unknown>>(
-  object: T,
-  prefix: string,
-  includes: Array<keyof T>,
-) {
-  return includes.reduce((acc, key) => {
-    return Object.assign(acc, {
-      [`data-${prefix}-${String(key)}`]: object[key],
-    });
-  }, {});
-}
-
 export {
   type ResourceHandle,
   type ResourceRegistrationDetail,

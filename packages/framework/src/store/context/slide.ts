@@ -1,13 +1,16 @@
-import { provideContext, useContext } from "."
+import { provideContext, useContext } from ".";
 
 export type SlideContext = {
-    index: number
-}
+  index: number;
+};
 
-export const createSlideContext = (element: HTMLElement, initialValue: SlideContext) => {
-    return provideContext<SlideContext>(element, initialValue)
-}
+export const createSlideContext = (
+  element: HTMLElement,
+  initialValue: SlideContext,
+) => {
+  return provideContext<SlideContext>(element, initialValue);
+};
 
 export const useSlideContext = (childElement: HTMLElement) => {
-    return useContext<SlideContext>(childElement, "ds-slide")
-}
+  return useContext<SlideContext>(childElement, "ds-slide");
+};

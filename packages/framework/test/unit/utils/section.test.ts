@@ -12,9 +12,9 @@ import {
 /** Build a ds-slideshow with section markers and slides for integration tests. */
 function buildSlideshowDom(root: HTMLElement): void {
   const section = (level: number, title?: string): HTMLElement => {
-    const el = document.createElement("section");
-    el.dataset.sectionLevel = String(level);
-    if (title !== undefined) el.dataset.sectionTitle = title;
+    const el = document.createElement("ds-section");
+    el.setAttribute("level", String(level));
+    if (title !== undefined) el.setAttribute("title", title);
     return el;
   };
   const slide = (): HTMLElement => {
@@ -38,7 +38,7 @@ describe("section utilities (integration)", () => {
     root = document.createElement("ds-slideshow");
     buildSlideshowDom(root);
     buildSectionHierarchy(root);
-    
+
     // getCurrentSection always resolves the slideshow context, so seed it.
     const sequence: NavigationNode[] = [0, 1, 2, 3].map((slideIndex) => ({
       type: NavigationType.slide,

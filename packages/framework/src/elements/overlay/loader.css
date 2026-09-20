@@ -13,11 +13,11 @@ ds-loader {
   justify-content: center;
 }
 
-ds-loader[state=loading] {
+ds-loader[data-state="loading"] {
   opacity: 100%;
 }
 
-ds-loader[state=finished] {
+ds-loader[data-state="finished"] {
   display: none;
 }
 
@@ -39,9 +39,15 @@ ds-loader .bar-inner {
 }
 
 @keyframes pulse {
-  0% { opacity: 70%; }
-  50% { opacity: 100%; }
-  100% { opacity: 70%; }
+  0% {
+    opacity: 70%;
+  }
+  50% {
+    opacity: 100%;
+  }
+  100% {
+    opacity: 70%;
+  }
 }
 
 .logo-text {
