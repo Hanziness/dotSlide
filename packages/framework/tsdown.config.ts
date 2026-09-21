@@ -49,12 +49,10 @@ export default defineConfig({
   minify: true,
   clean: true,
   plugins: [rawImportPlugin],
-  // Inline runtime deps so the dist works as a CDN module without an import map
-  // (bare specifiers like `import ... from "nanostores"` don't resolve in browsers).
-  // zod comes in transitively via @dotslide/protocol.
-  noExternal: ["@dotslide/protocol", "nanostores", "zod"],
-  // nanostores guards dev-mode code behind `process.env.NODE_ENV`, which doesn't
-  // exist in browsers. Replace it at build time so the dist is browser-safe.
+  deps: {
+    alwaysBundle: ["@dotslide/protocol", "nanostores", "zod"]
+  },
+  // nanostores guards dev-mode code behind `process.env.NODE_ENV`, so we replace it build-time
   define: {
     "process.env.NODE_ENV": JSON.stringify("production"),
   },
