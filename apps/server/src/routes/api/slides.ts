@@ -1,7 +1,7 @@
-import { zValidator } from "@hono/zod-validator";
-import { Hono } from "hono";
-import z from "zod";
 import { canPresent } from "@dotslide/protocol";
+import { vValidator } from "@hono/valibot-validator";
+import { Hono } from "hono";
+import * as v from "valibot";
 import type { AuthEnv } from "../../middleware/env";
 import { getUserPresentationRole } from "../../session";
 import { roomManager } from "../../ws/hub";
@@ -28,8 +28,14 @@ export const slideRoutes = new Hono<AuthEnv>()
   // Upload a slide thumbnail (from presenter's browser)
   .post(
     "/:roomId/:index/thumbnail",
-    zValidator("param", z.object({ roomId: z.uuidv4(), index: z.coerce.number().gte(0) })),
-    zValidator("form", z.object({ file: z.instanceof(File) })),
+    vValidator(
+      "param",
+      v.object({
+        roomId: v.pipe(v.string(), v.uuid()),
+        index: v.pipe(v.unknown(), v.transform(Number), v.number(), v.minValue(0)),
+      }),
+    ),
+    vValidator("form", v.object({ file: v.instance(File) })),
     async (c) => {
       const index = c.req.valid("param").index;
 
