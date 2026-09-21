@@ -50,7 +50,7 @@ export default defineConfig({
   clean: true,
   plugins: [rawImportPlugin],
   deps: {
-    alwaysBundle: ["@dotslide/protocol", "nanostores", "zod"]
+    alwaysBundle: ["@dotslide/protocol", "nanostores"]
   },
   // nanostores guards dev-mode code behind `process.env.NODE_ENV`, so we replace it build-time
   define: {
