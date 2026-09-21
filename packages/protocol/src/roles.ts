@@ -9,11 +9,15 @@ export type MembershipRole = (typeof MembershipRoles)[number];
 export const PresentationRoleSchema = v.picklist(PresentationRoles);
 export const MembershipRoleSchema = v.picklist(MembershipRoles);
 
-export function isMembershipRole(role: PresentationRole): role is MembershipRole {
+export function isMembershipRole(
+  role: PresentationRole,
+): role is MembershipRole {
   return role !== "viewer";
 }
 
-export function toPresentationRole(role: MembershipRole | null): PresentationRole {
+export function toPresentationRole(
+  role: MembershipRole | null,
+): PresentationRole {
   return role ?? "viewer";
 }
 
