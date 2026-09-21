@@ -7,6 +7,7 @@ import {
 } from "@dotslide/server/client";
 import { html, LitElement, unsafeCSS } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
+import * as v from "valibot";
 
 import remoteCSS from "./remote.css?inline";
 
@@ -148,18 +149,18 @@ export class Remote extends LitElement {
   }
 
   handleMessage(msg: MessageEvent<string>) {
-    const serverMsgRes = ServerMessage.safeParse(JSON.parse(msg.data));
+    const serverMsgRes = v.safeParse(ServerMessage, JSON.parse(msg.data));
 
     if (!serverMsgRes.success) {
       console.warn(
         "[remote] Failed to parse server message: ",
         msg.data,
-        serverMsgRes.error,
+        serverMsgRes.issues,
       );
       return;
     }
 
-    const parsedMsg = serverMsgRes.data;
+    const parsedMsg = serverMsgRes.output;
 
     switch (parsedMsg.type) {
       case "error":

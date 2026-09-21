@@ -3,6 +3,7 @@ import {
   type NavigationSnapshot,
   ServerMessage as ServerMessageSchema,
 } from "@dotslide/protocol";
+import * as v from "valibot";
 import { client } from "$lib/client";
 
 type ControllerConnectionOptions = {
@@ -134,14 +135,14 @@ export class ControllerConnection {
 
     socket.onmessage = (msg) => {
       const parsed = JSON.parse(msg.data);
-      const result = ServerMessageSchema.safeParse(parsed);
+      const result = v.safeParse(ServerMessageSchema, parsed);
 
       if (!result.success) {
-        console.error("Invalid server message", result.error, parsed);
+        console.error("Invalid server message", result.issues, parsed);
         return;
       }
 
-      const data = result.data;
+      const data = result.output;
 
       if (data.type === "sync") {
         const { type: _type, ...navData } = data;
