@@ -33,7 +33,8 @@
     "@dotslide/protocol": "workspace:*",
     "@fontsource-variable/source-sans-3": "^5.2.9",
     "better-auth": "1.5.3",
-    "lucide-svelte": "^1.0.1"
+    "lucide-svelte": "^1.0.1",
+    "valibot": "^1.5.0"
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^5.0.1",
