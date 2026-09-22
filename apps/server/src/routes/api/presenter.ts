@@ -1,16 +1,19 @@
-import { zValidator } from "@hono/zod-validator";
+import {
+  canPresent,
+  NavigationSnapshotSchema,
+} from "@dotslide/protocol";
+import { vValidator } from "@hono/valibot-validator";
 import { and, eq, gt, isNull } from "drizzle-orm";
 import { Hono } from "hono";
 import { sign, verify } from "hono/jwt";
 import { v4 as uuidv4 } from "uuid";
-import { z } from "zod";
+import * as v from "valibot";
 import { db } from "../../db";
 import { invites, members, presentation } from "../../db/dotslide";
 import type { AuthEnv } from "../../middleware/env";
 import { getUserPresentationRole } from "../../session";
-import { canPresent } from "@dotslide/protocol";
 
-const invitationTokenSchema = z.custom<(typeof invites)["$inferSelect"]>();
+const invitationTokenSchema = v.custom<(typeof invites)["$inferSelect"]>(() => true);
 
 export const presenterRoutes = new Hono<AuthEnv>()
   .get("/:roomId/me", async (c) => {
@@ -89,11 +92,15 @@ export const presenterRoutes = new Hono<AuthEnv>()
    */
   .post(
     "/claim",
-    zValidator("json", z.object({ token: z.string().min(1) }), (res, c) => {
-      if (!res.success) {
-        return c.json({ error: "Invalid request body." }, 400);
-      }
-    }),
+    vValidator(
+      "json",
+      v.object({ token: v.pipe(v.string(), v.minLength(1)) }),
+      (res, c) => {
+        if (!res.success) {
+          return c.json({ error: "Invalid request body." }, 400);
+        }
+      },
+    ),
     async (c) => {
       // ── Require an authenticated session on the consuming side ──
       const session = c.get("session");
@@ -105,9 +112,10 @@ export const presenterRoutes = new Hono<AuthEnv>()
       }
 
       // ── Verify and consume the one-time token ──
-      let verified: z.output<typeof invitationTokenSchema> | null = null;
+      let verified: v.InferOutput<typeof invitationTokenSchema> | null = null;
       try {
-        verified = invitationTokenSchema.parse(
+        verified = v.parse(
+          invitationTokenSchema,
           await verify(c.req.valid("json").token, "supersecret", "HS256"),
         );
       } catch {
@@ -220,11 +228,11 @@ export const presenterRoutes = new Hono<AuthEnv>()
 
   .post(
     "/:roomId/update",
-    zValidator(
+    vValidator(
       "json",
-      z.object({
-        presentation: z.string(),
-        state: z.json(),
+      v.object({
+        presentation: v.string(),
+        state: NavigationSnapshotSchema,
       }),
     ),
     async (c) => {

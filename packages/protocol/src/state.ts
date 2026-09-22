@@ -1,4 +1,4 @@
-import { z } from "zod";
+import * as v from "valibot";
 import {
   deriveNavigationState,
   type NavigationNode,
@@ -15,16 +15,16 @@ export interface SynchronizedPresentationState {
 }
 
 /** Wire DTO snapshot of the selected presentation state projection. */
-export const NavigationSnapshotSchema = z.object({
-  navigationIndex: z.number().int().min(0),
-  navigationSequence: z.array(NavigationNodeSchema),
-  numSlides: z.number().int().min(0),
-  activeSlide: z.number().int().min(0),
-  activeStep: z.number().int().min(1),
-  numNavigationSteps: z.number().int().min(0),
+export const NavigationSnapshotSchema = v.object({
+  navigationIndex: v.pipe(v.number(), v.integer(), v.minValue(0)),
+  navigationSequence: v.array(NavigationNodeSchema),
+  numSlides: v.pipe(v.number(), v.integer(), v.minValue(0)),
+  activeSlide: v.pipe(v.number(), v.integer(), v.minValue(0)),
+  activeStep: v.pipe(v.number(), v.integer(), v.minValue(1)),
+  numNavigationSteps: v.pipe(v.number(), v.integer(), v.minValue(0)),
 });
 
-export type NavigationSnapshot = z.infer<typeof NavigationSnapshotSchema>;
+export type NavigationSnapshot = v.InferOutput<typeof NavigationSnapshotSchema>;
 
 export function createNavigationSnapshot(
   state: SynchronizedPresentationState,
@@ -34,7 +34,7 @@ export function createNavigationSnapshot(
     state.navigationIndex,
   );
 
-  return NavigationSnapshotSchema.parse({
+  return v.parse(NavigationSnapshotSchema, {
     navigationIndex: state.navigationIndex,
     navigationSequence: state.navigationSequence,
     ...derived,

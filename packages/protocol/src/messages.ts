@@ -1,54 +1,55 @@
-import { z } from "zod";
+import * as v from "valibot";
 import { PresentationRoleSchema } from "./roles";
 import { NavigationSnapshotSchema } from "./state";
 
 // ─── Server → Client messages ─────────────────────────────────
 
-export const NavigateBroadcast = z.object({
-  type: z.literal("navigate"),
-  navigationIndex: z.number().int().min(0),
+export const NavigateBroadcast = v.object({
+  type: v.literal("navigate"),
+  navigationIndex: v.pipe(v.number(), v.integer(), v.minValue(0)),
 });
 
-export const LaserBroadcast = z.object({
-  type: z.literal("laser"),
+export const LaserBroadcast = v.object({
+  type: v.literal("laser"),
   /** X position normalized to [0, 1] relative to slide width */
-  x: z.number().min(0).max(1),
+  x: v.pipe(v.number(), v.minValue(0), v.maxValue(1)),
   /** Y position normalized to [0, 1] relative to slide height */
-  y: z.number().min(0).max(1),
+  y: v.pipe(v.number(), v.minValue(0), v.maxValue(1)),
   /** Whether the laser pointer is visible */
-  lastUpdate: z.date(),
+  lastUpdate: v.date(),
 });
 
-export const SyncBroadcast = NavigationSnapshotSchema.extend({
-  type: z.literal("sync"),
+export const SyncBroadcast = v.object({
+  ...NavigationSnapshotSchema.entries,
+  type: v.literal("sync"),
 });
 
-export const QuestionBroadcast = z.object({
-  type: z.literal("question"),
-  id: z.string(),
-  text: z.string(),
-  author: z.string(),
-  timestamp: z.number(),
-  upvotes: z.number().int().min(0),
+export const QuestionBroadcast = v.object({
+  type: v.literal("question"),
+  id: v.string(),
+  text: v.string(),
+  author: v.string(),
+  timestamp: v.number(),
+  upvotes: v.pipe(v.number(), v.integer(), v.minValue(0)),
 });
 
-export const QuestionUpvoteBroadcast = z.object({
-  type: z.literal("question:upvote"),
-  id: z.string(),
-  upvotes: z.number().int().min(0),
+export const QuestionUpvoteBroadcast = v.object({
+  type: v.literal("question:upvote"),
+  id: v.string(),
+  upvotes: v.pipe(v.number(), v.integer(), v.minValue(0)),
 });
 
-export const RoleAssigned = z.object({
-  type: z.literal("role"),
+export const RoleAssigned = v.object({
+  type: v.literal("role"),
   role: PresentationRoleSchema,
 });
 
-export const ErrorMessage = z.object({
-  type: z.literal("error"),
-  message: z.string(),
+export const ErrorMessage = v.object({
+  type: v.literal("error"),
+  message: v.string(),
 });
 
-export const ServerMessage = z.discriminatedUnion("type", [
+export const ServerMessage = v.variant("type", [
   NavigateBroadcast,
   LaserBroadcast,
   SyncBroadcast,
@@ -58,38 +59,38 @@ export const ServerMessage = z.discriminatedUnion("type", [
   ErrorMessage,
 ]);
 
-export type ServerMessage = z.infer<typeof ServerMessage>;
+export type ServerMessage = v.InferOutput<typeof ServerMessage>;
 
 // ─── Client → Server messages ─────────────────────────────────
 
-export const NavigateRequest = z.object({
-  type: z.literal("navigate"),
-  action: z.enum(["next", "prev", "first", "last", "goTo"]),
+export const NavigateRequest = v.object({
+  type: v.literal("navigate"),
+  action: v.picklist(["next", "prev", "first", "last", "goTo"]),
   /** Required when action is "goTo" */
-  index: z.number().int().min(0).optional(),
+  index: v.optional(v.pipe(v.number(), v.integer(), v.minValue(0))),
 });
 
-export const LaserUpdate = z.object({
-  type: z.literal("laser"),
-  x: z.number().min(0).max(1),
-  y: z.number().min(0).max(1),
+export const LaserUpdate = v.object({
+  type: v.literal("laser"),
+  x: v.pipe(v.number(), v.minValue(0), v.maxValue(1)),
+  y: v.pipe(v.number(), v.minValue(0), v.maxValue(1)),
 });
 
-export const QuestionSubmit = z.object({
-  type: z.literal("question"),
-  text: z.string().min(1).max(500),
+export const QuestionSubmit = v.object({
+  type: v.literal("question"),
+  text: v.pipe(v.string(), v.minLength(1), v.maxLength(500)),
 });
 
-export const QuestionUpvoteRequest = z.object({
-  type: z.literal("question:upvote"),
-  id: z.string(),
+export const QuestionUpvoteRequest = v.object({
+  type: v.literal("question:upvote"),
+  id: v.string(),
 });
 
-export const SyncRequest = z.object({
-  type: z.literal("sync:request"),
+export const SyncRequest = v.object({
+  type: v.literal("sync:request"),
 });
 
-export const ClientMessage = z.discriminatedUnion("type", [
+export const ClientMessage = v.variant("type", [
   NavigateRequest,
   LaserUpdate,
   QuestionSubmit,
@@ -97,4 +98,4 @@ export const ClientMessage = z.discriminatedUnion("type", [
   SyncRequest,
 ]);
 
-export type ClientMessage = z.infer<typeof ClientMessage>;
+export type ClientMessage = v.InferOutput<typeof ClientMessage>;

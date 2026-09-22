@@ -1,11 +1,11 @@
-import { z } from "zod";
+import * as v from "valibot";
 
 export enum NavigationType {
   slide = "slide",
   step = "step",
 }
 
-export const NavigationTypeSchema = z.enum([
+export const NavigationTypeSchema = v.picklist([
   NavigationType.slide,
   NavigationType.step,
 ]);
@@ -19,12 +19,12 @@ export type NavigationNode = {
   slideId: string;
 };
 
-export const NavigationNodeSchema = z.object({
+export const NavigationNodeSchema = v.object({
   type: NavigationTypeSchema,
-  slideIndex: z.number().int().min(0),
-  stepIndex: z.number().int().min(1),
+  slideIndex: v.pipe(v.number(), v.integer(), v.minValue(0)),
+  stepIndex: v.pipe(v.number(), v.integer(), v.minValue(1)),
   /** Auto-generated slide identifier (`slide-${slideIndex}`) */
-  slideId: z.string(),
+  slideId: v.string(),
 });
 
 export type NavigationDerivedState = {

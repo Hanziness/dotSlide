@@ -1,8 +1,8 @@
 import { NavigationSnapshotSchema } from "@dotslide/protocol";
-import { zValidator } from "@hono/zod-validator";
+import { vValidator } from "@hono/valibot-validator";
 import { eq } from "drizzle-orm";
 import { Hono } from "hono";
-import z from "zod";
+import * as v from "valibot";
 import { db } from "../../db";
 import { presentation } from "../../db/dotslide";
 import { requireLoginMiddleware } from "../../middleware/auth";
@@ -28,7 +28,7 @@ export const controllerRoutes = new Hono<AuthEnv>()
   })
   .post(
     "/:roomId/metadata",
-    zValidator("json", NavigationSnapshotSchema),
+    vValidator("json", NavigationSnapshotSchema),
     async (c) => {
       // Check user role
       const session = c.get("session");
@@ -68,9 +68,11 @@ export const controllerRoutes = new Hono<AuthEnv>()
   )
   .post(
     "/:roomId/navigate/:idx",
-    zValidator(
+    vValidator(
       "param",
-      z.object({ idx: z.coerce.number().gte(0) }),
+      v.object({
+        idx: v.pipe(v.unknown(), v.transform(Number), v.number(), v.minValue(0)),
+      }),
       (res, c) => {
         if (!res.success) {
           return c.json({ error: "Invalid slide index" }, 400);

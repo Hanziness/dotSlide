@@ -7,6 +7,7 @@ import {
 import { and, eq } from "drizzle-orm";
 import type { WSContext } from "hono/ws";
 import { v4 as uuidv4 } from "uuid";
+import * as v from "valibot";
 import { db } from "../db";
 import { user } from "../db/auth";
 import { presentation, question } from "../db/dotslide";
@@ -22,7 +23,7 @@ export function handleMessage(ws: WSContext, raw: string) {
     return;
   }
 
-  const result = ClientMessage.safeParse(parsed);
+  const result = v.safeParse(ClientMessage, parsed);
   if (!result.success) {
     ws.send(
       JSON.stringify({
@@ -33,7 +34,7 @@ export function handleMessage(ws: WSContext, raw: string) {
     return;
   }
 
-  const msg = result.data;
+  const msg = result.output;
   const user = roomManager.getUser(ws);
 
   if (!user) {
@@ -79,12 +80,12 @@ export function handleMessage(ws: WSContext, raw: string) {
 function normalizeNavigationSnapshot(
   rawState: unknown,
 ): NavigationSnapshot | null {
-  const parsedState = NavigationSnapshotSchema.safeParse(rawState);
+  const parsedState = v.safeParse(NavigationSnapshotSchema, rawState);
   if (!parsedState.success) {
     return null;
   }
 
-  return parsedState.data;
+  return parsedState.output;
 }
 
 async function handleNavigate(
