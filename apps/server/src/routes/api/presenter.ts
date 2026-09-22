@@ -1,4 +1,7 @@
-import { canPresent } from "@dotslide/protocol";
+import {
+  canPresent,
+  NavigationSnapshotSchema,
+} from "@dotslide/protocol";
 import { vValidator } from "@hono/valibot-validator";
 import { and, eq, gt, isNull } from "drizzle-orm";
 import { Hono } from "hono";
@@ -229,10 +232,7 @@ export const presenterRoutes = new Hono<AuthEnv>()
       "json",
       v.object({
         presentation: v.string(),
-        // The previous schema accepted any JSON value; there is no direct
-        // valibot equivalent, and the parsed value is only forwarded to the
-        // JSON column, so `v.unknown()` is the minimal faithful substitute.
-        state: v.unknown(),
+        state: NavigationSnapshotSchema,
       }),
     ),
     async (c) => {
