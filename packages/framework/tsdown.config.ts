@@ -49,9 +49,12 @@ export default defineConfig({
   minify: true,
   clean: true,
   plugins: [rawImportPlugin],
-  // Bundle these dependencies (don't externalize)
   deps: {
-    neverBundle: ["zod"],
+    alwaysBundle: ["@dotslide/protocol", "nanostores", "zod"]
+  },
+  // nanostores guards dev-mode code behind `process.env.NODE_ENV`, so we replace it build-time
+  define: {
+    "process.env.NODE_ENV": JSON.stringify("production"),
   },
   // Target modern browsers that support custom elements
   target: "es2020",
