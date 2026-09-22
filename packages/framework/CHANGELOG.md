@@ -1,5 +1,21 @@
 # @dotslide/framework
 
+## 0.3.0
+
+### Minor Changes
+
+- f9b3b1c: Framework bundle shrinks from 100.7 KB raw / 27.2 KB gzip to 35.8 KB raw / 10.5 KB gzip by consuming `@dotslide/protocol`'s valibot schemas instead of zod's. The dist remains fully self-contained (no import map needed). `peerDependencies.zod` removed — consumers extending protocol schemas install valibot themselves.
+- 2214cdc: Drop unused public helper functions that helped generate DOM attributes (they were only used in the old Astro codebase): `getDataTags`, `getComponentDataAttribute` and `getSelector`
+- f9b3b1c: Use Valibot validators instead of Zod. This should help reduce the bundle size.
+
+### Patch Changes
+
+- f9b3b1c: Add text fixtures for CDN-based loading to ensure that single-file presentations don't break
+- f2ddfc8: Bundle runtime dependencies into the ESM module so CDN uses work.
+- 470fdc9: Add automatic Custom Elements Manifest generation
+- Updated dependencies [f9b3b1c]
+  - @dotslide/protocol@0.2.0
+
 ## 0.2.2
 
 ### Patch Changes
