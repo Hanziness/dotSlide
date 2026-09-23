@@ -1,5 +1,11 @@
 # @dotslide/protocol
 
+## 0.2.0
+
+### Minor Changes
+
+- f9b3b1c: Use Valibot validators instead of Zod. This should help reduce the bundle size.
+
 ## 0.1.2
 
 ### Patch Changes
