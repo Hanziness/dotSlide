@@ -122,7 +122,7 @@ export class SlideControls extends HTMLElement {
 
       if (enterIcon && exitIcon) {
         const updateFullscreenIcons = () => {
-          const isFullscreen = document.fullscreenElement !== null;
+          const isFullscreen = document.fullscreenElement === root;
           enterIcon.toggleAttribute("hidden", isFullscreen);
           exitIcon.toggleAttribute("hidden", !isFullscreen);
         };
