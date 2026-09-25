@@ -36,6 +36,10 @@ ds-slide-controls > ds-overlay {
   background-color: rgba(0, 0, 0, 0.3);
 }
 
+ds-slide-controls [data-icon][hidden] {
+  display: none;
+}
+
 @media (hover: none) {
   ds-slide-controls {
     height: auto;
