@@ -1,5 +1,11 @@
 # @dotslide/framework
 
+## 0.3.1
+
+### Patch Changes
+
+- f24d2fb: Fix fullscreen toggle showing both icons
+
 ## 0.3.0
 
 ### Minor Changes
