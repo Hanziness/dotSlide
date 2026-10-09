@@ -1,5 +1,11 @@
 # @dotslide/framework
 
+## 0.3.2
+
+### Patch Changes
+
+- f3a6581: Fix `@dotslide/protocol` being included as a regular dependency when it's already bundled
+
 ## 0.3.1
 
 ### Patch Changes
