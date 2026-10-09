@@ -46,16 +46,14 @@
   },
   "devDependencies": {
     "@custom-elements-manifest/analyzer": "^0.11.0",
+    "@dotslide/protocol": "workspace:*",
     "@playwright/test": "^1.62.1",
     "@types/node": "^26.2.0",
     "jsdom": "^30.0.1",
     "lightningcss": "^1.33.0",
+    "nanostores": "^1.1.0",
     "tsdown": "^0.22.4",
     "vite": "^8.2.1",
     "vitest": "^4.1.10"
-  },
-  "dependencies": {
-    "@dotslide/protocol": "workspace:*",
-    "nanostores": "^1.1.0"
   }
 }
