@@ -81,7 +81,7 @@
     },
     "packages/framework": {
       "name": "@dotslide/framework",
-      "version": "0.3.1",
+      "version": "0.3.2",
       "devDependencies": {
         "@custom-elements-manifest/analyzer": "^0.11.0",
         "@dotslide/protocol": "workspace:*",
