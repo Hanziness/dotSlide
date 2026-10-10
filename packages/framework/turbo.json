@@ -3,10 +3,10 @@
   "extends": ["//"],
   "tasks": {
     "build": {
-      "dependsOn": ["generate-ce-manifest"]
+      "dependsOn": ["^build", "generate-ce-manifest"]
     },
     "dev": {
-      "dependsOn": ["generate-ce-manifest"]
+      "dependsOn": ["^build", "generate-ce-manifest"]
     },
     "generate-ce-manifest": {
       "cache": true,
